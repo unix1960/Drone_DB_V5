@@ -478,11 +478,11 @@
                 </div>
 
                 <div class="space-y-3">
-                    <button onclick="location.href='after-service.html'" class="w-full bg-primary text-white py-4 rounded-lg font-bold text-lg touch-friendly">
+                    <button onclick="checkLoginAndGoToCustomize()" class="w-full bg-primary text-white py-4 rounded-lg font-bold text-lg touch-friendly">
                         <i class="fa fa-star mr-2"></i>
                         定制我的成片
                     </button>
-                    <button onclick="location.href='user-management.html'" class="w-full bg-gray-light text-gray-medium py-3 rounded-lg font-medium touch-friendly">
+                    <button onclick="checkLoginAndGoToOrders()" class="w-full bg-gray-light text-gray-medium py-3 rounded-lg font-medium touch-friendly">
                         <i class="fa fa-list mr-2"></i>
                         查看我的订单
                     </button>
@@ -513,11 +513,11 @@
                 </div>
                 <span class="text-xs text-primary font-medium mt-1">拍摄</span>
             </div>
-            <div class="tab-item flex flex-col items-center justify-center text-gray-medium touch-friendly" onclick="location.href='user-management.html'">
+            <div class="tab-item flex flex-col items-center justify-center text-gray-medium touch-friendly" onclick="checkLoginAndGoToOrders()">
                 <i class="fa fa-user text-lg mb-1"></i>
                 <span class="text-xs">订单</span>
             </div>
-            <div class="tab-item flex flex-col items-center justify-center text-gray-medium touch-friendly" onclick="location.href='after-service.html'">
+            <div class="tab-item flex flex-col items-center justify-center text-gray-medium touch-friendly" onclick="checkLoginAndGoToCustomize()">
                 <i class="fa fa-star text-lg mb-1"></i>
                 <span class="text-xs">定制</span>
             </div>
@@ -1448,6 +1448,32 @@
                 closeLandmarkReference();
             }
         });
+
+        // 检查登录状态并跳转到订单页面
+        function checkLoginAndGoToOrders() {
+            const loginInfo = JSON.parse(localStorage.getItem('loginInfo') || '{}');
+            if (!loginInfo.isLoggedIn) {
+                // 未登录，设置返回URL并跳转到登录页面
+                localStorage.setItem('returnUrl', 'user-management.html');
+                location.href = 'login.html';
+            } else {
+                // 已登录，直接跳转到订单页面
+                location.href = 'user-management.html';
+            }
+        }
+
+        // 检查登录状态并跳转到定制页面
+        function checkLoginAndGoToCustomize() {
+            const loginInfo = JSON.parse(localStorage.getItem('loginInfo') || '{}');
+            if (!loginInfo.isLoggedIn) {
+                // 未登录，设置返回URL并跳转到登录页面
+                localStorage.setItem('returnUrl', 'after-service.html');
+                location.href = 'login.html';
+            } else {
+                // 已登录，直接跳转到定制页面
+                location.href = 'after-service.html';
+            }
+        }
     </script>
 </body>
 </html>

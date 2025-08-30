@@ -54,6 +54,10 @@
                 border: 2px solid #3B82F6;
                 background: #EFF6FF;
             }
+            .sample-selected {
+                border: 2px solid #3B82F6;
+                background: #EFF6FF;
+            }
             .shooting-selected {
                 border: 2px solid #3B82F6;
                 background: #EFF6FF;
@@ -90,10 +94,11 @@
         <!-- 头部导航 -->
         <header class="bg-white border-b border-gray-light sticky top-0 z-40">
             <div class="flex items-center justify-between h-14 px-4">
-                <button onclick="history.back()" class="flex items-center text-gray-medium touch-friendly">
+                <button onclick="goBackToSelection()" class="flex items-center text-gray-medium touch-friendly hidden" id="backButton">
                     <i class="fa fa-angle-left text-xl mr-1"></i>
                     <span class="text-sm">返回</span>
                 </button>
+                <div class="w-6" id="leftSpacer"></div>
                 <h1 class="font-bold text-dark">选择拍摄</h1>
                 <button onclick="showHelp()" class="text-gray-medium touch-friendly">
                     <i class="fa fa-question-circle text-xl"></i>
@@ -101,19 +106,7 @@
             </div>
         </header>
 
-        <!-- 步骤指示器 -->
-        <section class="bg-white px-4 py-4 border-b border-gray-light">
-            <div class="flex items-center justify-center space-x-8">
-                <div class="flex items-center">
-                    <div class="step-indicator w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-sm font-bold step-active">1</div>
-                    <span class="ml-2 text-sm font-medium text-primary">选择地点</span>
-                </div>
-                <div class="flex items-center">
-                    <div class="step-indicator w-8 h-8 rounded-full bg-gray-light text-gray-medium flex items-center justify-center text-sm font-bold" id="step2">2</div>
-                    <span class="ml-2 text-sm text-gray-medium" id="step2Text">确认订单</span>
-                </div>
-            </div>
-        </section>
+
 
         <!-- 拍摄地点选择 -->
         <section class="p-4" id="locationSection">
@@ -209,7 +202,99 @@
             </div>
         </section>
 
+        <!-- 选择拍摄样片 -->
+        <section class="p-4" id="sampleSection">
+            <div class="mb-4">
+                <h2 class="text-lg font-bold mb-2">选择拍摄样片</h2>
+                <p class="text-gray-medium text-sm">请选择您想要的拍摄效果样片</p>
+            </div>
 
+            <div class="space-y-3">
+                <!-- 山顶俯拍全景 -->
+                <div class="miniprogram-card bg-white overflow-hidden touch-friendly sample-card" onclick="selectSample('mountain')" data-sample="mountain">
+                    <div class="flex">
+                        <img src="https://picsum.photos/id/1015/150/120" alt="山顶俯拍全景" class="w-24 h-20 object-cover flex-shrink-0">
+                        <div class="p-4 flex-1">
+                            <div class="flex items-center justify-between mb-2">
+                                <h3 class="font-bold text-dark">山顶俯拍全景</h3>
+                                <div class="w-5 h-5 border-2 border-gray-300 rounded-full sample-checkbox" data-sample="mountain">
+                                    <i class="fa fa-check text-primary text-xs hidden"></i>
+                                </div>
+                            </div>
+                            <p class="text-gray-medium text-sm mb-2">360度环绕拍摄，展现壮丽山景</p>
+                            <div class="flex items-center space-x-3 text-xs text-gray-medium">
+                                <span><i class="fa fa-video-camera mr-1"></i>视频时长 3:20</span>
+                                <span><i class="fa fa-star mr-1"></i>4.9分</span>
+                                <span class="text-primary font-bold">¥128</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 湖畔追踪拍摄 -->
+                <div class="miniprogram-card bg-white overflow-hidden touch-friendly sample-card" onclick="selectSample('lake')" data-sample="lake">
+                    <div class="flex">
+                        <img src="https://picsum.photos/id/1031/150/120" alt="湖畔追踪拍摄" class="w-24 h-20 object-cover flex-shrink-0">
+                        <div class="p-4 flex-1">
+                            <div class="flex items-center justify-between mb-2">
+                                <h3 class="font-bold text-dark">湖畔追踪拍摄</h3>
+                                <div class="w-5 h-5 border-2 border-gray-300 rounded-full sample-checkbox" data-sample="lake">
+                                    <i class="fa fa-check text-primary text-xs hidden"></i>
+                                </div>
+                            </div>
+                            <p class="text-gray-medium text-sm mb-2">智能跟拍功能，捕捉湖边漫步美好瞬间</p>
+                            <div class="flex items-center space-x-3 text-xs text-gray-medium">
+                                <span><i class="fa fa-video-camera mr-1"></i>视频时长 2:45</span>
+                                <span><i class="fa fa-star mr-1"></i>4.8分</span>
+                                <span class="text-primary font-bold">¥98</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 城市夜景航拍 -->
+                <div class="miniprogram-card bg-white overflow-hidden touch-friendly sample-card" onclick="selectSample('city')" data-sample="city">
+                    <div class="flex">
+                        <img src="https://picsum.photos/id/1016/150/120" alt="城市夜景航拍" class="w-24 h-20 object-cover flex-shrink-0">
+                        <div class="p-4 flex-1">
+                            <div class="flex items-center justify-between mb-2">
+                                <h3 class="font-bold text-dark">城市夜景航拍</h3>
+                                <div class="w-5 h-5 border-2 border-gray-300 rounded-full sample-checkbox" data-sample="city">
+                                    <i class="fa fa-check text-primary text-xs hidden"></i>
+                                </div>
+                            </div>
+                            <p class="text-gray-medium text-sm mb-2">现代都市灯火辉煌，夜景航拍展现城市魅力</p>
+                            <div class="flex items-center space-x-3 text-xs text-gray-medium">
+                                <span><i class="fa fa-video-camera mr-1"></i>视频时长 4:10</span>
+                                <span><i class="fa fa-star mr-1"></i>4.7分</span>
+                                <span class="text-primary font-bold">¥158</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 森林俯拍 -->
+                <div class="miniprogram-card bg-white overflow-hidden touch-friendly sample-card" onclick="selectSample('forest')" data-sample="forest">
+                    <div class="flex">
+                        <img src="https://picsum.photos/id/1020/150/120" alt="森林俯拍" class="w-24 h-20 object-cover flex-shrink-0">
+                        <div class="p-4 flex-1">
+                            <div class="flex items-center justify-between mb-2">
+                                <h3 class="font-bold text-dark">森林俯拍</h3>
+                                <div class="w-5 h-5 border-2 border-gray-300 rounded-full sample-checkbox" data-sample="forest">
+                                    <i class="fa fa-check text-primary text-xs hidden"></i>
+                                </div>
+                            </div>
+                            <p class="text-gray-medium text-sm mb-2">绿意盎然的自然画卷，展现大自然的美丽</p>
+                            <div class="flex items-center space-x-3 text-xs text-gray-medium">
+                                <span><i class="fa fa-video-camera mr-1"></i>视频时长 2:30</span>
+                                <span><i class="fa fa-star mr-1"></i>4.6分</span>
+                                <span class="text-primary font-bold">¥88</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
 
         <!-- 订单确认 -->
         <section class="p-4 hidden" id="confirmSection">
@@ -227,8 +312,10 @@
                             <span class="text-gray-medium">拍摄地点</span>
                             <span class="font-medium" id="selectedLocationName">-</span>
                         </div>
-
-
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-gray-medium">拍摄样片</span>
+                            <span class="font-medium" id="selectedSampleName">-</span>
+                        </div>
                         <div class="flex justify-between items-center text-sm">
                             <span class="text-gray-medium">预计时长</span>
                             <span class="font-medium" id="estimatedDuration">-</span>
@@ -301,11 +388,11 @@
                 </div>
                 <span class="text-xs text-primary font-medium mt-1">拍摄</span>
             </div>
-            <div class="tab-item flex flex-col items-center justify-center text-gray-medium touch-friendly" onclick="location.href='user-management.html'">
+            <div class="tab-item flex flex-col items-center justify-center text-gray-medium touch-friendly" onclick="checkLoginAndGoToOrders()">
                 <i class="fa fa-user text-lg mb-1"></i>
                 <span class="text-xs">订单</span>
             </div>
-            <div class="tab-item flex flex-col items-center justify-center text-gray-medium touch-friendly" onclick="location.href='after-service.html'">
+            <div class="tab-item flex flex-col items-center justify-center text-gray-medium touch-friendly" onclick="checkLoginAndGoToCustomize()">
                 <i class="fa fa-star text-lg mb-1"></i>
                 <span class="text-xs">定制</span>
             </div>
@@ -343,6 +430,7 @@
     <script>
         let currentStep = 1;
         let selectedLocation = null;
+        let selectedSample = null;
 
         
         const locationNames = {
@@ -350,6 +438,20 @@
             'lake': '西湖景区',
             'city': '城市中心广场',
             'forest': '翠竹森林公园'
+        };
+
+        const sampleNames = {
+            'mountain': '山顶俯拍全景',
+            'lake': '湖畔追踪拍摄',
+            'city': '城市夜景航拍',
+            'forest': '森林俯拍'
+        };
+
+        const samplePrices = {
+            'mountain': 128,
+            'lake': 98,
+            'city': 158,
+            'forest': 88
         };
         
         // 统一服务价格和时长
@@ -391,11 +493,20 @@
                 });
             });
 
-            // 检查URL参数，如果有location参数则默认选择对应地点
+            // 检查URL参数，如果有location或sample参数则默认选择对应项目
             const urlParams = new URLSearchParams(window.location.search);
             const defaultLocation = urlParams.get('location');
+            const defaultSample = urlParams.get('sample');
+            
             if (defaultLocation && locationNames[defaultLocation]) {
                 selectLocation(defaultLocation);
+            }
+            
+            if (defaultSample && sampleNames[defaultSample]) {
+                selectSample(defaultSample);
+            } else if (defaultLocation && sampleNames[defaultLocation]) {
+                // 如果没有指定样片但有地点，则默认选择对应的样片
+                selectSample(defaultLocation);
             }
         });
 
@@ -463,6 +574,31 @@
             updateNextButton();
         }
 
+        // 选择样片
+        function selectSample(sample) {
+            selectedSample = sample;
+            
+            // 更新UI
+            document.querySelectorAll('.sample-card').forEach(card => {
+                card.classList.remove('sample-selected');
+            });
+            document.querySelectorAll('.sample-checkbox').forEach(checkbox => {
+                checkbox.classList.remove('bg-primary', 'border-primary');
+                checkbox.classList.add('border-gray-300');
+                checkbox.querySelector('i').classList.add('hidden');
+            });
+            
+            const selectedCard = document.querySelector(`.sample-card[data-sample="${sample}"]`);
+            const selectedCheckbox = document.querySelector(`.sample-checkbox[data-sample="${sample}"]`);
+            
+            selectedCard.classList.add('sample-selected');
+            selectedCheckbox.classList.remove('border-gray-300');
+            selectedCheckbox.classList.add('bg-primary', 'border-primary');
+            selectedCheckbox.querySelector('i').classList.remove('hidden');
+            
+            updateNextButton();
+        }
+
 
 
 
@@ -471,7 +607,7 @@
         function updateNextButton() {
             const nextBtn = document.getElementById('nextStepBtn');
             
-            if (currentStep === 1 && selectedLocation) {
+            if (currentStep === 1 && selectedLocation && selectedSample) {
                 nextBtn.disabled = false;
                 nextBtn.classList.remove('bg-gray-300', 'text-gray-500');
                 nextBtn.classList.add('bg-primary', 'text-white');
@@ -491,7 +627,7 @@
 
         // 下一步
         function nextStep() {
-            if (currentStep === 1 && selectedLocation) {
+            if (currentStep === 1 && selectedLocation && selectedSample) {
                 currentStep = 2;
                 showConfirmSection();
             } else if (currentStep === 2) {
@@ -499,34 +635,49 @@
             }
         }
 
-
+        // 回退到选择界面
+        function goBackToSelection() {
+            // 隐藏确认订单页面
+            document.getElementById('confirmSection').classList.add('hidden');
+            // 显示地点和样片选择页面
+            document.getElementById('locationSection').classList.remove('hidden');
+            document.getElementById('sampleSection').classList.remove('hidden');
+            
+            // 隐藏返回按钮，显示左侧占位符
+            document.getElementById('backButton').classList.add('hidden');
+            document.getElementById('leftSpacer').classList.remove('hidden');
+            
+            // 重置步骤
+            currentStep = 1;
+            updateNextButton();
+        }
 
         // 显示订单确认
         function showConfirmSection() {
             document.getElementById('locationSection').classList.add('hidden');
+            document.getElementById('sampleSection').classList.add('hidden');
             document.getElementById('confirmSection').classList.remove('hidden');
+            
+            // 显示返回按钮，隐藏左侧占位符
+            document.getElementById('backButton').classList.remove('hidden');
+            document.getElementById('leftSpacer').classList.add('hidden');
             
             // 更新订单信息
             document.getElementById('selectedLocationName').textContent = locationNames[selectedLocation];
+            document.getElementById('selectedSampleName').textContent = sampleNames[selectedSample];
             document.getElementById('estimatedDuration').textContent = serviceDuration;
             
-            // 更新步骤指示器
-            updateStepIndicator();
+            // 更新价格信息
+            const samplePrice = samplePrices[selectedSample];
+            document.getElementById('servicePrice').textContent = `¥${samplePrice}`;
+            document.getElementById('totalPrice').textContent = `¥${samplePrice}`;
+            document.getElementById('bottomTotalPrice').textContent = `¥${samplePrice}`;
+            
+
             updateNextButton();
         }
 
-        // 更新步骤指示器
-        function updateStepIndicator() {
-            const step2El = document.getElementById('step2');
-            const step2TextEl = document.getElementById('step2Text');
-            
-            if (currentStep >= 2) {
-                step2El.classList.remove('bg-gray-light', 'text-gray-medium');
-                step2El.classList.add('step-active');
-                step2TextEl.classList.remove('text-gray-medium');
-                step2TextEl.classList.add('text-primary', 'font-medium');
-            }
-        }
+
 
         // 进入支付流程
         function proceedToPayment() {
@@ -538,8 +689,9 @@
                 const orderInfo = {
                     location: selectedLocation,
                     locationName: locationNames[selectedLocation],
-                    sampleName: getSampleNameByLocation(selectedLocation),
-                    totalPrice: servicePrice,
+                    sample: selectedSample,
+                    sampleName: sampleNames[selectedSample],
+                    totalPrice: samplePrices[selectedSample],
                     duration: serviceDuration,
                     timestamp: Date.now()
                 };
@@ -554,8 +706,9 @@
                 const orderInfo = {
                     location: selectedLocation,
                     locationName: locationNames[selectedLocation],
-                    sampleName: getSampleNameByLocation(selectedLocation),
-                    totalPrice: servicePrice,
+                    sample: selectedSample,
+                    sampleName: sampleNames[selectedSample],
+                    totalPrice: samplePrices[selectedSample],
                     duration: serviceDuration,
                     timestamp: Date.now()
                 };
@@ -583,6 +736,32 @@
                 closeHelp();
             }
         });
+
+        // 检查登录状态并跳转到订单页面
+        function checkLoginAndGoToOrders() {
+            const loginInfo = JSON.parse(localStorage.getItem('loginInfo') || '{}');
+            if (!loginInfo.isLoggedIn) {
+                // 未登录，设置返回URL并跳转到登录页面
+                localStorage.setItem('returnUrl', 'user-management.html');
+                location.href = 'login.html';
+            } else {
+                // 已登录，直接跳转到订单页面
+                location.href = 'user-management.html';
+            }
+        }
+
+        // 检查登录状态并跳转到定制页面
+        function checkLoginAndGoToCustomize() {
+            const loginInfo = JSON.parse(localStorage.getItem('loginInfo') || '{}');
+            if (!loginInfo.isLoggedIn) {
+                // 未登录，设置返回URL并跳转到登录页面
+                localStorage.setItem('returnUrl', 'after-service.html');
+                location.href = 'login.html';
+            } else {
+                // 已登录，直接跳转到定制页面
+                location.href = 'after-service.html';
+            }
+        }
     </script>
 </body>
 </html>

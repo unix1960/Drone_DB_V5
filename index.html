@@ -204,11 +204,11 @@
                 </div>
                 <span class="text-xs text-primary font-medium mt-1">拍摄</span>
             </div>
-            <div class="tab-item flex flex-col items-center justify-center text-gray-medium touch-friendly no-scale" data-page="user-management" onclick="location.href='user-management.html'">
+            <div class="tab-item flex flex-col items-center justify-center text-gray-medium touch-friendly no-scale" data-page="user-management" onclick="checkLoginAndGoToOrders()">
                 <i class="fa fa-user text-lg mb-1"></i>
                 <span class="text-xs">订单</span>
             </div>
-            <div class="tab-item flex flex-col items-center justify-center text-gray-medium touch-friendly" data-page="after-service" onclick="location.href='after-service.html'">
+            <div class="tab-item flex flex-col items-center justify-center text-gray-medium touch-friendly" data-page="after-service" onclick="checkLoginAndGoToCustomize()">
                 <i class="fa fa-star text-lg mb-1"></i>
                 <span class="text-xs">定制</span>
             </div>
@@ -342,6 +342,32 @@
                     page: page,
                     timestamp: Date.now()
                 });
+            }
+        }
+
+        // 检查登录状态并跳转到订单页面
+        function checkLoginAndGoToOrders() {
+            const loginInfo = JSON.parse(localStorage.getItem('loginInfo') || '{}');
+            if (!loginInfo.isLoggedIn) {
+                // 未登录，设置返回URL并跳转到登录页面
+                localStorage.setItem('returnUrl', 'user-management.html');
+                location.href = 'login.html';
+            } else {
+                // 已登录，直接跳转到订单页面
+                location.href = 'user-management.html';
+            }
+        }
+
+        // 检查登录状态并跳转到定制页面
+        function checkLoginAndGoToCustomize() {
+            const loginInfo = JSON.parse(localStorage.getItem('loginInfo') || '{}');
+            if (!loginInfo.isLoggedIn) {
+                // 未登录，设置返回URL并跳转到登录页面
+                localStorage.setItem('returnUrl', 'after-service.html');
+                location.href = 'login.html';
+            } else {
+                // 已登录，直接跳转到定制页面
+                location.href = 'after-service.html';
             }
         }
     </script>

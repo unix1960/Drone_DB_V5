@@ -61,12 +61,8 @@
     <div class="min-h-screen w-full pb-16 safe-area-bottom">
         <!-- 顶部导航栏 -->
         <header class="sticky top-0 left-0 right-0 bg-white z-30 border-b border-gray-light">
-            <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-                <button onclick="history.back()" class="text-dark touch-friendly p-2 -ml-2">
-                    <i class="fa fa-arrow-left text-lg"></i>
-                </button>
+            <div class="container mx-auto px-4 py-3 flex justify-center items-center">
                 <h1 class="text-lg font-medium">样片展示</h1>
-                <div class="w-8"></div>
             </div>
         </header>
 
@@ -279,11 +275,11 @@
                 </div>
                 <span class="text-xs text-primary font-medium mt-1">拍摄</span>
             </div>
-            <div class="tab-item flex flex-col items-center justify-center text-gray-medium touch-friendly" onclick="location.href='user-management.html'">
+            <div class="tab-item flex flex-col items-center justify-center text-gray-medium touch-friendly" onclick="checkLoginAndGoToOrders()">
                 <i class="fa fa-user text-lg mb-1"></i>
                 <span class="text-xs">订单</span>
             </div>
-            <div class="tab-item flex flex-col items-center justify-center text-gray-medium touch-friendly" onclick="location.href='after-service.html'">
+            <div class="tab-item flex flex-col items-center justify-center text-gray-medium touch-friendly" onclick="checkLoginAndGoToCustomize()">
                 <i class="fa fa-star text-lg mb-1"></i>
                 <span class="text-xs">定制</span>
             </div>
@@ -515,10 +511,36 @@
             alert('链接已复制到剪贴板，可以分享给好友！');
         }
 
-        // 跳转到拍摄页面并传递地点信息
+        // 跳转到拍摄页面并传递样片信息
         function goToShooting() {
             const category = window.currentSampleCategory || 'mountain'; // 默认选择山景
-            location.href = `user-selection.html?location=${category}`;
+            location.href = `user-selection.html?sample=${category}`;
+        }
+
+        // 检查登录状态并跳转到订单页面
+        function checkLoginAndGoToOrders() {
+            const loginInfo = JSON.parse(localStorage.getItem('loginInfo') || '{}');
+            if (!loginInfo.isLoggedIn) {
+                // 未登录，设置返回URL并跳转到登录页面
+                localStorage.setItem('returnUrl', 'user-management.html');
+                location.href = 'login.html';
+            } else {
+                // 已登录，直接跳转到订单页面
+                location.href = 'user-management.html';
+            }
+        }
+
+        // 检查登录状态并跳转到定制页面
+        function checkLoginAndGoToCustomize() {
+            const loginInfo = JSON.parse(localStorage.getItem('loginInfo') || '{}');
+            if (!loginInfo.isLoggedIn) {
+                // 未登录，设置返回URL并跳转到登录页面
+                localStorage.setItem('returnUrl', 'after-service.html');
+                location.href = 'login.html';
+            } else {
+                // 已登录，直接跳转到定制页面
+                location.href = 'after-service.html';
+            }
         }
 
     </script>

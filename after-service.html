@@ -69,13 +69,8 @@
     <div class="min-h-screen w-full safe-area-bottom content-container">
         <!-- 头部导航 -->
         <header class="bg-white border-b border-gray-light sticky top-0 z-40">
-            <div class="flex items-center justify-between h-14 px-4">
-                <button onclick="history.back()" class="flex items-center text-gray-medium touch-friendly">
-                    <i class="fa fa-angle-left text-xl mr-1"></i>
-                    <span class="text-sm">返回</span>
-                </button>
+            <div class="flex items-center justify-center h-14 px-4">
                 <h1 class="font-bold text-dark">成片定制</h1>
-                <div class="w-6"></div>
             </div>
         </header>
 
@@ -419,7 +414,7 @@
                 </div>
                 <span class="text-xs text-primary font-medium mt-1">拍摄</span>
             </div>
-            <div class="tab-item flex flex-col items-center justify-center text-gray-medium touch-friendly" onclick="location.href='user-management.html'">
+            <div class="tab-item flex flex-col items-center justify-center text-gray-medium touch-friendly" onclick="checkLoginAndGoToOrders()">
                 <i class="fa fa-user text-lg mb-1"></i>
                 <span class="text-xs">订单</span>
             </div>
@@ -1011,6 +1006,19 @@
                 });
             } else {
                 window.open('tel:400-888-6666');
+            }
+        }
+
+        // 检查登录状态并跳转到订单页面
+        function checkLoginAndGoToOrders() {
+            const loginInfo = JSON.parse(localStorage.getItem('loginInfo') || '{}');
+            if (!loginInfo.isLoggedIn) {
+                // 未登录，设置返回URL并跳转到登录页面
+                localStorage.setItem('returnUrl', 'user-management.html');
+                location.href = 'login.html';
+            } else {
+                // 已登录，直接跳转到订单页面
+                location.href = 'user-management.html';
             }
         }
     </script>
