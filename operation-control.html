@@ -1,0 +1,1453 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>拍摄控制 - 无人机自助打卡</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#1E40AF',
+                        accent: '#06B6D4',
+                        dark: '#1E293B',
+                        light: '#F8FAFC',
+                        'gray-medium': '#64748B',
+                        'gray-light': '#E2E8F0',
+                        'blue-primary': '#3B82F6',
+                        'blue-secondary': '#1D4ED8',
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            }
+            .touch-friendly {
+                touch-action: manipulation;
+                -webkit-tap-highlight-color: transparent;
+            }
+            .safe-area-bottom {
+                padding-bottom: constant(safe-area-inset-bottom);
+                padding-bottom: env(safe-area-inset-bottom);
+            }
+            .miniprogram-scroll {
+                -webkit-overflow-scrolling: touch;
+            }
+            .miniprogram-card {
+                box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+                border-radius: 8px;
+            }
+            .pulse-animation {
+                animation: pulse 2s infinite;
+            }
+            @keyframes pulse {
+                0%, 100% { opacity: 1; }
+                50% { opacity: 0.5; }
+            }
+            .countdown-circle {
+                stroke-dasharray: 283;
+                stroke-dashoffset: 283;
+                animation: countdown 3s linear;
+            }
+            @keyframes countdown {
+                from { stroke-dashoffset: 283; }
+                to { stroke-dashoffset: 0; }
+            }
+            .drone-control-btn {
+                background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
+                box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+                transform: scale(1);
+                transition: all 0.3s ease;
+            }
+            .drone-control-btn:active {
+                transform: scale(0.95);
+                box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
+            }
+            .status-indicator {
+                position: relative;
+            }
+            .status-indicator::before {
+                content: '';
+                position: absolute;
+                top: -2px;
+                right: -2px;
+                width: 12px;
+                height: 12px;
+                border-radius: 50%;
+                background: #10B981;
+                border: 2px solid white;
+                animation: blink 1.5s infinite;
+            }
+            @keyframes blink {
+                0%, 100% { opacity: 1; }
+                50% { opacity: 0.3; }
+            }
+        }
+    </style>
+</head>
+<body class="font-inter bg-light text-dark antialiased touch-action-manipulation">
+    <!-- 页面容器 -->
+    <div class="min-h-screen w-full safe-area-bottom content-container">
+        <!-- 头部导航 -->
+        <header class="bg-white border-b border-gray-light sticky top-0 z-40">
+            <div class="flex items-center justify-between h-14 px-4">
+                <button onclick="goBack()" class="flex items-center text-gray-medium touch-friendly">
+                    <i class="fa fa-angle-left text-xl mr-1"></i>
+                    <span class="text-sm">返回</span>
+                </button>
+                <h1 class="font-bold text-dark">拍摄控制</h1>
+                <button onclick="showHelp()" class="text-gray-medium touch-friendly">
+                    <i class="fa fa-question-circle text-xl"></i>
+                </button>
+            </div>
+        </header>
+
+                        <!-- 当前状态指示 -->
+                <section class="bg-white p-4 border-b border-gray-light">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h2 class="font-bold text-dark mb-1" id="currentStepTitle">步骤1：确认位置</h2>
+                            <p class="text-gray-medium text-sm" id="currentStepDesc">请确认您已到达正确的拍摄地点</p>
+                        </div>
+                        <div class="status-indicator">
+                            <div class="w-12 h-12 bg-primary rounded-full flex items-center justify-center text-white">
+                                <i class="fa fa-map-marker text-xl" id="statusIcon"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+
+                    
+                    <!-- 进度条 -->
+                    <div class="mt-4">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-xs text-gray-medium">拍摄进度</span>
+                            <span class="text-xs text-gray-medium" id="progressText">1/4</span>
+                        </div>
+                        <div class="w-full bg-gray-light rounded-full h-2">
+                            <div class="bg-primary rounded-full h-2 transition-all duration-500" style="width: 25%" id="progressBar"></div>
+                        </div>
+                    </div>
+                </section>
+
+        <!-- 订单信息 -->
+        <section class="p-4">
+            <div class="miniprogram-card bg-white p-4">
+                <h3 class="font-bold text-dark mb-3 flex items-center">
+                    <i class="fa fa-file-text mr-2 text-primary"></i>
+                    订单信息
+                </h3>
+                <div class="space-y-2 text-sm">
+                    <div class="flex justify-between">
+                        <span class="text-gray-medium">拍摄地点</span>
+                        <span class="font-medium" id="orderLocation">天台山观景台</span>
+                    </div>
+
+                    <div class="flex justify-between">
+                        <span class="text-gray-medium">订单号</span>
+                        <span class="font-medium" id="orderNumber">ORDER123456</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 第一步：位置确认 -->
+        <section class="p-4" id="locationSection">
+            <div class="miniprogram-card bg-white p-4">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-bold text-dark flex items-center">
+                        <i class="fa fa-map-marker mr-2 text-primary"></i>
+                        位置确认
+                    </h3>
+                    <div class="bg-blue-500 bg-opacity-70 backdrop-blur-sm px-4 py-2 rounded-full text-sm font-medium text-white shadow-lg border border-white border-opacity-20">
+                        <span id="headerConfirmStatus">GPS定位中...</span>
+                    </div>
+                </div>
+                
+                <!-- GPS地图区域 -->
+                <div class="mb-4" id="positionInfoArea">
+                    <!-- GPS定位内容 -->
+                    <div id="gpsContent">
+                        <!-- GPS地图可视化 - 铺满容器 -->
+                        <div class="w-full h-48 bg-gray-200 rounded-lg border overflow-hidden relative">
+                            <div id="gpsMapContainer" class="w-full h-full relative">
+                                <!-- 开源地图背景 -->
+                                <div class="absolute inset-0">
+                                    <!-- 使用OpenStreetMap瓦片作为背景演示 -->
+                                    <img id="mapTileImage" 
+                                         src="https://tile.openstreetmap.org/12/3251/1632.png" 
+                                         alt="地图背景" 
+                                         class="w-full h-full object-cover"
+                                         onerror="this.style.display='none'; document.getElementById('fallbackMap').style.display='block';">
+                                    
+                                    <!-- 备用地图（如果瓦片加载失败） -->
+                                    <div id="fallbackMap" class="w-full h-full bg-gradient-to-br from-green-100 to-blue-100 hidden relative">
+                                        <div class="absolute inset-0 opacity-20">
+                                            <svg viewBox="0 0 200 128" class="w-full h-full">
+                                                <defs>
+                                                    <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                                                        <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#059669" stroke-width="0.5"/>
+                                                    </pattern>
+                                                </defs>
+                                                <rect width="100%" height="100%" fill="url(#grid)" />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- 当前位置标记 -->
+                                <div id="currentPositionMarker" class="absolute w-4 h-4 bg-blue-500 rounded-full border-2 border-white shadow-lg transform -translate-x-1/2 -translate-y-1/2 z-10" style="left: 30%; top: 70%;">
+                                    <div class="absolute inset-0 bg-blue-500 rounded-full animate-ping opacity-75"></div>
+                                </div>
+                                
+                                <!-- 目标位置标记 -->
+                                <div id="targetPositionMarker" class="absolute w-5 h-5 bg-red-500 rounded-full border-2 border-white shadow-lg transform -translate-x-1/2 -translate-y-1/2 z-10" style="left: 75%; top: 25%;">
+                                    <i class="fa fa-map-marker text-white text-sm absolute inset-0 flex items-center justify-center"></i>
+                                </div>
+                                
+                                <!-- 连接线 -->
+                                <svg class="absolute inset-0 w-full h-full pointer-events-none z-5">
+                                    <line id="connectionLine" x1="30%" y1="70%" x2="75%" y2="25%" stroke="#3B82F6" stroke-width="2" stroke-dasharray="4,4" opacity="0.7"/>
+                                </svg>
+                                
+
+                                
+                                <!-- 地图信息标签 -->
+                                <div class="absolute bottom-2 left-2 text-xs text-gray-500 bg-white bg-opacity-80 px-2 py-1 rounded z-10">
+                                    © OpenStreetMap
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 地标物确认内容 -->
+                    <div id="landmarkContent" class="hidden">
+                        <!-- 地标物对比区域 - 铺满容器 -->
+                        <div class="w-full h-48 bg-gray-50 rounded-lg border overflow-hidden">
+                            <div class="grid grid-cols-2 gap-1 h-full">
+                                <div class="bg-white p-3 flex flex-col">
+                                    <h5 class="font-medium text-blue-800 text-sm mb-2">标准参考图片</h5>
+                                    <div class="flex-1 bg-gray-200 rounded overflow-hidden">
+                                        <img id="miniLandmarkRef" src="https://picsum.photos/id/1015/200/160" alt="参考图片" class="w-full h-full object-cover">
+                                    </div>
+                                </div>
+                                <div class="bg-white p-3 flex flex-col">
+                                    <h5 class="font-medium text-blue-800 text-sm mb-2">您的拍摄</h5>
+                                    <div class="flex-1 bg-gray-100 rounded border-2 border-dashed border-gray-300 flex items-center justify-center cursor-pointer touch-friendly" id="miniCaptureArea" onclick="quickCaptureLandmark()">
+                                        <div class="text-center text-gray-400" id="miniCapturePlaceholder">
+                                            <i class="fa fa-camera text-2xl mb-2"></i>
+                                            <p class="text-sm">点击拍摄地标</p>
+                                        </div>
+                                        <img id="miniCapturedImg" class="w-full h-full object-cover rounded hidden" alt="拍摄图片">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 位置确认方式 -->
+                <div class="space-y-3 mb-4">
+                    <h4 class="font-medium text-dark">确认方式选择</h4>
+                    <div class="space-y-2">
+                        <label class="flex items-center p-3 border border-gray-light rounded-lg cursor-pointer">
+                            <input type="radio" name="confirmMethod" value="gps" class="mr-3" checked onchange="switchConfirmMethod()">
+                            <div>
+                                <div class="font-medium text-sm">GPS自动定位</div>
+                                <div class="text-gray-medium text-xs">系统自动判断位置是否正确</div>
+                            </div>
+                        </label>
+                        <label class="flex items-center p-3 border border-gray-light rounded-lg cursor-pointer">
+                            <input type="radio" name="confirmMethod" value="landmark" class="mr-3" onchange="switchConfirmMethod()">
+                            <div class="flex-1">
+                                <div class="font-medium text-sm">地标物确认</div>
+                                <div class="text-gray-medium text-xs">拍摄地标物照片与参考图片对比确认</div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+
+
+                <button onclick="confirmLocation()" class="w-full drone-control-btn text-white py-4 rounded-lg font-bold text-lg touch-friendly" id="confirmLocationBtn">
+                    <i class="fa fa-check-circle mr-2"></i>
+                    确认位置
+                </button>
+            </div>
+        </section>
+
+        <!-- 第二步：召唤无人机 -->
+        <section class="p-4 hidden" id="summonSection">
+            <div class="miniprogram-card bg-white p-4">
+                <h3 class="font-bold text-dark mb-4 flex items-center">
+                    <i class="fa fa-paper-plane mr-2 text-primary"></i>
+                    召唤无人机
+                </h3>
+                
+                <div class="text-center mb-6">
+                    <div class="w-32 h-32 mx-auto mb-4 relative">
+                        <div class="w-full h-full rounded-full bg-gradient-to-br from-primary to-blue-secondary flex items-center justify-center text-white relative overflow-hidden">
+                            <i class="fa fa-paper-plane text-4xl"></i>
+                            <div class="absolute inset-0 rounded-full border-4 border-white opacity-30 pulse-animation"></div>
+                        </div>
+                    </div>
+                    <p class="text-gray-medium text-sm mb-2">点击下方按钮召唤无人机</p>
+                    <p class="text-gray-medium text-xs">请确保周围环境安全，无人机将在8秒内到达</p>
+                </div>
+
+                <button onclick="summonDrone()" class="w-full drone-control-btn text-white py-4 rounded-lg font-bold text-lg touch-friendly mb-4" id="summonBtn">
+                    <i class="fa fa-rocket mr-2"></i>
+                    召唤无人机
+                </button>
+
+                <!-- 无人机状态 -->
+                <div class="hidden" id="droneStatus">
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-blue-800 font-medium">无人机状态</span>
+                            <span class="text-blue-600 text-sm" id="droneStatusText">准备起飞</span>
+                        </div>
+                        <div class="text-sm text-blue-700">
+                            <div>预计到达时间：<span id="arrivalTime">8秒</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 第三步：身份确认 -->
+        <section class="p-4 hidden" id="identitySection">
+            <div class="miniprogram-card bg-white p-4">
+                <h3 class="font-bold text-dark mb-4 flex items-center">
+                    <i class="fa fa-camera mr-2 text-primary"></i>
+                    身份确认
+                </h3>
+
+                <!-- 无人机到达提示 -->
+                <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
+                    <div class="flex items-center mb-2">
+                        <i class="fa fa-check-circle text-green-600 mr-2"></i>
+                        <span class="text-green-800 font-medium">无人机已到达</span>
+                    </div>
+                    <p class="text-green-700 text-sm">无人机正在播放音乐并盘旋等待，请按以下步骤进行身份确认</p>
+                </div>
+
+                <!-- 确认步骤 -->
+                <div class="space-y-4 mb-6">
+                    <div class="flex items-start space-x-3">
+                        <div class="w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">1</div>
+                        <div>
+                            <h4 class="font-medium text-dark">举手示意</h4>
+                            <p class="text-gray-medium text-sm">请向无人机举起双手，让相机能够清楚拍摄到您</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start space-x-3">
+                        <div class="w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">2</div>
+                        <div>
+                            <h4 class="font-medium text-dark">等待拍照</h4>
+                            <p class="text-gray-medium text-sm">无人机将自动拍摄身份确认照片</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start space-x-3">
+                        <div class="w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">3</div>
+                        <div>
+                            <h4 class="font-medium text-dark">确认身份</h4>
+                            <p class="text-gray-medium text-sm">在手机上确认拍摄的是否为本人</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 身份确认照片 -->
+                <div class="hidden" id="identityPhoto">
+                    <div class="bg-gray-100 rounded-lg p-4 mb-4">
+                        <h4 class="font-medium text-dark mb-3">身份确认照片</h4>
+                        <div class="w-full h-48 bg-gray-200 rounded-lg flex items-center justify-center mb-3">
+                            <img id="capturedPhoto" class="w-full h-full object-cover rounded-lg hidden" alt="身份确认照片">
+                            <div id="photoPlaceholder" class="text-center text-gray-400">
+                                <i class="fa fa-camera text-3xl mb-2"></i>
+                                <p class="text-sm">等待拍摄...</p>
+                            </div>
+                        </div>
+                        <p class="text-gray-medium text-xs text-center">请确认照片中的人物是否为您本人</p>
+                    </div>
+                </div>
+
+                <button onclick="startIdentityCheck()" class="w-full drone-control-btn text-white py-4 rounded-lg font-bold text-lg touch-friendly" id="identityBtn">
+                    <i class="fa fa-hand-paper-o mr-2"></i>
+                    开始身份确认
+                </button>
+            </div>
+        </section>
+
+        <!-- 第四步：正式拍摄 -->
+        <section class="p-4 hidden" id="shootingSection">
+            <div class="miniprogram-card bg-white p-4">
+                <h3 class="font-bold text-dark mb-4 flex items-center">
+                    <i class="fa fa-video-camera mr-2 text-primary"></i>
+                    正式拍摄
+                </h3>
+
+                <!-- 拍摄倒计时 -->
+                <div class="text-center mb-6" id="shootingCountdown" style="display: none;">
+                    <div class="w-32 h-32 mx-auto mb-4 relative">
+                        <svg class="w-full h-full -rotate-90" viewBox="0 0 100 100">
+                            <circle cx="50" cy="50" r="45" fill="none" stroke="#E2E8F0" stroke-width="8"/>
+                            <circle cx="50" cy="50" r="45" fill="none" stroke="#3B82F6" stroke-width="8" 
+                                    class="countdown-circle" id="countdownCircle"/>
+                        </svg>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <span class="text-3xl font-bold text-primary" id="countdownNumber">3</span>
+                        </div>
+                    </div>
+                    <p class="text-lg font-medium text-dark">拍摄倒计时</p>
+                    <p class="text-gray-medium text-sm">请保持姿势，无人机即将开始拍摄</p>
+                </div>
+
+                <!-- 拍摄状态 -->
+                <div class="space-y-4 mb-6">
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-blue-800 font-medium">拍摄状态</span>
+                            <span class="text-blue-600 text-sm" id="shootingStatus">准备中</span>
+                        </div>
+                        <div class="text-sm text-blue-700 space-y-1">
+                            <div>拍摄进度：<span id="shootingProgress">0/5</span></div>
+                            <div>当前镜头：<span id="currentShot">定位镜头</span></div>
+                        </div>
+                    </div>
+
+                    <!-- 语音提示 -->
+                    <div class="bg-green-50 border border-green-200 rounded-lg p-4" id="voicePrompt" style="display: none;">
+                        <div class="flex items-center mb-2">
+                            <i class="fa fa-volume-up text-green-600 mr-2"></i>
+                            <span class="text-green-800 font-medium">语音提示</span>
+                        </div>
+                        <p class="text-green-700 text-sm" id="voicePromptText">请保持微笑，看向无人机镜头</p>
+                    </div>
+                </div>
+
+                <button onclick="confirmStartShooting()" class="w-full drone-control-btn text-white py-4 rounded-lg font-bold text-lg touch-friendly" id="shootingBtn">
+                    <i class="fa fa-play mr-2"></i>
+                    确认开始拍摄
+                </button>
+            </div>
+        </section>
+
+        <!-- 拍摄完成 -->
+        <section class="p-4 hidden" id="completedSection">
+            <div class="miniprogram-card bg-white p-4">
+                <div class="text-center mb-6">
+                    <div class="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fa fa-check text-white text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-dark mb-2">拍摄完成！</h3>
+                    <p class="text-gray-medium">无人机正在返回基地，您的专属大片正在AI智能剪辑中</p>
+                </div>
+
+                <div class="space-y-4 mb-6">
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <h4 class="font-medium text-blue-800 mb-2">拍摄统计</h4>
+                        <div class="text-sm text-blue-700 space-y-1">
+                            <div>拍摄照片：<span id="totalPhotos">32 张</span></div>
+                            <div>拍摄视频：<span id="totalVideos">3 段</span></div>
+                            <div>拍摄时长：<span id="totalDuration">12 分钟</span></div>
+                        </div>
+                    </div>
+
+                    <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                        <h4 class="font-medium text-green-800 mb-2">后续流程</h4>
+                        <div class="text-sm text-green-700 space-y-1">
+                            <div>✓ AI智能剪辑：预计30-60分钟</div>
+                            <div>✓ 成片交付：通过企业微信发送</div>
+                            <div>✓ 售后服务：支持二次剪辑定制</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <button onclick="location.href='after-service.html'" class="w-full bg-primary text-white py-4 rounded-lg font-bold text-lg touch-friendly">
+                        <i class="fa fa-star mr-2"></i>
+                        定制我的成片
+                    </button>
+                    <button onclick="location.href='user-management.html'" class="w-full bg-gray-light text-gray-medium py-3 rounded-lg font-medium touch-friendly">
+                        <i class="fa fa-list mr-2"></i>
+                        查看我的订单
+                    </button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- 可拖动的客服电话按钮 -->
+    <div id="customerServiceBtn" class="fixed bottom-20 right-4 w-14 h-14 bg-blue-500 hover:bg-blue-600 rounded-full flex items-center justify-center text-white shadow-lg z-40 touch-friendly cursor-move">
+        <i class="fa fa-phone text-lg"></i>
+    </div>
+
+    <!-- 微信小程序底部导航栏 -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-light z-50 safe-area-bottom" id="bottomNav">
+        <div class="flex justify-around items-center h-16">
+            <div class="tab-item flex flex-col items-center justify-center text-gray-medium touch-friendly" onclick="location.href='index.html'">
+                <i class="fa fa-home text-lg mb-1"></i>
+                <span class="text-xs">首页</span>
+            </div>
+            <div class="tab-item flex flex-col items-center justify-center text-gray-medium touch-friendly" onclick="location.href='sample-display.html'">
+                <i class="fa fa-picture-o text-lg mb-1"></i>
+                <span class="text-xs">样片</span>
+            </div>
+            <div class="tab-item flex flex-col items-center justify-center touch-friendly active">
+                <div class="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center -mt-6 shadow-lg relative">
+                    <i class="fa fa-camera text-lg"></i>
+                </div>
+                <span class="text-xs text-primary font-medium mt-1">拍摄</span>
+            </div>
+            <div class="tab-item flex flex-col items-center justify-center text-gray-medium touch-friendly" onclick="location.href='user-management.html'">
+                <i class="fa fa-user text-lg mb-1"></i>
+                <span class="text-xs">订单</span>
+            </div>
+            <div class="tab-item flex flex-col items-center justify-center text-gray-medium touch-friendly" onclick="location.href='after-service.html'">
+                <i class="fa fa-star text-lg mb-1"></i>
+                <span class="text-xs">定制</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 路线地图弹窗 -->
+    <div id="routeMapModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg max-w-md w-full">
+            <div class="p-4 border-b border-gray-light">
+                <div class="flex items-center justify-between">
+                    <h3 class="font-bold text-dark">AI路线指引</h3>
+                    <button onclick="closeRouteMap()" class="text-gray-medium text-xl">
+                        <i class="fa fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="p-4">
+                <div class="w-full h-64 bg-gray-200 rounded-lg flex items-center justify-center mb-4">
+                    <div class="text-center text-gray-400">
+                        <i class="fa fa-map text-3xl mb-2"></i>
+                        <p class="text-sm">地图加载中...</p>
+                    </div>
+                </div>
+                <div class="space-y-2 text-sm">
+                    <div class="flex items-center">
+                        <div class="w-3 h-3 bg-blue-500 rounded-full mr-3"></div>
+                        <span>您的当前位置</span>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="w-3 h-3 bg-red-500 rounded-full mr-3"></div>
+                        <span>最佳拍摄位置</span>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="w-3 h-1 bg-green-500 mr-3"></div>
+                        <span>推荐路线</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 地标物参考图片弹窗 -->
+    <div id="landmarkModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg max-w-md w-full max-h-96 overflow-y-auto">
+            <div class="p-4 border-b border-gray-light">
+                <div class="flex items-center justify-between">
+                    <h3 class="font-bold text-dark">地标物参考图片</h3>
+                    <button onclick="closeLandmarkReference()" class="text-gray-medium text-xl">
+                        <i class="fa fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="p-4">
+                <div class="mb-4">
+                    <h4 class="font-medium text-dark mb-2">标准参考图片</h4>
+                    <div class="w-full h-48 bg-gray-200 rounded-lg overflow-hidden mb-2">
+                        <img id="landmarkReferenceImg" src="https://picsum.photos/id/1015/400/300" alt="地标物参考图片" class="w-full h-full object-cover">
+                    </div>
+                    <p class="text-gray-medium text-sm" id="landmarkDescription">请找到图片中显示的地标物，并从相同角度拍摄照片进行确认</p>
+                </div>
+                
+                <div class="mb-4">
+                    <h4 class="font-medium text-dark mb-2">您的拍摄</h4>
+                    <div class="w-full h-48 bg-gray-100 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center mb-2" id="captureArea">
+                        <div class="text-center text-gray-400" id="capturePlaceholder">
+                            <i class="fa fa-camera text-3xl mb-2"></i>
+                            <p class="text-sm">点击下方按钮拍摄地标物</p>
+                        </div>
+                        <img id="capturedLandmarkImg" class="w-full h-full object-cover rounded-lg hidden" alt="拍摄的地标物">
+                    </div>
+                </div>
+                
+                <div class="space-y-3">
+                    <button onclick="captureLandmark()" class="w-full bg-primary text-white py-3 rounded-lg font-medium touch-friendly" id="captureBtn">
+                        <i class="fa fa-camera mr-2"></i>
+                        拍摄地标物
+                    </button>
+                    
+                    <button onclick="confirmLandmarkMatch()" class="w-full bg-green-500 text-white py-3 rounded-lg font-medium touch-friendly hidden" id="confirmMatchBtn">
+                        <i class="fa fa-check mr-2"></i>
+                        确认位置匹配
+                    </button>
+                    
+                    <button onclick="retakeLandmark()" class="w-full bg-gray-500 text-white py-2 rounded-lg font-medium touch-friendly hidden" id="retakeBtn">
+                        <i class="fa fa-refresh mr-2"></i>
+                        重新拍摄
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 帮助弹窗 -->
+    <div id="helpModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg max-w-sm w-full max-h-96 overflow-y-auto">
+            <div class="p-4 border-b border-gray-light">
+                <div class="flex items-center justify-between">
+                    <h3 class="font-bold text-dark">拍摄帮助</h3>
+                    <button onclick="closeHelp()" class="text-gray-medium text-xl">
+                        <i class="fa fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="p-4 space-y-3 text-sm">
+                <div>
+                    <h4 class="font-medium text-dark mb-1">位置确认问题</h4>
+                    <p class="text-gray-medium">请确保GPS信号良好，如果定位不准确可选择地标物确认方式。</p>
+                </div>
+                <div>
+                    <h4 class="font-medium text-dark mb-1">无人机召唤问题</h4>
+                    <p class="text-gray-medium">确保周围环境安全，无人机需要足够的起降空间。</p>
+                </div>
+                <div>
+                    <h4 class="font-medium text-dark mb-1">拍摄注意事项</h4>
+                    <p class="text-gray-medium">保持自然姿态，听从语音提示，避免突然移动。</p>
+                </div>
+                <div>
+                    <h4 class="font-medium text-dark mb-1">紧急情况处理</h4>
+                    <p class="text-gray-medium">如遇异常情况，请立即联系客服：400-888-6666</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript交互代码 -->
+    <script>
+        let currentStep = 1;
+        let orderId = null;
+        let gpsWatchId = null;
+        let droneTimer = null;
+        let shootingTimer = null;
+        let isDragging = false;
+        let dragStartX = 0;
+        let dragStartY = 0;
+        let landmarkCaptured = false;
+
+        const steps = [
+            { title: "确认位置", desc: "请确认您已到达正确的拍摄地点", icon: "fa-map-marker" },
+            { title: "召唤无人机", desc: "点击按钮召唤无人机到达拍摄位置", icon: "fa-paper-plane" },
+            { title: "身份确认", desc: "配合无人机进行身份确认拍摄", icon: "fa-camera" },
+            { title: "正式拍摄", desc: "开始精彩的无人机拍摄体验", icon: "fa-video-camera" }
+        ];
+
+        // 小程序适配
+        document.addEventListener('DOMContentLoaded', function() {
+            // 解决底部导航栏遮挡内容的问题
+            adjustContentPadding();
+            
+            // 添加小程序风格的触摸反馈
+            const touchElements = document.querySelectorAll('.touch-friendly');
+            touchElements.forEach(element => {
+                element.addEventListener('touchstart', function() {
+                    this.style.opacity = '0.7';
+                    this.style.transform = 'scale(0.98)';
+                });
+                
+                element.addEventListener('touchend', function() {
+                    this.style.opacity = '1';
+                    this.style.transform = 'scale(1)';
+                });
+                
+                element.addEventListener('touchcancel', function() {
+                    this.style.opacity = '1';
+                    this.style.transform = 'scale(1)';
+                });
+            });
+
+            // 初始化页面
+            initializePage();
+            
+            // 初始化可拖拽客服按钮
+            initDraggableCustomerService();
+        });
+
+        // 窗口大小变化时重新调整padding
+        window.addEventListener('resize', adjustContentPadding);
+
+        // 调整内容区域的padding-bottom以适应底部导航栏
+        function adjustContentPadding() {
+            const nav = document.getElementById('bottomNav');
+            const contentContainer = document.querySelector('.content-container');
+            
+            if (nav && contentContainer) {
+                // 获取导航栏的实际高度
+                const navHeight = nav.offsetHeight;
+                // 获取安全区域底部高度
+                const safeAreaBottom = getSafeAreaBottom();
+                // 设置内容区域底部内边距，确保内容不被导航栏遮挡
+                contentContainer.style.paddingBottom = `${navHeight + safeAreaBottom}px`;
+            }
+        }
+
+        // 获取安全区域底部高度
+        function getSafeAreaBottom() {
+            if (typeof window !== 'undefined' && window.screen) {
+                // 尝试从环境变量获取
+                const envSafeArea = getComputedStyle(document.documentElement).getPropertyValue('--safe-area-inset-bottom');
+                if (envSafeArea) {
+                    return parseFloat(envSafeArea);
+                }
+                
+                // 回退方案
+                return Math.max(
+                    0,
+                    window.innerHeight - document.documentElement.clientHeight
+                );
+            }
+            return 0;
+        }
+
+        // 初始化页面
+        function initializePage() {
+            // 获取订单ID
+            const urlParams = new URLSearchParams(window.location.search);
+            orderId = urlParams.get('orderId');
+            
+            if (orderId) {
+                loadOrderInfo(orderId);
+            }
+            
+            // 开始GPS定位
+            startGPSTracking();
+        }
+
+        // 加载订单信息
+        function loadOrderInfo(id) {
+            // 从localStorage获取订单信息或使用默认值
+            const orders = JSON.parse(localStorage.getItem('orders')) || [];
+            const order = orders.find(o => o.id === id);
+            
+            if (order) {
+                document.getElementById('orderLocation').textContent = order.location;
+                document.getElementById('orderPackage').textContent = order.package;
+                document.getElementById('orderNumber').textContent = order.id;
+                document.getElementById('targetLocation').textContent = order.location;
+            }
+        }
+
+        // 开始GPS追踪
+        function startGPSTracking() {
+            if (navigator.geolocation) {
+                document.getElementById('confirmStatus').textContent = 'GPS定位中...';
+                
+                gpsWatchId = navigator.geolocation.watchPosition(
+                    function(position) {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+                        
+                        // 只有在GPS模式下才更新状态
+                        const currentMethod = document.querySelector('input[name="confirmMethod"]:checked').value;
+                        if (currentMethod === 'gps') {
+                            document.getElementById('headerConfirmStatus').textContent = 'GPS定位成功';
+                        }
+                        
+                        // 尝试获取地名
+                        reverseGeocode(lat, lng);
+                        
+                        // 计算到目标位置的距离（这里使用模拟数据）
+                        const distance = Math.random() * 50 + 10; // 10-60米的随机距离
+                        document.getElementById('mapDistance').textContent = `${distance.toFixed(0)}m`;
+                        
+                        // 更新GPS地图可视化
+                        updateGPSMapVisualization(lat, lng, distance);
+                        
+                        // 更新地图瓦片
+                        updateMapTile(lat, lng);
+                        
+                        // 如果距离足够近，启用确认按钮
+                        if (distance < 30) {
+                            document.getElementById('confirmLocationBtn').classList.remove('opacity-50');
+                            document.getElementById('confirmLocationBtn').disabled = false;
+                        }
+                    },
+                    function(error) {
+                        const currentMethod = document.querySelector('input[name="confirmMethod"]:checked').value;
+                        if (currentMethod === 'gps') {
+                            document.getElementById('headerConfirmStatus').textContent = 'GPS定位失败';
+                        }
+                        document.getElementById('currentLocation').textContent = '无法获取位置';
+                        console.error('GPS error:', error);
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 60000
+                    }
+                );
+            } else {
+                const currentMethod = document.querySelector('input[name="confirmMethod"]:checked').value;
+                if (currentMethod === 'gps') {
+                    document.getElementById('headerConfirmStatus').textContent = '设备不支持GPS';
+                }
+            }
+        }
+
+        // 反向地理编码（获取地名）
+        function reverseGeocode(lat, lng) {
+            // 使用OpenStreetMap的Nominatim服务进行反向地理编码
+            const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`;
+            
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data && data.display_name) {
+                        // 提取有用的地名信息
+                        const address = data.address || {};
+                        let locationName = '';
+                        
+                        if (address.building || address.house_number) {
+                            locationName = address.road || address.neighbourhood || address.suburb;
+                        } else if (address.road) {
+                            locationName = address.road;
+                        } else if (address.neighbourhood) {
+                            locationName = address.neighbourhood;
+                        } else if (address.suburb) {
+                            locationName = address.suburb;
+                        } else if (address.city || address.town || address.village) {
+                            locationName = address.city || address.town || address.village;
+                        }
+                        
+                        document.getElementById('currentLocation').textContent = locationName || '未知位置';
+                    } else {
+                        document.getElementById('currentLocation').textContent = '未知位置';
+                    }
+                })
+                .catch(error => {
+                    console.log('地名获取失败:', error);
+                    document.getElementById('currentLocation').textContent = '未知位置';
+                });
+        }
+
+        // 更新地图瓦片
+        function updateMapTile(lat, lng) {
+            // 计算瓦片坐标（缩放级别12）
+            const zoom = 12;
+            const x = Math.floor((lng + 180) / 360 * Math.pow(2, zoom));
+            const y = Math.floor((1 - Math.log(Math.tan(lat * Math.PI / 180) + 1 / Math.cos(lat * Math.PI / 180)) / Math.PI) / 2 * Math.pow(2, zoom));
+            
+            // 更新地图瓦片URL
+            const tileUrl = `https://tile.openstreetmap.org/${zoom}/${x}/${y}.png`;
+            const mapTileImage = document.getElementById('mapTileImage');
+            
+            if (mapTileImage) {
+                mapTileImage.src = tileUrl;
+                mapTileImage.style.display = 'block';
+                document.getElementById('fallbackMap').style.display = 'none';
+            }
+        }
+
+        // 更新GPS地图可视化
+        function updateGPSMapVisualization(lat, lng, distance) {
+            // 根据距离动态调整当前位置标记的位置
+            const currentMarker = document.getElementById('currentPositionMarker');
+            const targetMarker = document.getElementById('targetPositionMarker');
+            const connectionLine = document.getElementById('connectionLine');
+            
+            // 模拟位置移动效果
+            let newX, newY;
+            if (distance < 20) {
+                // 距离很近时，标记靠近目标
+                newX = 70 + Math.random() * 10;
+                newY = 30 + Math.random() * 10;
+                currentMarker.className = currentMarker.className.replace('bg-blue-500', 'bg-green-500');
+            } else if (distance < 50) {
+                // 中等距离
+                newX = 50 + Math.random() * 20;
+                newY = 50 + Math.random() * 20;
+                currentMarker.className = currentMarker.className.replace('bg-green-500', 'bg-yellow-500').replace('bg-blue-500', 'bg-yellow-500');
+            } else {
+                // 距离较远
+                newX = 25 + Math.random() * 15;
+                newY = 65 + Math.random() * 15;
+                currentMarker.className = currentMarker.className.replace('bg-green-500', 'bg-blue-500').replace('bg-yellow-500', 'bg-blue-500');
+            }
+            
+            // 平滑移动标记
+            currentMarker.style.left = newX + '%';
+            currentMarker.style.top = newY + '%';
+            
+            // 更新连接线
+            connectionLine.setAttribute('x1', newX + '%');
+            connectionLine.setAttribute('y1', newY + '%');
+            
+            // 根据距离调整连接线样式
+            if (distance < 30) {
+                connectionLine.setAttribute('stroke', '#10B981'); // 绿色
+                connectionLine.setAttribute('stroke-width', '3');
+            } else {
+                connectionLine.setAttribute('stroke', '#3B82F6'); // 蓝色
+                connectionLine.setAttribute('stroke-width', '2');
+            }
+        }
+
+        // 切换确认方式
+        function switchConfirmMethod() {
+            const method = document.querySelector('input[name="confirmMethod"]:checked').value;
+            const gpsContent = document.getElementById('gpsContent');
+            const landmarkContent = document.getElementById('landmarkContent');
+            const headerConfirmStatus = document.getElementById('headerConfirmStatus');
+            
+            if (method === 'gps') {
+                gpsContent.classList.remove('hidden');
+                landmarkContent.classList.add('hidden');
+                headerConfirmStatus.textContent = 'GPS定位成功';
+            } else if (method === 'landmark') {
+                gpsContent.classList.add('hidden');
+                landmarkContent.classList.remove('hidden');
+                headerConfirmStatus.textContent = '地标物确认';
+                
+                // 根据当前地点设置参考图片
+                const location = document.getElementById('orderLocation').textContent;
+                const landmarkData = getLandmarkData(location);
+                document.getElementById('miniLandmarkRef').src = landmarkData.image;
+            }
+        }
+
+        // 快速拍摄地标物
+        function quickCaptureLandmark() {
+            // 调用相机API（这里使用模拟）
+            if (typeof wx !== 'undefined') {
+                wx.chooseImage({
+                    count: 1,
+                    sizeType: ['compressed'],
+                    sourceType: ['camera'],
+                    success: function(res) {
+                        handleQuickLandmarkCapture(res.tempFilePaths[0]);
+                    }
+                });
+            } else {
+                // 模拟拍照
+                setTimeout(() => {
+                    const simulatedImageUrl = 'https://picsum.photos/400/300?random=' + Date.now();
+                    handleQuickLandmarkCapture(simulatedImageUrl);
+                }, 800);
+            }
+        }
+
+        // 处理快速地标物拍摄结果
+        function handleQuickLandmarkCapture(imageUrl) {
+            // 显示拍摄的图片
+            document.getElementById('miniCapturePlaceholder').classList.add('hidden');
+            document.getElementById('miniCapturedImg').src = imageUrl;
+            document.getElementById('miniCapturedImg').classList.remove('hidden');
+            
+            // 自动确认匹配（简化流程）
+            setTimeout(() => {
+                landmarkCaptured = true;
+                document.getElementById('headerConfirmStatus').textContent = '地标物确认成功';
+                
+                if (typeof wx !== 'undefined') {
+                    wx.showToast({
+                        title: '位置确认成功',
+                        icon: 'success'
+                    });
+                } else {
+                    // 简单的成功提示
+                    const captureArea = document.getElementById('miniCaptureArea');
+                    const originalBorder = captureArea.className;
+                    captureArea.className = captureArea.className.replace('border-gray-300', 'border-green-500');
+                    setTimeout(() => {
+                        captureArea.className = originalBorder.replace('border-green-500', 'border-gray-300');
+                    }, 2000);
+                }
+            }, 1000);
+        }
+
+        // 显示路线地图
+        function showRouteMap() {
+            document.getElementById('routeMapModal').classList.remove('hidden');
+        }
+
+        // 关闭路线地图
+        function closeRouteMap() {
+            document.getElementById('routeMapModal').classList.add('hidden');
+        }
+
+        // 确认位置
+        function confirmLocation() {
+            const method = document.querySelector('input[name="confirmMethod"]:checked').value;
+            
+            if (method === 'landmark') {
+                // 地标物确认逻辑
+                if (!landmarkCaptured) {
+                    alert('请先拍摄地标物照片并确认位置匹配');
+                    // 自动切换到地标物确认模式
+                    document.querySelector('input[value="landmark"]').checked = true;
+                    switchConfirmMethod();
+                    return;
+                }
+                nextStep();
+            } else {
+                // GPS确认
+                const distance = parseFloat(document.getElementById('distanceToTarget').textContent);
+                if (distance > 30) {
+                    alert('您距离拍摄点较远，请移步到指定位置后再确认');
+                    return;
+                }
+                nextStep();
+            }
+        }
+
+        // 召唤无人机
+        function summonDrone() {
+            document.getElementById('summonBtn').disabled = true;
+            document.getElementById('summonBtn').innerHTML = '<i class="fa fa-spinner fa-spin mr-2"></i>无人机准备中...';
+            document.getElementById('droneStatus').classList.remove('hidden');
+            
+            // 模拟无人机准备和飞行过程
+            let countdown = 8; // 8秒
+            droneTimer = setInterval(() => {
+                countdown--;
+                const minutes = Math.floor(countdown / 60);
+                const seconds = countdown % 60;
+                document.getElementById('arrivalTime').textContent = 
+                    `${minutes}分${seconds.toString().padStart(2, '0')}秒`;
+                
+                if (countdown === 6) {
+                    document.getElementById('droneStatusText').textContent = '正在起飞';
+                } else if (countdown === 3) {
+                    document.getElementById('droneStatusText').textContent = '飞行中';
+                } else if (countdown === 0) {
+                    clearInterval(droneTimer);
+                    droneArrived();
+                }
+            }, 1000);
+        }
+
+        // 无人机到达
+        function droneArrived() {
+            document.getElementById('droneStatusText').textContent = '已到达';
+            document.getElementById('arrivalTime').textContent = '已到达';
+            
+            // 播放到达音效（如果支持）
+            if (typeof wx !== 'undefined') {
+                wx.showToast({
+                    title: '无人机已到达',
+                    icon: 'success'
+                });
+            }
+            
+            setTimeout(() => {
+                nextStep();
+            }, 3000);
+        }
+
+        // 开始身份确认
+        function startIdentityCheck() {
+            document.getElementById('identityBtn').disabled = true;
+            document.getElementById('identityBtn').innerHTML = '<i class="fa fa-spinner fa-spin mr-2"></i>正在拍摄...';
+            
+            // 模拟拍摄过程
+            setTimeout(() => {
+                // 显示身份确认照片
+                document.getElementById('identityPhoto').classList.remove('hidden');
+                document.getElementById('photoPlaceholder').classList.add('hidden');
+                document.getElementById('capturedPhoto').classList.remove('hidden');
+                document.getElementById('capturedPhoto').src = 'https://picsum.photos/300/200?random=' + Date.now();
+                
+                document.getElementById('identityBtn').disabled = false;
+                document.getElementById('identityBtn').innerHTML = '<i class="fa fa-check mr-2"></i>确认是本人';
+                document.getElementById('identityBtn').onclick = confirmIdentity;
+            }, 3000);
+        }
+
+        // 确认身份
+        function confirmIdentity() {
+            if (confirm('请确认照片中的人物是您本人？')) {
+                nextStep();
+            }
+        }
+
+        // 确认开始拍摄
+        function confirmStartShooting() {
+            document.getElementById('shootingBtn').disabled = true;
+            document.getElementById('shootingCountdown').style.display = 'block';
+            
+            // 开始3秒倒计时
+            let countdown = 3;
+            const countdownInterval = setInterval(() => {
+                document.getElementById('countdownNumber').textContent = countdown;
+                countdown--;
+                
+                if (countdown < 0) {
+                    clearInterval(countdownInterval);
+                    startShooting();
+                }
+            }, 1000);
+        }
+
+        // 开始拍摄
+        function startShooting() {
+            document.getElementById('shootingCountdown').style.display = 'none';
+            document.getElementById('shootingStatus').textContent = '拍摄中';
+            document.getElementById('voicePrompt').style.display = 'block';
+            
+            const shots = ['定位镜头', '远景拍摄', '中景拍摄', '近景拍摄', '特写镜头'];
+            const prompts = [
+                '请保持微笑，看向无人机镜头',
+                '请向左转身，展示侧面轮廓',
+                '请举起双手，做一个开心的手势',
+                '请保持自然站姿，微笑看镜头',
+                '拍摄完成，感谢您的配合'
+            ];
+            
+            let shotIndex = 0;
+            shootingTimer = setInterval(() => {
+                if (shotIndex < shots.length) {
+                    document.getElementById('currentShot').textContent = shots[shotIndex];
+                    document.getElementById('voicePromptText').textContent = prompts[shotIndex];
+                    document.getElementById('shootingProgress').textContent = `${shotIndex + 1}/${shots.length}`;
+                    shotIndex++;
+                } else {
+                    clearInterval(shootingTimer);
+                    completeSession();
+                }
+            }, 2000); // 每个镜头2秒
+        }
+
+        // 完成拍摄
+        function completeSession() {
+            // 停止GPS追踪
+            if (gpsWatchId) {
+                navigator.geolocation.clearWatch(gpsWatchId);
+            }
+            
+            // 更新订单状态
+            if (orderId) {
+                const orders = JSON.parse(localStorage.getItem('orders')) || [];
+                const orderIndex = orders.findIndex(o => o.id === orderId);
+                if (orderIndex !== -1) {
+                    orders[orderIndex].status = 'processing';
+                    orders[orderIndex].shootingDate = new Date().toLocaleString('zh-CN');
+                    localStorage.setItem('orders', JSON.stringify(orders));
+                }
+            }
+            
+            // 显示完成界面
+            document.getElementById('shootingSection').classList.add('hidden');
+            document.getElementById('completedSection').classList.remove('hidden');
+            
+            updateStepUI(5); // 完成状态
+        }
+
+        // 下一步
+        function nextStep() {
+            currentStep++;
+            
+            // 隐藏当前section
+            const sections = ['locationSection', 'summonSection', 'identitySection', 'shootingSection'];
+            sections.forEach(section => {
+                document.getElementById(section).classList.add('hidden');
+            });
+            
+            // 显示下一个section
+            if (currentStep === 2) {
+                document.getElementById('summonSection').classList.remove('hidden');
+            } else if (currentStep === 3) {
+                document.getElementById('identitySection').classList.remove('hidden');
+            } else if (currentStep === 4) {
+                document.getElementById('shootingSection').classList.remove('hidden');
+            }
+            
+            updateStepUI(currentStep);
+        }
+
+        // 更新步骤UI
+        function updateStepUI(step) {
+            if (step <= 4) {
+                const stepInfo = steps[step - 1];
+                document.getElementById('currentStepTitle').textContent = `步骤${step}：${stepInfo.title}`;
+                document.getElementById('currentStepDesc').textContent = stepInfo.desc;
+                document.getElementById('statusIcon').className = `fa ${stepInfo.icon} text-xl`;
+                document.getElementById('progressText').textContent = `${step}/4`;
+                document.getElementById('progressBar').style.width = `${(step / 4) * 100}%`;
+            } else {
+                document.getElementById('currentStepTitle').textContent = '拍摄完成';
+                document.getElementById('currentStepDesc').textContent = '感谢您的配合，请等待AI剪辑完成';
+                document.getElementById('statusIcon').className = 'fa fa-check text-xl';
+                document.getElementById('progressText').textContent = '完成';
+                document.getElementById('progressBar').style.width = '100%';
+            }
+        }
+
+        // 返回处理
+        function goBack() {
+            if (currentStep > 1) {
+                if (confirm('拍摄正在进行中，确定要返回吗？')) {
+                    // 清理定时器
+                    if (droneTimer) clearInterval(droneTimer);
+                    if (shootingTimer) clearInterval(shootingTimer);
+                    if (gpsWatchId) navigator.geolocation.clearWatch(gpsWatchId);
+                    
+                    history.back();
+                }
+            } else {
+                history.back();
+            }
+        }
+
+        // 显示帮助
+        function showHelp() {
+            document.getElementById('helpModal').classList.remove('hidden');
+        }
+
+        // 关闭帮助
+        function closeHelp() {
+            document.getElementById('helpModal').classList.add('hidden');
+        }
+
+        // 点击遮罩关闭弹窗
+        document.getElementById('routeMapModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeRouteMap();
+            }
+        });
+
+        document.getElementById('helpModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeHelp();
+            }
+        });
+
+        // 页面卸载时清理资源
+        window.addEventListener('beforeunload', function() {
+            if (droneTimer) clearInterval(droneTimer);
+            if (shootingTimer) clearInterval(shootingTimer);
+            if (gpsWatchId) navigator.geolocation.clearWatch(gpsWatchId);
+        });
+
+        // 初始化可拖拽客服按钮
+        function initDraggableCustomerService() {
+            const customerBtn = document.getElementById('customerServiceBtn');
+            
+            // 添加点击拨号功能
+            customerBtn.addEventListener('click', function(e) {
+                if (!isDragging) {
+                    callCustomerService();
+                }
+            });
+            
+            // 鼠标事件
+            customerBtn.addEventListener('mousedown', startDrag);
+            document.addEventListener('mousemove', drag);
+            document.addEventListener('mouseup', endDrag);
+            
+            // 触摸事件
+            customerBtn.addEventListener('touchstart', startDrag, { passive: false });
+            document.addEventListener('touchmove', drag, { passive: false });
+            document.addEventListener('touchend', endDrag);
+        }
+
+        function startDrag(e) {
+            isDragging = false;
+            const customerBtn = document.getElementById('customerServiceBtn');
+            const rect = customerBtn.getBoundingClientRect();
+            
+            if (e.type === 'mousedown') {
+                dragStartX = e.clientX - rect.left;
+                dragStartY = e.clientY - rect.top;
+            } else {
+                dragStartX = e.touches[0].clientX - rect.left;
+                dragStartY = e.touches[0].clientY - rect.top;
+            }
+            
+            customerBtn.style.transition = 'none';
+            e.preventDefault();
+        }
+
+        function drag(e) {
+            if (dragStartX === 0 && dragStartY === 0) return;
+            
+            isDragging = true;
+            const customerBtn = document.getElementById('customerServiceBtn');
+            let clientX, clientY;
+            
+            if (e.type === 'mousemove') {
+                clientX = e.clientX;
+                clientY = e.clientY;
+            } else {
+                clientX = e.touches[0].clientX;
+                clientY = e.touches[0].clientY;
+            }
+            
+            const newX = clientX - dragStartX;
+            const newY = clientY - dragStartY;
+            
+            // 限制在屏幕范围内
+            const maxX = window.innerWidth - 56; // 按钮宽度
+            const maxY = window.innerHeight - 56; // 按钮高度
+            
+            const constrainedX = Math.max(0, Math.min(newX, maxX));
+            const constrainedY = Math.max(0, Math.min(newY, maxY));
+            
+            customerBtn.style.left = constrainedX + 'px';
+            customerBtn.style.top = constrainedY + 'px';
+            customerBtn.style.right = 'auto';
+            customerBtn.style.bottom = 'auto';
+            
+            e.preventDefault();
+        }
+
+        function endDrag() {
+            const customerBtn = document.getElementById('customerServiceBtn');
+            customerBtn.style.transition = 'all 0.3s ease';
+            
+            setTimeout(() => {
+                isDragging = false;
+            }, 100);
+            
+            dragStartX = 0;
+            dragStartY = 0;
+        }
+
+        // 拨打客服电话
+        function callCustomerService() {
+            if (typeof wx !== 'undefined') {
+                wx.makePhoneCall({
+                    phoneNumber: '400-888-6666'
+                });
+            } else {
+                window.open('tel:400-888-6666');
+            }
+        }
+
+        // 显示地标物参考图片
+        function showLandmarkReference() {
+            // 根据当前地点设置参考图片
+            const location = document.getElementById('orderLocation').textContent;
+            const landmarkData = getLandmarkData(location);
+            
+            document.getElementById('landmarkReferenceImg').src = landmarkData.image;
+            document.getElementById('landmarkDescription').textContent = landmarkData.description;
+            document.getElementById('landmarkModal').classList.remove('hidden');
+        }
+
+        // 关闭地标物参考
+        function closeLandmarkReference() {
+            document.getElementById('landmarkModal').classList.add('hidden');
+        }
+
+        // 获取地标物数据
+        function getLandmarkData(location) {
+            const landmarks = {
+                '天台山观景台': {
+                    image: 'https://picsum.photos/id/1015/400/300',
+                    description: '请找到观景台的标志性石碑，从正面角度拍摄包含"天台山观景台"字样的照片'
+                },
+                '西湖景区': {
+                    image: 'https://picsum.photos/id/1031/400/300',
+                    description: '请找到西湖景区的入口标志牌，拍摄包含"西湖景区"字样的完整标牌照片'
+                },
+                '城市中心广场': {
+                    image: 'https://picsum.photos/id/1016/400/300',
+                    description: '请找到广场中央的雕塑或标志性建筑，从正面拍摄完整的地标物照片'
+                },
+                '翠竹森林公园': {
+                    image: 'https://picsum.photos/id/1020/400/300',
+                    description: '请找到公园入口的标识牌，拍摄包含"翠竹森林公园"字样的标牌照片'
+                }
+            };
+            
+            return landmarks[location] || landmarks['天台山观景台'];
+        }
+
+        // 拍摄地标物
+        function captureLandmark() {
+            // 调用相机API（这里使用模拟）
+            if (typeof wx !== 'undefined') {
+                wx.chooseImage({
+                    count: 1,
+                    sizeType: ['compressed'],
+                    sourceType: ['camera'],
+                    success: function(res) {
+                        handleLandmarkCapture(res.tempFilePaths[0]);
+                    }
+                });
+            } else {
+                // 模拟拍照
+                setTimeout(() => {
+                    const simulatedImageUrl = 'https://picsum.photos/400/300?random=' + Date.now();
+                    handleLandmarkCapture(simulatedImageUrl);
+                }, 1000);
+            }
+        }
+
+        // 处理地标物拍摄结果
+        function handleLandmarkCapture(imageUrl) {
+            document.getElementById('capturePlaceholder').classList.add('hidden');
+            document.getElementById('capturedLandmarkImg').src = imageUrl;
+            document.getElementById('capturedLandmarkImg').classList.remove('hidden');
+            
+            document.getElementById('captureBtn').classList.add('hidden');
+            document.getElementById('confirmMatchBtn').classList.remove('hidden');
+            document.getElementById('retakeBtn').classList.remove('hidden');
+        }
+
+        // 确认地标物匹配
+        function confirmLandmarkMatch() {
+            if (confirm('请确认您拍摄的照片与参考图片中的地标物匹配？')) {
+                landmarkCaptured = true;
+                closeLandmarkReference();
+                
+                if (typeof wx !== 'undefined') {
+                    wx.showToast({
+                        title: '位置确认成功',
+                        icon: 'success'
+                    });
+                } else {
+                    alert('位置确认成功，您可以继续下一步操作');
+                }
+            }
+        }
+
+        // 重新拍摄地标物
+        function retakeLandmark() {
+            document.getElementById('capturePlaceholder').classList.remove('hidden');
+            document.getElementById('capturedLandmarkImg').classList.add('hidden');
+            
+            document.getElementById('captureBtn').classList.remove('hidden');
+            document.getElementById('confirmMatchBtn').classList.add('hidden');
+            document.getElementById('retakeBtn').classList.add('hidden');
+        }
+
+        // 点击遮罩关闭弹窗
+        document.getElementById('landmarkModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeLandmarkReference();
+            }
+        });
+    </script>
+</body>
+</html>

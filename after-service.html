@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>成片定制 - 无人机自助打卡</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#1E40AF',
+                        accent: '#06B6D4',
+                        dark: '#1E293B',
+                        light: '#F8FAFC',
+                        'gray-medium': '#64748B',
+                        'gray-light': '#E2E8F0',
+                        'blue-primary': '#3B82F6',
+                        'blue-secondary': '#1D4ED8',
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            }
+            .touch-friendly {
+                touch-action: manipulation;
+                -webkit-tap-highlight-color: transparent;
+            }
+            .safe-area-bottom {
+                padding-bottom: constant(safe-area-inset-bottom);
+                padding-bottom: env(safe-area-inset-bottom);
+            }
+            .miniprogram-scroll {
+                -webkit-overflow-scrolling: touch;
+            }
+            .miniprogram-card {
+                box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+                border-radius: 8px;
+            }
+            .template-selected {
+                border: 2px solid #3B82F6;
+                background: #EFF6FF;
+            }
+            .music-selected {
+                border: 2px solid #3B82F6;
+                background: #EFF6FF;
+            }
+            .wechat-qr {
+                background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><rect width="200" height="200" fill="%23f0f0f0"/><text x="100" y="100" font-family="Arial" font-size="12" text-anchor="middle" dy=".3em">企业微信二维码</text></svg>') center/contain no-repeat;
+            }
+        }
+    </style>
+</head>
+<body class="font-inter bg-light text-dark antialiased touch-action-manipulation">
+    <!-- 页面容器 -->
+    <div class="min-h-screen w-full safe-area-bottom content-container">
+        <!-- 头部导航 -->
+        <header class="bg-white border-b border-gray-light sticky top-0 z-40">
+            <div class="flex items-center justify-between h-14 px-4">
+                <button onclick="history.back()" class="flex items-center text-gray-medium touch-friendly">
+                    <i class="fa fa-angle-left text-xl mr-1"></i>
+                    <span class="text-sm">返回</span>
+                </button>
+                <h1 class="font-bold text-dark">成片定制</h1>
+                <div class="w-6"></div>
+            </div>
+        </header>
+
+        <!-- 定制状态提示 -->
+        <section class="bg-gradient-to-r from-blue-50 to-cyan-50 p-4 border-b border-blue-200">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="font-bold text-blue-800 mb-1">定制您的专属大片</h2>
+                    <p class="text-blue-600 text-sm">选择片头片尾、背景音乐等个性化元素</p>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <span class="text-xs bg-green-100 text-green-600 px-2 py-1 rounded-full font-medium">免费定制</span>
+                    <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white">
+                        <i class="fa fa-magic text-lg"></i>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 关联订单信息 -->
+        <section class="px-3 pt-3">
+            <div class="miniprogram-card bg-white p-3">
+                <h3 class="text-base font-medium mb-3 flex items-center">
+                    <i class="fa fa-list-alt text-primary mr-2"></i>
+                    关联订单
+                </h3>
+                <div class="border border-primary rounded-lg p-3 bg-primary/5">
+                    <div class="flex items-center space-x-3">
+                        <img src="https://picsum.photos/id/1039/100/100" alt="订单预览" class="w-12 h-12 object-cover rounded-lg">
+                        <div class="flex-1">
+                            <h4 class="font-medium text-sm" id="orderPackageName">山顶附览全景</h4>
+                            <p class="text-gray-medium text-xs" id="orderLocationName">天台山观景台</p>
+                            <p class="text-gray-medium text-xs">订单号: <span id="orderNumberDisplay">ORDER001</span></p>
+                        </div>
+                        <i class="fa fa-check text-primary"></i>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 片头片尾模板 -->
+        <section class="px-3 pt-2">
+            <div class="miniprogram-card bg-white p-3">
+                <h3 class="text-base font-medium mb-3 flex items-center">
+                    <i class="fa fa-film text-primary mr-2"></i>
+                    片头片尾模板
+                </h3>
+                
+                <div class="grid grid-cols-4 gap-2">
+                    <!-- 简约风格 -->
+                    <div class="template-item group relative border-2 border-primary bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-2 text-center cursor-pointer touch-friendly transition-all duration-300 shadow-md" onclick="selectTemplate(this)" data-template="simple">
+                        <div class="w-10 h-10 rounded-full mx-auto mb-1 overflow-hidden">
+                            <img src="https://picsum.photos/id/1011/40/40" alt="简约风格" class="w-full h-full object-cover">
+                        </div>
+                        <p class="text-xs font-semibold text-gray-700">简约</p>
+                        <div class="absolute -top-1 -right-1 w-4 h-4 bg-primary rounded-full flex items-center justify-center">
+                            <i class="fa fa-check text-white text-xs"></i>
+                        </div>
+                    </div>
+                    
+                    <!-- 动感风格 -->
+                    <div class="template-item group hover:shadow-lg border border-gray-200 bg-gradient-to-br from-blue-50 to-purple-100 rounded-xl p-2 text-center cursor-pointer touch-friendly transition-all duration-300" onclick="selectTemplate(this)" data-template="dynamic">
+                        <div class="w-10 h-10 rounded-full mx-auto mb-1 overflow-hidden">
+                            <img src="https://picsum.photos/id/1012/40/40" alt="动感风格" class="w-full h-full object-cover">
+                        </div>
+                        <p class="text-xs font-semibold text-blue-700">动感</p>
+                    </div>
+                    
+                    <!-- 浪漫风格 -->
+                    <div class="template-item group hover:shadow-lg border border-gray-200 bg-gradient-to-br from-pink-50 to-red-100 rounded-xl p-2 text-center cursor-pointer touch-friendly transition-all duration-300" onclick="selectTemplate(this)" data-template="romantic">
+                        <div class="w-10 h-10 rounded-full mx-auto mb-1 overflow-hidden">
+                            <img src="https://picsum.photos/id/1013/40/40" alt="浪漫风格" class="w-full h-full object-cover">
+                        </div>
+                        <p class="text-xs font-semibold text-pink-700">浪漫</p>
+                    </div>
+                    
+                    <!-- 科技风格 -->
+                    <div class="template-item group hover:shadow-lg border border-gray-200 bg-gradient-to-br from-cyan-50 to-blue-100 rounded-xl p-2 text-center cursor-pointer touch-friendly transition-all duration-300" onclick="selectTemplate(this)" data-template="tech">
+                        <div class="w-10 h-10 rounded-full mx-auto mb-1 overflow-hidden">
+                            <img src="https://picsum.photos/id/1014/40/40" alt="科技风格" class="w-full h-full object-cover">
+                        </div>
+                        <p class="text-xs font-semibold text-cyan-700">科技</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 景区背景选择 -->
+        <section class="px-3 pt-2">
+            <div class="miniprogram-card bg-white p-3">
+                <h3 class="text-base font-medium mb-3 flex items-center">
+                    <i class="fa fa-picture-o text-primary mr-2"></i>
+                    景区背景选择
+                </h3>
+                
+                                 <div class="grid grid-cols-4 gap-2">
+                     <!-- 原始背景 -->
+                     <label class="background-item group relative border-2 border-primary bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-2 cursor-pointer touch-friendly transition-all duration-300 shadow-md">
+                         <input type="radio" name="background" value="none" class="sr-only" checked>
+                         <div class="text-center">
+                             <div class="w-10 h-10 rounded-lg mx-auto mb-1 overflow-hidden">
+                                  <img src="https://picsum.photos/id/1019/40/40" alt="原始背景" class="w-full h-full object-cover">
+                             </div>
+                             <p class="text-xs font-semibold text-gray-700">原始</p>
+                         </div>
+                         <div class="absolute -top-1 -right-1 w-4 h-4 bg-primary rounded-full flex items-center justify-center">
+                             <i class="fa fa-check text-white text-xs"></i>
+                         </div>
+                     </label>
+                     
+                     <!-- 山景背景 -->
+                     <label class="background-item group hover:shadow-lg border border-gray-200 bg-gradient-to-br from-green-50 to-blue-100 rounded-xl p-2 cursor-pointer touch-friendly transition-all duration-300">
+                         <input type="radio" name="background" value="mountain" class="sr-only">
+                         <div class="text-center">
+                             <div class="w-10 h-10 rounded-lg mx-auto mb-1 overflow-hidden">
+                                  <img src="https://picsum.photos/id/1020/40/40" alt="山景特效" class="w-full h-full object-cover">
+                             </div>
+                             <p class="text-xs font-semibold text-green-700">山景</p>
+                         </div>
+                     </label>
+                     
+                     <!-- 湖景背景 -->
+                     <label class="background-item group hover:shadow-lg border border-gray-200 bg-gradient-to-br from-blue-50 to-cyan-100 rounded-xl p-2 cursor-pointer touch-friendly transition-all duration-300">
+                         <input type="radio" name="background" value="lake" class="sr-only">
+                         <div class="text-center">
+                             <div class="w-10 h-10 rounded-lg mx-auto mb-1 overflow-hidden">
+                                  <img src="https://picsum.photos/id/1021/40/40" alt="湖景特效" class="w-full h-full object-cover">
+                             </div>
+                             <p class="text-xs font-semibold text-blue-700">湖景</p>
+                         </div>
+                     </label>
+                     
+                     <!-- 城市背景 -->
+                     <label class="background-item group hover:shadow-lg border border-gray-200 bg-gradient-to-br from-purple-50 to-pink-100 rounded-xl p-2 cursor-pointer touch-friendly transition-all duration-300">
+                         <input type="radio" name="background" value="city" class="sr-only">
+                         <div class="text-center">
+                             <div class="w-10 h-10 rounded-lg mx-auto mb-1 overflow-hidden">
+                                  <img src="https://picsum.photos/id/1022/40/40" alt="城市特效" class="w-full h-full object-cover">
+                             </div>
+                             <p class="text-xs font-semibold text-purple-700">城市</p>
+                         </div>
+                     </label>
+                 </div>
+            </div>
+        </section>
+
+        <!-- 背景音乐选择 -->
+        <section class="px-3 pt-2">
+            <div class="miniprogram-card bg-white p-3">
+                <h3 class="text-base font-medium mb-3 flex items-center">
+                    <i class="fa fa-music text-primary mr-2"></i>
+                    背景音乐选择
+                </h3>
+                
+                <div class="space-y-2">
+                    <!-- 轻松愉快 -->
+                    <div class="music-item group relative border-2 border-primary bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl p-3 cursor-pointer touch-friendly transition-all duration-300 shadow-md" onclick="selectMusic(this)" data-music="upbeat">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 rounded-lg mr-3 overflow-hidden">
+                                    <img src="https://picsum.photos/id/1015/48/48" alt="轻松愉快" class="w-full h-full object-cover">
+                                </div>
+                                <div>
+                                    <h4 class="font-medium text-dark text-sm">轻松愉快</h4>
+                                    <p class="text-gray-medium text-xs">欢快节奏，活力四射</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <button onclick="event.stopPropagation(); playMusic('upbeat')" class="text-primary touch-friendly p-1">
+                                    <i class="fa fa-play text-lg"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="absolute -top-1 -right-1 w-4 h-4 bg-primary rounded-full flex items-center justify-center">
+                            <i class="fa fa-check text-white text-xs"></i>
+                        </div>
+                    </div>
+                    
+                    <!-- 浪漫抒情 -->
+                    <div class="music-item group hover:shadow-lg border border-gray-200 bg-gradient-to-r from-pink-50 to-red-50 rounded-xl p-3 cursor-pointer touch-friendly transition-all duration-300" onclick="selectMusic(this)" data-music="romantic">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 rounded-lg mr-3 overflow-hidden">
+                                    <img src="https://picsum.photos/id/1016/48/48" alt="浪漫抒情" class="w-full h-full object-cover">
+                                </div>
+                                <div>
+                                    <h4 class="font-medium text-dark text-sm">浪漫抒情</h4>
+                                    <p class="text-gray-medium text-xs">温馨旋律，情感丰富</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <button onclick="event.stopPropagation(); playMusic('romantic')" class="text-primary touch-friendly p-1">
+                                    <i class="fa fa-play text-lg"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 震撼大气 -->
+                    <div class="music-item group hover:shadow-lg border border-gray-200 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-3 cursor-pointer touch-friendly transition-all duration-300" onclick="selectMusic(this)" data-music="epic">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 rounded-lg mr-3 overflow-hidden">
+                                    <img src="https://picsum.photos/id/1017/48/48" alt="震撼大气" class="w-full h-full object-cover">
+                                </div>
+                                <div>
+                                    <h4 class="font-medium text-dark text-sm">震撼大气</h4>
+                                    <p class="text-gray-medium text-xs">雄壮旋律，气势磅礴</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <button onclick="event.stopPropagation(); playMusic('epic')" class="text-primary touch-friendly p-1">
+                                    <i class="fa fa-play text-lg"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 自然纯音 -->
+                    <div class="music-item group hover:shadow-lg border border-gray-200 bg-gradient-to-r from-green-50 to-teal-50 rounded-xl p-3 cursor-pointer touch-friendly transition-all duration-300" onclick="selectMusic(this)" data-music="nature">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 rounded-lg mr-3 overflow-hidden">
+                                    <img src="https://picsum.photos/id/1018/48/48" alt="自然纯音" class="w-full h-full object-cover">
+                                </div>
+                                <div>
+                                    <h4 class="font-medium text-dark text-sm">自然纯音</h4>
+                                    <p class="text-gray-medium text-xs">清新自然，宁静致远</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <button onclick="event.stopPropagation(); playMusic('nature')" class="text-primary touch-friendly p-1">
+                                    <i class="fa fa-play text-lg"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 文字内容定制 -->
+        <section class="px-3 pt-2">
+            <div class="miniprogram-card bg-white p-3">
+                <h3 class="text-base font-medium mb-3 flex items-center">
+                    <i class="fa fa-text-width mr-2 text-primary"></i>
+                    文字内容定制
+                </h3>
+
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-sm font-medium text-dark mb-2">片头标题</label>
+                        <input type="text" id="titleText" class="w-full p-3 border border-gray-light rounded-lg focus:border-primary focus:outline-none" placeholder="例如：我的天台山之旅" maxlength="20">
+                        <p class="text-gray-medium text-xs mt-1">最多20个字符</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-dark mb-2">片尾署名</label>
+                        <input type="text" id="authorText" class="w-full p-3 border border-gray-light rounded-lg focus:border-primary focus:outline-none" placeholder="例如：张三的精彩时刻" maxlength="15">
+                        <p class="text-gray-medium text-xs mt-1">最多15个字符</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-dark mb-2">特殊备注（可选）</label>
+                        <textarea id="noteText" class="w-full p-3 border border-gray-light rounded-lg focus:border-primary focus:outline-none" placeholder="例如：纪念我们的周年纪念日" rows="3" maxlength="50"></textarea>
+                        <p class="text-gray-medium text-xs mt-1">最多50个字符，将在合适位置显示</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 定制说明 -->
+        <section class="px-3 pt-2 pb-3">
+            <div class="miniprogram-card bg-white p-3">
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                    <p class="text-blue-700 text-sm">
+                        <i class="fa fa-clock-o mr-1"></i>
+                        定制服务将在原视频基础上重新渲染，预计需要2-4小时完成
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 企业微信联系 -->
+        <section class="px-4 pb-8">
+            <div class="miniprogram-card bg-gradient-to-br from-green-50 to-blue-50 border-2 border-green-200 p-4">
+                <div class="text-center mb-4">
+                    <h3 class="text-lg font-bold text-green-800 mb-2 flex items-center justify-center">
+                        <i class="fa fa-wechat mr-2"></i>
+                        添加企业微信
+                    </h3>
+                    <p class="text-green-700 text-sm">扫描二维码添加企业微信，我们将发送您的定制成片</p>
+                </div>
+
+                <!-- 企业微信二维码 -->
+                <div class="text-center mb-4">
+                    <div class="w-40 h-40 bg-white border-2 border-gray-light rounded-lg mx-auto mb-3 wechat-qr"></div>
+                    <p class="text-green-700 text-sm">企业微信号：DroneVideo2025</p>
+                </div>
+
+                <div class="space-y-3">
+                    <button onclick="submitCustomization()" class="w-full bg-gradient-to-r from-primary to-blue-secondary text-white py-4 rounded-lg font-bold text-lg touch-friendly">
+                        <i class="fa fa-magic mr-2"></i>
+                        提交定制需求
+                    </button>
+                    
+                    <div class="flex space-x-3">
+                        <button onclick="saveAsDraft()" class="flex-1 bg-gray-light text-gray-medium py-3 rounded-lg font-medium touch-friendly">
+                            <i class="fa fa-save mr-2"></i>
+                            保存草稿
+                        </button>
+                        <button onclick="resetCustomization()" class="flex-1 bg-gray-light text-gray-medium py-3 rounded-lg font-medium touch-friendly">
+                            <i class="fa fa-refresh mr-2"></i>
+                            重置选择
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- 固定客服电话按钮 -->
+    <button onclick="callService()" class="fixed bottom-20 right-4 w-12 h-12 bg-primary text-white rounded-full shadow-lg z-40 flex items-center justify-center touch-friendly hover:bg-primary/90 transition-colors">
+        <i class="fa fa-phone text-lg"></i>
+    </button>
+
+    <!-- 微信小程序底部导航栏 -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-light z-50 safe-area-bottom" id="bottomNav">
+        <div class="flex justify-around items-center h-16">
+            <div class="tab-item flex flex-col items-center justify-center text-gray-medium touch-friendly" onclick="location.href='index.html'">
+                <i class="fa fa-home text-lg mb-1"></i>
+                <span class="text-xs">首页</span>
+            </div>
+            <div class="tab-item flex flex-col items-center justify-center text-gray-medium touch-friendly" onclick="location.href='sample-display.html'">
+                <i class="fa fa-picture-o text-lg mb-1"></i>
+                <span class="text-xs">样片</span>
+            </div>
+            <div class="tab-item flex flex-col items-center justify-center touch-friendly" onclick="location.href='user-selection.html'">
+                <div class="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center -mt-6 shadow-lg relative">
+                    <i class="fa fa-camera text-lg"></i>
+                </div>
+                <span class="text-xs text-primary font-medium mt-1">拍摄</span>
+            </div>
+            <div class="tab-item flex flex-col items-center justify-center text-gray-medium touch-friendly" onclick="location.href='user-management.html'">
+                <i class="fa fa-user text-lg mb-1"></i>
+                <span class="text-xs">订单</span>
+            </div>
+            <div class="tab-item flex flex-col items-center justify-center text-primary touch-friendly active">
+                <i class="fa fa-star text-lg mb-1"></i>
+                <span class="text-xs">定制</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 预览弹窗 -->
+    <div id="previewModal" class="fixed inset-0 bg-black bg-opacity-75 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg max-w-md w-full max-h-96 overflow-y-auto">
+            <div class="sticky top-0 bg-white border-b border-gray-light p-4">
+                <div class="flex items-center justify-between">
+                    <h3 class="font-bold text-dark">定制预览</h3>
+                    <button onclick="closePreview()" class="text-gray-medium text-xl">
+                        <i class="fa fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="p-4" id="previewContent">
+                <!-- 预览内容将动态生成 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 小程序风格提示窗 -->
+    <div id="toastContainer" class="fixed top-4 left-1/2 transform -translate-x-1/2 z-60 hidden">
+        <div class="bg-black bg-opacity-80 text-white px-4 py-2 rounded-lg text-sm">
+            <span id="toastMessage">消息内容</span>
+        </div>
+    </div>
+
+    <!-- 小程序风格模态框 -->
+    <div id="modalContainer" class="fixed inset-0 bg-black bg-opacity-50 z-60 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg max-w-sm w-full">
+            <div class="p-4 text-center">
+                <h3 class="font-bold text-dark mb-2" id="modalTitle">提示</h3>
+                <p class="text-gray-medium text-sm mb-4" id="modalMessage">这是提示信息</p>
+                <div class="flex space-x-3" id="modalButtons">
+                    <!-- 按钮将动态生成 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript交互代码 -->
+    <script>
+        let selectedTemplate = 'simple';
+        let selectedMusic = 'upbeat';
+        let currentAudio = null;
+
+        const templatePrices = {
+            'simple': 0,
+            'dynamic': 20,
+            'romantic': 15,
+            'tech': 30
+        };
+
+        const backgroundPrices = {
+            'none': 0,
+            'mountain': 25,
+            'lake': 25,
+            'city': 25
+        };
+
+        // 加载订单信息
+        function loadOrderInfo() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const orderId = urlParams.get('orderId') || localStorage.getItem('customizeOrderId');
+            
+            if (orderId) {
+                // 从localStorage或API获取订单信息
+                const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+                const sampleOrders = [
+                    {
+                        id: 'ORDER001',
+                        location: '天台山观景台',
+                        package: '山顶附览全景',
+                        photos: 45,
+                        videos: 1,
+                        identityCode: 'ID001',
+                        status: 'completed'
+                    },
+                    {
+                        id: 'ORDER002', 
+                        location: '西湖景区',
+                        package: '标准拍摄套餐',
+                        photos: 18,
+                        videos: 1,
+                        identityCode: 'ID002',
+                        status: 'completed'
+                    }
+                ];
+                
+                const order = [...orders, ...sampleOrders].find(o => o.id === orderId);
+                
+                if (order) {
+                    document.getElementById('orderPackageName').textContent = order.package;
+                    document.getElementById('orderLocationName').textContent = order.location;
+                    document.getElementById('orderNumberDisplay').textContent = order.id;
+                }
+            } else {
+                // 默认显示
+                document.getElementById('orderPackageName').textContent = '基础拍摄套餐';
+                document.getElementById('orderLocationName').textContent = '天台山观景台';
+                document.getElementById('orderNumberDisplay').textContent = 'ORDER001';
+            }
+        }
+
+        // 选择模板（新版本）
+        function selectTemplate(element) {
+            // 移除其他选中状态
+            document.querySelectorAll('.template-item').forEach(item => {
+                item.classList.remove('border-2', 'border-primary', 'shadow-md');
+                item.classList.add('border', 'border-gray-200');
+                // 移除选中标记
+                const checkMark = item.querySelector('.absolute');
+                if (checkMark) {
+                    checkMark.remove();
+                }
+            });
+            
+            // 添加选中状态
+            element.classList.remove('border', 'border-gray-200');
+            element.classList.add('border-2', 'border-primary', 'shadow-md');
+            
+            // 添加选中标记
+            if (!element.querySelector('.absolute')) {
+                const checkMark = document.createElement('div');
+                checkMark.className = 'absolute -top-1 -right-1 w-4 h-4 bg-primary rounded-full flex items-center justify-center';
+                checkMark.innerHTML = '<i class="fa fa-check text-white text-xs"></i>';
+                element.appendChild(checkMark);
+            }
+            
+            selectedTemplate = element.getAttribute('data-template');
+            updateCosts();
+            
+            // 小程序振动反馈
+            if (typeof wx !== 'undefined') {
+                wx.vibrateShort({ type: 'light' });
+            }
+        }
+
+        // 选择背景
+        function selectBackground(element) {
+            // 移除其他选中状态
+            document.querySelectorAll('.background-item').forEach(item => {
+                item.classList.remove('border-2', 'border-primary', 'shadow-md');
+                item.classList.add('border', 'border-gray-200');
+                // 移除选中标记
+                const checkMark = item.querySelector('.absolute');
+                if (checkMark) {
+                    checkMark.remove();
+                }
+            });
+            
+            // 添加选中状态
+            element.classList.remove('border', 'border-gray-200');
+            element.classList.add('border-2', 'border-primary', 'shadow-md');
+            
+            // 添加选中标记
+            if (!element.querySelector('.absolute')) {
+                const checkMark = document.createElement('div');
+                checkMark.className = 'absolute -top-1 -right-1 w-4 h-4 bg-primary rounded-full flex items-center justify-center';
+                checkMark.innerHTML = '<i class="fa fa-check text-white text-xs"></i>';
+                element.appendChild(checkMark);
+            }
+            
+            // 选中对应的radio
+            const radio = element.querySelector('input[type="radio"]');
+            if (radio) {
+                radio.checked = true;
+            }
+            
+            updateCosts();
+            
+            // 小程序振动反馈
+            if (typeof wx !== 'undefined') {
+                wx.vibrateShort({ type: 'light' });
+            }
+        }
+
+        // 小程序适配
+        document.addEventListener('DOMContentLoaded', function() {
+            // 加载订单信息
+            loadOrderInfo();
+            
+            // 解决底部导航栏遮挡内容的问题
+            adjustContentPadding();
+            
+            // 添加小程序风格的触摸反馈
+            const touchElements = document.querySelectorAll('.touch-friendly');
+            touchElements.forEach(element => {
+                element.addEventListener('touchstart', function() {
+                    this.style.opacity = '0.7';
+                    this.style.transform = 'scale(0.98)';
+                });
+                
+                element.addEventListener('touchend', function() {
+                    this.style.opacity = '1';
+                    this.style.transform = 'scale(1)';
+                });
+                
+                element.addEventListener('touchcancel', function() {
+                    this.style.opacity = '1';
+                    this.style.transform = 'scale(1)';
+                });
+            });
+
+            // 添加背景选择点击事件
+            document.querySelectorAll('.background-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    selectBackground(this);
+                });
+            });
+
+            // 初始化默认选择
+            // selectMusic函数现在需要element参数，所以在页面加载后自动选择第一个音乐项
+            
+            // 监听背景选择变化
+            const backgroundRadios = document.querySelectorAll('input[name="background"]');
+            backgroundRadios.forEach(radio => {
+                radio.addEventListener('change', updateCosts);
+            });
+
+            // 加载保存的草稿
+            loadDraft();
+        });
+
+        // 窗口大小变化时重新调整padding
+        window.addEventListener('resize', adjustContentPadding);
+
+        // 调整内容区域的padding-bottom以适应底部导航栏
+        function adjustContentPadding() {
+            const nav = document.getElementById('bottomNav');
+            const contentContainer = document.querySelector('.content-container');
+            
+            if (nav && contentContainer) {
+                // 获取导航栏的实际高度
+                const navHeight = nav.offsetHeight;
+                // 获取安全区域底部高度
+                const safeAreaBottom = getSafeAreaBottom();
+                // 设置内容区域底部内边距，确保内容不被导航栏遮挡
+                contentContainer.style.paddingBottom = `${navHeight + safeAreaBottom}px`;
+            }
+        }
+
+        // 获取安全区域底部高度
+        function getSafeAreaBottom() {
+            if (typeof window !== 'undefined' && window.screen) {
+                // 尝试从环境变量获取
+                const envSafeArea = getComputedStyle(document.documentElement).getPropertyValue('--safe-area-inset-bottom');
+                if (envSafeArea) {
+                    return parseFloat(envSafeArea);
+                }
+                
+                // 回退方案
+                return Math.max(
+                    0,
+                    window.innerHeight - document.documentElement.clientHeight
+                );
+            }
+            return 0;
+        }
+
+
+
+        // 选择音乐（新版本）
+        function selectMusic(element) {
+            // 移除其他选中状态
+            document.querySelectorAll('.music-item').forEach(item => {
+                item.classList.remove('border-2', 'border-primary', 'shadow-md');
+                item.classList.add('border', 'border-gray-200');
+                // 移除选中标记
+                const checkMark = item.querySelector('.absolute');
+                if (checkMark) {
+                    checkMark.remove();
+                }
+            });
+            
+            // 添加选中状态
+            element.classList.remove('border', 'border-gray-200');
+            element.classList.add('border-2', 'border-primary', 'shadow-md');
+            
+            // 添加选中标记
+            if (!element.querySelector('.absolute')) {
+                const checkMark = document.createElement('div');
+                checkMark.className = 'absolute -top-1 -right-1 w-4 h-4 bg-primary rounded-full flex items-center justify-center';
+                checkMark.innerHTML = '<i class="fa fa-check text-white text-xs"></i>';
+                element.appendChild(checkMark);
+            }
+            
+            selectedMusic = element.getAttribute('data-music');
+            
+            // 小程序振动反馈
+            if (typeof wx !== 'undefined') {
+                wx.vibrateShort({ type: 'light' });
+            }
+        }
+
+        // 小程序风格提示函数
+        function showToast(message, duration = 2000) {
+            document.getElementById('toastMessage').textContent = message;
+            document.getElementById('toastContainer').classList.remove('hidden');
+            
+            setTimeout(() => {
+                document.getElementById('toastContainer').classList.add('hidden');
+            }, duration);
+        }
+
+        function showModal(title, message, buttons = []) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalMessage').textContent = message;
+            
+            const buttonsContainer = document.getElementById('modalButtons');
+            buttonsContainer.innerHTML = '';
+            
+            if (buttons.length === 0) {
+                // 默认确定按钮
+                buttonsContainer.innerHTML = `
+                    <button onclick="closeModal()" class="flex-1 bg-primary text-white py-2 rounded-lg font-medium touch-friendly">
+                        确定
+                    </button>
+                `;
+            } else if (buttons.length === 1) {
+                // 单个按钮
+                buttonsContainer.innerHTML = `
+                    <button onclick="${buttons[0].action}" class="flex-1 bg-primary text-white py-2 rounded-lg font-medium touch-friendly">
+                        ${buttons[0].text}
+                    </button>
+                `;
+            } else {
+                // 多个按钮
+                buttons.forEach((btn, index) => {
+                    const buttonClass = index === 0 ? 'bg-gray-light text-gray-medium' : 'bg-primary text-white';
+                    buttonsContainer.innerHTML += `
+                        <button onclick="${btn.action}" class="flex-1 ${buttonClass} py-2 rounded-lg font-medium touch-friendly">
+                            ${btn.text}
+                        </button>
+                    `;
+                });
+            }
+            
+            document.getElementById('modalContainer').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('modalContainer').classList.add('hidden');
+        }
+
+        // 播放音乐
+        function playMusic(musicType) {
+            // 停止当前播放的音乐
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio = null;
+            }
+
+            // 使用小程序风格提示
+            showToast(`正在播放${getMusicName(musicType)}预览...`);
+            
+            // 实际项目中的音频播放代码：
+            // const audioUrl = getMusicUrl(musicType);
+            // currentAudio = new Audio(audioUrl);
+            // currentAudio.play();
+        }
+
+        // 获取音乐名称
+        function getMusicName(musicType) {
+            const names = {
+                'upbeat': '轻松愉快',
+                'romantic': '浪漫抒情',
+                'epic': '震撼大气',
+                'nature': '自然纯音'
+            };
+            return names[musicType] || '未知音乐';
+        }
+
+        // 更新费用
+        function updateCosts() {
+            const templateCost = templatePrices[selectedTemplate] || 0;
+            const backgroundValue = document.querySelector('input[name="background"]:checked').value;
+            const backgroundCost = backgroundPrices[backgroundValue] || 0;
+            const musicCost = 0; // 音乐暂时免费
+            
+            const totalCost = templateCost + backgroundCost + musicCost;
+            
+            document.getElementById('templateCost').textContent = templateCost > 0 ? `+¥${templateCost}` : '免费';
+            document.getElementById('backgroundCost').textContent = backgroundCost > 0 ? `+¥${backgroundCost}` : '免费';
+            document.getElementById('musicCost').textContent = musicCost > 0 ? `+¥${musicCost}` : '免费';
+            document.getElementById('totalCustomCost').textContent = totalCost > 0 ? `¥${totalCost}` : '免费';
+        }
+
+        // 显示预览
+        function showPreview() {
+            const title = document.getElementById('titleText').value || '我的无人机大片';
+            const author = document.getElementById('authorText').value || '用户作品';
+            const note = document.getElementById('noteText').value || '';
+            const background = document.querySelector('input[name="background"]:checked').value;
+            
+            const previewContent = document.getElementById('previewContent');
+            previewContent.innerHTML = `
+                <div class="space-y-4">
+                    <div>
+                        <h4 class="font-medium text-dark mb-2">选择预览</h4>
+                        <div class="bg-gray-50 p-3 rounded-lg text-sm">
+                            <div>片头片尾：${getTemplateName(selectedTemplate)}</div>
+                            <div>背景效果：${getBackgroundName(background)}</div>
+                            <div>背景音乐：${getMusicName(selectedMusic)}</div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-medium text-dark mb-2">文字内容</h4>
+                        <div class="bg-gray-50 p-3 rounded-lg text-sm">
+                            <div>片头标题：${title}</div>
+                            <div>片尾署名：${author}</div>
+                            ${note ? `<div>特殊备注：${note}</div>` : ''}
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-medium text-dark mb-2">费用合计</h4>
+                        <div class="bg-blue-50 p-3 rounded-lg">
+                            <div class="text-2xl font-bold text-primary text-center">
+                                ${document.getElementById('totalCustomCost').textContent}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('previewModal').classList.remove('hidden');
+        }
+
+        // 关闭预览
+        function closePreview() {
+            document.getElementById('previewModal').classList.add('hidden');
+        }
+
+        // 获取模板名称
+        function getTemplateName(template) {
+            const names = {
+                'simple': '简约现代',
+                'dynamic': '动感炫酷',
+                'romantic': '浪漫温馨',
+                'tech': '科技未来'
+            };
+            return names[template] || '未知模板';
+        }
+
+        // 获取背景名称
+        function getBackgroundName(background) {
+            const names = {
+                'none': '保持原始背景',
+                'mountain': '山景特效背景',
+                'lake': '湖景特效背景',
+                'city': '城市特效背景'
+            };
+            return names[background] || '未知背景';
+        }
+
+        // 提交定制需求
+        function submitCustomization() {
+            const title = document.getElementById('titleText').value;
+            const author = document.getElementById('authorText').value;
+            const note = document.getElementById('noteText').value;
+            const background = document.querySelector('input[name="background"]:checked').value;
+            
+            if (!title.trim()) {
+                showModal('提示', '请填写片头标题', [{
+                    text: '确定',
+                    action: 'closeModal(); document.getElementById("titleText").focus();'
+                }]);
+                return;
+            }
+            
+            if (!author.trim()) {
+                showModal('提示', '请填写片尾署名', [{
+                    text: '确定', 
+                    action: 'closeModal(); document.getElementById("authorText").focus();'
+                }]);
+                return;
+            }
+            
+            const customization = {
+                template: selectedTemplate,
+                background: background,
+                music: selectedMusic,
+                title: title.trim(),
+                author: author.trim(),
+                note: note.trim(),
+                timestamp: Date.now()
+            };
+            
+            // 保存定制需求
+            localStorage.setItem('customization', JSON.stringify(customization));
+            
+            // 显示提交成功
+            showModal('提交成功', '定制需求已提交！我们将在2-4小时内完成制作，并通过企业微信发送给您。', [{
+                text: '确定',
+                action: 'closeModal(); submitSuccess();'
+            }]);
+        }
+
+        function submitSuccess() {
+            // 清空表单
+            resetCustomization();
+            
+            // 跳转到订单页面
+            setTimeout(() => {
+                location.href = 'user-management.html';
+            }, 1000);
+        }
+
+        // 保存草稿
+        function saveAsDraft() {
+            const draft = {
+                template: selectedTemplate,
+                background: document.querySelector('input[name="background"]:checked').value,
+                music: selectedMusic,
+                title: document.getElementById('titleText').value,
+                author: document.getElementById('authorText').value,
+                note: document.getElementById('noteText').value,
+                timestamp: Date.now()
+            };
+            
+            localStorage.setItem('customizationDraft', JSON.stringify(draft));
+            showToast('草稿已保存');
+        }
+
+        // 加载草稿
+        function loadDraft() {
+            const draft = localStorage.getItem('customizationDraft');
+            if (draft) {
+                const data = JSON.parse(draft);
+                
+                selectTemplate(data.template);
+                selectMusic(data.music);
+                
+                if (data.background) {
+                    document.querySelector(`input[name="background"][value="${data.background}"]`).checked = true;
+                }
+                
+                document.getElementById('titleText').value = data.title || '';
+                document.getElementById('authorText').value = data.author || '';
+                document.getElementById('noteText').value = data.note || '';
+                
+                updateCosts();
+            }
+        }
+
+        // 重置选择
+        function resetCustomization() {
+            selectTemplate('simple');
+            selectMusic('upbeat');
+            document.querySelector('input[name="background"][value="none"]').checked = true;
+            document.getElementById('titleText').value = '';
+            document.getElementById('authorText').value = '';
+            document.getElementById('noteText').value = '';
+            
+            updateCosts();
+            
+            // 清除草稿
+            localStorage.removeItem('customizationDraft');
+        }
+
+        // 点击遮罩关闭弹窗
+        document.getElementById('previewModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closePreview();
+            }
+        });
+
+        document.getElementById('modalContainer').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // 客服电话
+        function callService() {
+            // 小程序中应使用 wx.makePhoneCall
+            if (typeof wx !== 'undefined') {
+                wx.makePhoneCall({
+                    phoneNumber: '400-888-6666'
+                });
+            } else {
+                window.open('tel:400-888-6666');
+            }
+        }
+    </script>
+</body>
+</html>

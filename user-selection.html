@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>选择拍摄 - 无人机自助打卡</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#1E40AF',
+                        accent: '#06B6D4',
+                        dark: '#1E293B',
+                        light: '#F8FAFC',
+                        'gray-medium': '#64748B',
+                        'gray-light': '#E2E8F0',
+                        'blue-primary': '#3B82F6',
+                        'blue-secondary': '#1D4ED8',
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            }
+            .touch-friendly {
+                touch-action: manipulation;
+                -webkit-tap-highlight-color: transparent;
+            }
+            .safe-area-bottom {
+                padding-bottom: constant(safe-area-inset-bottom);
+                padding-bottom: env(safe-area-inset-bottom);
+            }
+            .miniprogram-scroll {
+                -webkit-overflow-scrolling: touch;
+            }
+            .miniprogram-card {
+                box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+                border-radius: 8px;
+            }
+            .location-selected {
+                border: 2px solid #3B82F6;
+                background: #EFF6FF;
+            }
+            .shooting-selected {
+                border: 2px solid #3B82F6;
+                background: #EFF6FF;
+            }
+            .step-indicator {
+                position: relative;
+            }
+            .step-indicator::after {
+                content: '';
+                position: absolute;
+                top: 50%;
+                right: -12px;
+                width: 24px;
+                height: 2px;
+                background: #E2E8F0;
+                transform: translateY(-50%);
+            }
+            .step-indicator:last-child::after {
+                display: none;
+            }
+            .step-active {
+                background: #3B82F6;
+                color: white;
+            }
+            .step-active::after {
+                background: #3B82F6;
+            }
+        }
+    </style>
+</head>
+<body class="font-inter bg-light text-dark antialiased touch-action-manipulation">
+    <!-- 页面容器 -->
+    <div class="min-h-screen w-full safe-area-bottom content-container">
+        <!-- 头部导航 -->
+        <header class="bg-white border-b border-gray-light sticky top-0 z-40">
+            <div class="flex items-center justify-between h-14 px-4">
+                <button onclick="history.back()" class="flex items-center text-gray-medium touch-friendly">
+                    <i class="fa fa-angle-left text-xl mr-1"></i>
+                    <span class="text-sm">返回</span>
+                </button>
+                <h1 class="font-bold text-dark">选择拍摄</h1>
+                <button onclick="showHelp()" class="text-gray-medium touch-friendly">
+                    <i class="fa fa-question-circle text-xl"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- 步骤指示器 -->
+        <section class="bg-white px-4 py-4 border-b border-gray-light">
+            <div class="flex items-center justify-center space-x-8">
+                <div class="flex items-center">
+                    <div class="step-indicator w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-sm font-bold step-active">1</div>
+                    <span class="ml-2 text-sm font-medium text-primary">选择地点</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="step-indicator w-8 h-8 rounded-full bg-gray-light text-gray-medium flex items-center justify-center text-sm font-bold" id="step2">2</div>
+                    <span class="ml-2 text-sm text-gray-medium" id="step2Text">确认订单</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- 拍摄地点选择 -->
+        <section class="p-4" id="locationSection">
+            <div class="mb-4">
+                <h2 class="text-lg font-bold mb-2">选择拍摄地点</h2>
+                <p class="text-gray-medium text-sm">请选择您要拍摄的景点位置</p>
+            </div>
+
+            <div class="space-y-3">
+                <!-- 山顶观景台 -->
+                <div class="miniprogram-card bg-white overflow-hidden touch-friendly location-card" onclick="selectLocation('mountain')" data-location="mountain">
+                    <div class="flex">
+                        <img src="https://picsum.photos/id/1015/150/120" alt="天台山观景台" class="w-24 h-20 object-cover flex-shrink-0">
+                        <div class="p-4 flex-1">
+                            <div class="flex items-center justify-between mb-2">
+                                <h3 class="font-bold text-dark">天台山观景台</h3>
+                                <div class="w-5 h-5 border-2 border-gray-300 rounded-full location-checkbox" data-location="mountain">
+                                    <i class="fa fa-check text-primary text-xs hidden"></i>
+                                </div>
+                            </div>
+                            <p class="text-gray-medium text-sm mb-2">海拔1200米，360度全景视野</p>
+                            <div class="flex items-center space-x-3 text-xs text-gray-medium">
+                                <span><i class="fa fa-map-marker mr-1"></i>距离5.2km</span>
+                                <span><i class="fa fa-clock-o mr-1"></i>15分钟车程</span>
+                                <span><i class="fa fa-star mr-1"></i>4.8分</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 西湖景区 -->
+                <div class="miniprogram-card bg-white overflow-hidden touch-friendly location-card" onclick="selectLocation('lake')" data-location="lake">
+                    <div class="flex">
+                        <img src="https://picsum.photos/id/1031/150/120" alt="西湖景区" class="w-24 h-20 object-cover flex-shrink-0">
+                        <div class="p-4 flex-1">
+                            <div class="flex items-center justify-between mb-2">
+                                <h3 class="font-bold text-dark">西湖景区</h3>
+                                <div class="w-5 h-5 border-2 border-gray-300 rounded-full location-checkbox" data-location="lake">
+                                    <i class="fa fa-check text-primary text-xs hidden"></i>
+                                </div>
+                            </div>
+                            <p class="text-gray-medium text-sm mb-2">湖光山色，四季皆美</p>
+                            <div class="flex items-center space-x-3 text-xs text-gray-medium">
+                                <span><i class="fa fa-map-marker mr-1"></i>距离3.8km</span>
+                                <span><i class="fa fa-clock-o mr-1"></i>12分钟车程</span>
+                                <span><i class="fa fa-star mr-1"></i>4.9分</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 城市地标 -->
+                <div class="miniprogram-card bg-white overflow-hidden touch-friendly location-card" onclick="selectLocation('city')" data-location="city">
+                    <div class="flex">
+                        <img src="https://picsum.photos/id/1016/150/120" alt="城市中心广场" class="w-24 h-20 object-cover flex-shrink-0">
+                        <div class="p-4 flex-1">
+                            <div class="flex items-center justify-between mb-2">
+                                <h3 class="font-bold text-dark">城市中心广场</h3>
+                                <div class="w-5 h-5 border-2 border-gray-300 rounded-full location-checkbox" data-location="city">
+                                    <i class="fa fa-check text-primary text-xs hidden"></i>
+                                </div>
+                            </div>
+                            <p class="text-gray-medium text-sm mb-2">现代都市，霓虹璀璨</p>
+                            <div class="flex items-center space-x-3 text-xs text-gray-medium">
+                                <span><i class="fa fa-map-marker mr-1"></i>距离2.1km</span>
+                                <span><i class="fa fa-clock-o mr-1"></i>8分钟车程</span>
+                                <span><i class="fa fa-star mr-1"></i>4.7分</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 森林公园 -->
+                <div class="miniprogram-card bg-white overflow-hidden touch-friendly location-card" onclick="selectLocation('forest')" data-location="forest">
+                    <div class="flex">
+                        <img src="https://picsum.photos/id/1020/150/120" alt="翠竹森林公园" class="w-24 h-20 object-cover flex-shrink-0">
+                        <div class="p-4 flex-1">
+                            <div class="flex items-center justify-between mb-2">
+                                <h3 class="font-bold text-dark">翠竹森林公园</h3>
+                                <div class="w-5 h-5 border-2 border-gray-300 rounded-full location-checkbox" data-location="forest">
+                                    <i class="fa fa-check text-primary text-xs hidden"></i>
+                                </div>
+                            </div>
+                            <p class="text-gray-medium text-sm mb-2">绿意盎然，天然氧吧</p>
+                            <div class="flex items-center space-x-3 text-xs text-gray-medium">
+                                <span><i class="fa fa-map-marker mr-1"></i>距离4.5km</span>
+                                <span><i class="fa fa-clock-o mr-1"></i>13分钟车程</span>
+                                <span><i class="fa fa-star mr-1"></i>4.6分</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+
+        <!-- 订单确认 -->
+        <section class="p-4 hidden" id="confirmSection">
+            <div class="mb-4">
+                <h2 class="text-lg font-bold mb-2">确认订单</h2>
+                <p class="text-gray-medium text-sm">请确认您的拍摄信息</p>
+            </div>
+
+            <div class="space-y-4">
+                <!-- 拍摄信息 -->
+                <div class="miniprogram-card bg-white p-4">
+                    <h3 class="font-bold text-dark mb-3">拍摄信息</h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-gray-medium">拍摄地点</span>
+                            <span class="font-medium" id="selectedLocationName">-</span>
+                        </div>
+
+
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-gray-medium">预计时长</span>
+                            <span class="font-medium" id="estimatedDuration">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 费用明细 -->
+                <div class="miniprogram-card bg-white p-4">
+                    <h3 class="font-bold text-dark mb-3">费用明细</h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-gray-medium">拍摄服务费</span>
+                            <span class="font-medium" id="servicePrice">¥98</span>
+                        </div>
+
+                        <div class="border-t border-gray-light pt-3">
+                            <div class="flex justify-between items-center">
+                                <span class="text-lg font-bold text-dark">总计</span>
+                                <span class="text-2xl font-bold text-primary" id="totalPrice">¥98</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 温馨提示 -->
+                <div class="miniprogram-card bg-blue-50 border border-blue-200 p-4">
+                    <h3 class="font-bold text-blue-800 mb-3 flex items-center">
+                        <i class="fa fa-lightbulb-o mr-2"></i>
+                        温馨提示
+                    </h3>
+                    <div class="text-sm text-blue-700 space-y-2">
+                        <p>• 请在预约时间前10分钟到达拍摄地点</p>
+                        <p>• 拍摄过程请配合无人机指引，确保安全</p>
+                        <p>• 恶劣天气将自动取消并全额退款</p>
+                        <p>• 成片将在24-48小时内通过企业微信发送</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- 底部操作栏 -->
+    <div class="fixed bottom-16 left-0 right-0 bg-white border-t border-gray-light p-4 z-40" id="actionBar">
+        <div class="flex items-center justify-between">
+            <div>
+                <span class="text-gray-medium text-sm">总计:</span>
+                <span class="text-2xl font-bold text-primary ml-2" id="bottomTotalPrice">¥98</span>
+            </div>
+            <button id="nextStepBtn" onclick="nextStep()" disabled class="px-8 py-3 bg-gray-300 text-gray-500 rounded-lg font-bold touch-friendly">
+                下一步
+            </button>
+        </div>
+    </div>
+
+    <!-- 微信小程序底部导航栏 -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-light z-50 safe-area-bottom" id="bottomNav">
+        <div class="flex justify-around items-center h-16">
+            <div class="tab-item flex flex-col items-center justify-center text-gray-medium touch-friendly" onclick="location.href='index.html'">
+                <i class="fa fa-home text-lg mb-1"></i>
+                <span class="text-xs">首页</span>
+            </div>
+            <div class="tab-item flex flex-col items-center justify-center text-gray-medium touch-friendly" onclick="location.href='sample-display.html'">
+                <i class="fa fa-picture-o text-lg mb-1"></i>
+                <span class="text-xs">样片</span>
+            </div>
+            <div class="tab-item flex flex-col items-center justify-center touch-friendly active">
+                <div class="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center -mt-6 shadow-lg relative">
+                    <i class="fa fa-camera text-lg"></i>
+                </div>
+                <span class="text-xs text-primary font-medium mt-1">拍摄</span>
+            </div>
+            <div class="tab-item flex flex-col items-center justify-center text-gray-medium touch-friendly" onclick="location.href='user-management.html'">
+                <i class="fa fa-user text-lg mb-1"></i>
+                <span class="text-xs">订单</span>
+            </div>
+            <div class="tab-item flex flex-col items-center justify-center text-gray-medium touch-friendly" onclick="location.href='after-service.html'">
+                <i class="fa fa-star text-lg mb-1"></i>
+                <span class="text-xs">定制</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 帮助弹窗 -->
+    <div id="helpModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg max-w-sm w-full">
+            <div class="p-4 border-b border-gray-light">
+                <div class="flex items-center justify-between">
+                    <h3 class="font-bold text-dark">选择帮助</h3>
+                    <button onclick="closeHelp()" class="text-gray-medium text-xl">
+                        <i class="fa fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="p-4 space-y-3 text-sm">
+                <div>
+                    <h4 class="font-medium text-dark mb-1">如何选择地点？</h4>
+                    <p class="text-gray-medium">根据您想要的拍摄风格选择，山景适合大气照片，湖景适合浪漫风格。</p>
+                </div>
+                <div>
+                    <h4 class="font-medium text-dark mb-1">如何确定拍摄内容？</h4>
+                    <p class="text-gray-medium">拍摄内容根据您选择的样片确定，统一提供专业无人机拍摄服务。</p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- JavaScript交互代码 -->
+    <script>
+        let currentStep = 1;
+        let selectedLocation = null;
+
+        
+        const locationNames = {
+            'mountain': '天台山观景台',
+            'lake': '西湖景区',
+            'city': '城市中心广场',
+            'forest': '翠竹森林公园'
+        };
+        
+        // 统一服务价格和时长
+        const servicePrice = 98;
+        const serviceDuration = '20-30分钟';
+
+        // 根据地点获取对应的样片名称
+        function getSampleNameByLocation(location) {
+            const sampleMapping = {
+                'mountain': '山顶俯拍全景',
+                'lake': '湖畔追踪拍摄',
+                'city': '城市夜景航拍',
+                'forest': '森林俯拍'
+            };
+            return sampleMapping[location] || '无人机拍摄服务';
+        }
+
+        // 小程序适配
+        document.addEventListener('DOMContentLoaded', function() {
+            // 解决底部导航栏遮挡内容的问题
+            adjustContentPadding();
+            
+            // 添加小程序风格的触摸反馈
+            const touchElements = document.querySelectorAll('.touch-friendly');
+            touchElements.forEach(element => {
+                element.addEventListener('touchstart', function() {
+                    this.style.opacity = '0.7';
+                    this.style.transform = 'scale(0.98)';
+                });
+                
+                element.addEventListener('touchend', function() {
+                    this.style.opacity = '1';
+                    this.style.transform = 'scale(1)';
+                });
+                
+                element.addEventListener('touchcancel', function() {
+                    this.style.opacity = '1';
+                    this.style.transform = 'scale(1)';
+                });
+            });
+
+            // 检查URL参数，如果有location参数则默认选择对应地点
+            const urlParams = new URLSearchParams(window.location.search);
+            const defaultLocation = urlParams.get('location');
+            if (defaultLocation && locationNames[defaultLocation]) {
+                selectLocation(defaultLocation);
+            }
+        });
+
+        // 窗口大小变化时重新调整padding
+        window.addEventListener('resize', adjustContentPadding);
+
+        // 调整内容区域的padding-bottom以适应底部导航栏和操作栏
+        function adjustContentPadding() {
+            const nav = document.getElementById('bottomNav');
+            const actionBar = document.getElementById('actionBar');
+            const contentContainer = document.querySelector('.content-container');
+            
+            if (nav && actionBar && contentContainer) {
+                // 获取导航栏的实际高度
+                const navHeight = nav.offsetHeight;
+                // 获取操作栏的实际高度
+                const actionBarHeight = actionBar.offsetHeight;
+                // 获取安全区域底部高度
+                const safeAreaBottom = getSafeAreaBottom();
+                // 设置内容区域底部内边距（导航栏 + 操作栏 + 安全区域）
+                contentContainer.style.paddingBottom = `${navHeight + actionBarHeight + safeAreaBottom}px`;
+            }
+        }
+
+        // 获取安全区域底部高度
+        function getSafeAreaBottom() {
+            if (typeof window !== 'undefined' && window.screen) {
+                // 尝试从环境变量获取
+                const envSafeArea = getComputedStyle(document.documentElement).getPropertyValue('--safe-area-inset-bottom');
+                if (envSafeArea) {
+                    return parseFloat(envSafeArea);
+                }
+                
+                // 回退方案
+                return Math.max(
+                    0,
+                    window.innerHeight - document.documentElement.clientHeight
+                );
+            }
+            return 0;
+        }
+
+        // 选择地点
+        function selectLocation(location) {
+            selectedLocation = location;
+            
+            // 更新UI
+            document.querySelectorAll('.location-card').forEach(card => {
+                card.classList.remove('location-selected');
+            });
+            document.querySelectorAll('.location-checkbox').forEach(checkbox => {
+                checkbox.classList.remove('bg-primary', 'border-primary');
+                checkbox.classList.add('border-gray-300');
+                checkbox.querySelector('i').classList.add('hidden');
+            });
+            
+            const selectedCard = document.querySelector(`.location-card[data-location="${location}"]`);
+            const selectedCheckbox = document.querySelector(`.location-checkbox[data-location="${location}"]`);
+            
+            selectedCard.classList.add('location-selected');
+            selectedCheckbox.classList.remove('border-gray-300');
+            selectedCheckbox.classList.add('bg-primary', 'border-primary');
+            selectedCheckbox.querySelector('i').classList.remove('hidden');
+            
+            updateNextButton();
+        }
+
+
+
+
+
+        // 更新下一步按钮状态
+        function updateNextButton() {
+            const nextBtn = document.getElementById('nextStepBtn');
+            
+            if (currentStep === 1 && selectedLocation) {
+                nextBtn.disabled = false;
+                nextBtn.classList.remove('bg-gray-300', 'text-gray-500');
+                nextBtn.classList.add('bg-primary', 'text-white');
+                nextBtn.textContent = '确认订单';
+            } else if (currentStep === 2) {
+                nextBtn.disabled = false;
+                nextBtn.classList.remove('bg-gray-300', 'text-gray-500');
+                nextBtn.classList.add('bg-gradient-to-r', 'from-primary', 'to-blue-secondary', 'text-white');
+                nextBtn.textContent = '立即支付';
+            } else {
+                nextBtn.disabled = true;
+                nextBtn.classList.remove('bg-primary', 'text-white', 'bg-gradient-to-r', 'from-primary', 'to-blue-secondary');
+                nextBtn.classList.add('bg-gray-300', 'text-gray-500');
+                nextBtn.textContent = '下一步';
+            }
+        }
+
+        // 下一步
+        function nextStep() {
+            if (currentStep === 1 && selectedLocation) {
+                currentStep = 2;
+                showConfirmSection();
+            } else if (currentStep === 2) {
+                proceedToPayment();
+            }
+        }
+
+
+
+        // 显示订单确认
+        function showConfirmSection() {
+            document.getElementById('locationSection').classList.add('hidden');
+            document.getElementById('confirmSection').classList.remove('hidden');
+            
+            // 更新订单信息
+            document.getElementById('selectedLocationName').textContent = locationNames[selectedLocation];
+            document.getElementById('estimatedDuration').textContent = serviceDuration;
+            
+            // 更新步骤指示器
+            updateStepIndicator();
+            updateNextButton();
+        }
+
+        // 更新步骤指示器
+        function updateStepIndicator() {
+            const step2El = document.getElementById('step2');
+            const step2TextEl = document.getElementById('step2Text');
+            
+            if (currentStep >= 2) {
+                step2El.classList.remove('bg-gray-light', 'text-gray-medium');
+                step2El.classList.add('step-active');
+                step2TextEl.classList.remove('text-gray-medium');
+                step2TextEl.classList.add('text-primary', 'font-medium');
+            }
+        }
+
+        // 进入支付流程
+        function proceedToPayment() {
+            // 检查登录状态
+            const loginInfo = JSON.parse(localStorage.getItem('loginInfo') || '{}');
+            
+            if (!loginInfo.isLoggedIn) {
+                // 未登录，先存储订单信息，然后跳转到登录页面
+                const orderInfo = {
+                    location: selectedLocation,
+                    locationName: locationNames[selectedLocation],
+                    sampleName: getSampleNameByLocation(selectedLocation),
+                    totalPrice: servicePrice,
+                    duration: serviceDuration,
+                    timestamp: Date.now()
+                };
+                
+                localStorage.setItem('pendingOrder', JSON.stringify(orderInfo));
+                localStorage.setItem('returnUrl', 'user-management.html?action=payment');
+                
+                // 跳转到登录页面
+                location.href = 'login.html';
+            } else {
+                // 已登录，存储订单信息并跳转到支付页面
+                const orderInfo = {
+                    location: selectedLocation,
+                    locationName: locationNames[selectedLocation],
+                    sampleName: getSampleNameByLocation(selectedLocation),
+                    totalPrice: servicePrice,
+                    duration: serviceDuration,
+                    timestamp: Date.now()
+                };
+                
+                localStorage.setItem('pendingOrder', JSON.stringify(orderInfo));
+                
+                // 跳转到用户管理页面进行支付
+                location.href = 'user-management.html?action=payment';
+            }
+        }
+
+        // 显示帮助
+        function showHelp() {
+            document.getElementById('helpModal').classList.remove('hidden');
+        }
+
+        // 关闭帮助
+        function closeHelp() {
+            document.getElementById('helpModal').classList.add('hidden');
+        }
+
+        // 点击遮罩关闭弹窗
+        document.getElementById('helpModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeHelp();
+            }
+        });
+    </script>
+</body>
+</html>

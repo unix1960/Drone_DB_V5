@@ -1,0 +1,1607 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>我的订单 - 无人机自助打卡</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#1E40AF',
+                        accent: '#06B6D4',
+                        dark: '#1E293B',
+                        light: '#F8FAFC',
+                        'gray-medium': '#64748B',
+                        'gray-light': '#E2E8F0',
+                        'blue-primary': '#3B82F6',
+                        'blue-secondary': '#1D4ED8',
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            }
+            .touch-friendly {
+                touch-action: manipulation;
+                -webkit-tap-highlight-color: transparent;
+            }
+            .safe-area-bottom {
+                padding-bottom: constant(safe-area-inset-bottom);
+                padding-bottom: env(safe-area-inset-bottom);
+            }
+            .miniprogram-scroll {
+                -webkit-overflow-scrolling: touch;
+            }
+            .miniprogram-card {
+                box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+                border-radius: 8px;
+            }
+            .qr-code {
+                background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23f0f0f0"/><text x="50" y="50" font-family="Arial" font-size="8" text-anchor="middle" dy=".3em">二维码</text></svg>') center/contain no-repeat;
+            }
+        }
+    </style>
+</head>
+<body class="font-inter bg-light text-dark antialiased touch-action-manipulation">
+    <!-- 页面容器 -->
+    <div class="min-h-screen w-full safe-area-bottom content-container">
+        <!-- 头部导航 -->
+        <header class="bg-white border-b border-gray-light sticky top-0 z-40">
+            <div class="flex items-center justify-between h-14 px-4">
+                <button onclick="history.back()" class="flex items-center text-gray-medium touch-friendly">
+                    <i class="fa fa-angle-left text-xl mr-1"></i>
+                    <span class="text-sm">返回</span>
+                </button>
+                <h1 class="font-bold text-dark">我的订单</h1>
+                <div class="w-6"></div>
+            </div>
+        </header>
+
+        <!-- 登录提示 -->
+        <div id="loginRequired" class="hidden bg-white p-6 text-center">
+            <i class="fa fa-user-circle-o text-6xl text-gray-300 mb-4"></i>
+            <h3 class="font-bold text-dark mb-2">请先登录</h3>
+            <p class="text-gray-medium mb-4 text-sm">登录后可查看您的订单记录</p>
+            <div class="space-y-3">
+                <button onclick="goToLogin()" class="w-full bg-primary text-white py-3 rounded-lg font-medium touch-friendly">
+                    <i class="fa fa-sign-in mr-2"></i>
+                    立即登录
+                </button>
+            </div>
+        </div>
+
+        <!-- 用户信息区域 -->
+        <section class="bg-white p-4 border-b border-gray-light" id="userSection">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="font-bold text-dark">用户信息</h2>
+                <div class="flex space-x-2">
+                    <button onclick="editUserInfo()" class="text-primary text-sm touch-friendly">
+                        <i class="fa fa-edit mr-1"></i>编辑
+                    </button>
+                    <button onclick="logout()" class="text-gray-medium text-sm touch-friendly">
+                        <i class="fa fa-sign-out mr-1"></i>退出
+                    </button>
+                </div>
+            </div>
+            
+            <div id="userInfoDisplay" class="space-y-3">
+                <div class="flex items-center justify-between">
+                    <span class="text-gray-medium">手机号码</span>
+                    <span class="font-medium" id="userPhone">未填写</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="text-gray-medium">姓氏</span>
+                    <span class="font-medium" id="userName">未填写</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="text-gray-medium">性别</span>
+                    <span class="font-medium" id="userGender">未选择</span>
+                </div>
+            </div>
+
+            <!-- 用户信息编辑表单 -->
+            <div id="userInfoForm" class="hidden space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-dark mb-2">手机号码 *</label>
+                    <input type="tel" id="phoneInput" class="w-full p-3 border border-gray-light rounded-lg focus:border-primary focus:outline-none" placeholder="请输入手机号码" maxlength="11">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-dark mb-2">姓氏 *</label>
+                    <input type="text" id="nameInput" class="w-full p-3 border border-gray-light rounded-lg focus:border-primary focus:outline-none" placeholder="请输入姓氏" maxlength="10">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-dark mb-2">性别 *</label>
+                    <div class="flex space-x-4">
+                        <label class="flex items-center">
+                            <input type="radio" name="gender" value="male" class="mr-2">
+                            <span>先生</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="radio" name="gender" value="female" class="mr-2">
+                            <span>女士</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="flex space-x-3">
+                    <button onclick="saveUserInfo()" class="flex-1 bg-primary text-white py-3 rounded-lg font-medium touch-friendly">
+                        保存
+                    </button>
+                    <button onclick="cancelEdit()" class="flex-1 bg-gray-light text-gray-medium py-3 rounded-lg font-medium touch-friendly">
+                        取消
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 待支付订单 -->
+        <section class="p-4" id="pendingPaymentSection" style="display: none;">
+            <div class="miniprogram-card bg-gradient-to-br from-orange-50 to-white border-2 border-orange-200 p-4">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-bold text-orange-800 flex items-center">
+                        <i class="fa fa-clock-o mr-2"></i>
+                        待支付订单
+                    </h3>
+                    <span class="text-orange-600 text-sm" id="paymentCountdown">15:00</span>
+                </div>
+                
+                <div class="space-y-3 mb-4">
+                    <div class="flex justify-between items-center text-sm">
+                        <span class="text-gray-medium">拍摄地点</span>
+                        <span class="font-medium" id="pendingLocation">-</span>
+                    </div>
+                    <div class="flex justify-between items-center text-sm">
+                        <span class="text-gray-medium">选择样片</span>
+                        <span class="font-medium" id="pendingSample">-</span>
+                    </div>
+                    <div class="flex justify-between items-center text-sm">
+                        <span class="text-gray-medium">订单金额</span>
+                        <span class="font-bold text-lg text-primary" id="pendingPrice">-</span>
+                    </div>
+                </div>
+
+                <!-- 支付方式选择 -->
+                <div class="space-y-3 mb-4">
+                    <p class="text-sm text-gray-medium text-center">请选择支付方式</p>
+                    <div class="space-y-2">
+                        <button onclick="payWithWechat()" class="w-full bg-green-500 text-white py-3 rounded-lg font-medium touch-friendly flex items-center justify-center">
+                            <i class="fa fa-wechat mr-2"></i>
+                            微信支付
+                        </button>
+                        <button onclick="payWithAlipay()" class="w-full bg-blue-500 text-white py-3 rounded-lg font-medium touch-friendly flex items-center justify-center">
+                            <i class="fa fa-credit-card mr-2"></i>
+                            支付宝支付
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex space-x-3">
+                    <button onclick="cancelOrder()" class="w-full bg-gray-light text-gray-medium py-3 rounded-lg font-medium touch-friendly">
+                        取消订单
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 订单列表 -->
+        <section class="p-4">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="font-bold text-dark">订单记录</h2>
+                <div class="flex flex-wrap gap-2">
+                    <button class="px-3 py-1 bg-primary text-white rounded-full text-sm touch-friendly order-filter active" data-status="all">
+                        全部
+                    </button>
+                    <button class="px-3 py-1 bg-gray-light text-gray-medium rounded-full text-sm touch-friendly order-filter" data-status="shooting">
+                        拍摄中
+                    </button>
+                    <button class="px-3 py-1 bg-gray-light text-gray-medium rounded-full text-sm touch-friendly order-filter" data-status="pending_customize">
+                        待定制
+                    </button>
+                    <button class="px-3 py-1 bg-gray-light text-gray-medium rounded-full text-sm touch-friendly order-filter" data-status="completed">
+                        已完成
+                    </button>
+                </div>
+            </div>
+
+            <div class="space-y-4" id="ordersList">
+                <!-- 订单项会通过JavaScript动态生成 -->
+            </div>
+
+            <!-- 空状态 -->
+            <div id="emptyState" class="text-center py-12">
+                <i class="fa fa-file-text-o text-6xl text-gray-300 mb-4"></i>
+                <p class="text-gray-medium mb-4">暂无订单记录</p>
+                <button onclick="location.href='user-selection.html'" class="px-6 py-3 bg-primary text-white rounded-lg font-medium touch-friendly">
+                    <i class="fa fa-camera mr-2"></i>
+                    立即拍摄
+                </button>
+            </div>
+        </section>
+
+        <!-- 客服联系区域 -->
+        <section class="px-4 pb-6" id="serviceSection" style="display: none;">
+            <div class="miniprogram-card bg-blue-50 border border-blue-200 p-4">
+                <h3 class="font-bold text-blue-800 mb-3 flex items-center">
+                    <i class="fa fa-headphones mr-2"></i>
+                    客服支持
+                </h3>
+                <p class="text-blue-700 text-sm mb-4">支付完成后如有问题，请联系我们的专业客服团队</p>
+                <div class="flex space-x-3">
+                    <button onclick="callService()" class="flex-1 bg-primary text-white py-2 rounded-lg text-sm font-medium touch-friendly">
+                        <i class="fa fa-phone mr-1"></i>
+                        <span id="servicePhoneDisplay">客服电话</span>
+                    </button>
+                    <button onclick="addWechat()" class="flex-1 bg-accent text-white py-2 rounded-lg text-sm font-medium touch-friendly">
+                        <i class="fa fa-wechat mr-1"></i>
+                        企业微信
+                    </button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- 固定客服电话按钮 -->
+    <button onclick="callService()" class="fixed bottom-20 right-4 w-12 h-12 bg-primary text-white rounded-full shadow-lg z-40 flex items-center justify-center touch-friendly hover:bg-primary/90 transition-colors">
+        <i class="fa fa-phone text-lg"></i>
+    </button>
+
+    <!-- 微信小程序底部导航栏 -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-light z-50 safe-area-bottom" id="bottomNav">
+        <div class="flex justify-around items-center h-16">
+            <div class="tab-item flex flex-col items-center justify-center text-gray-medium touch-friendly" onclick="location.href='index.html'">
+                <i class="fa fa-home text-lg mb-1"></i>
+                <span class="text-xs">首页</span>
+            </div>
+            <div class="tab-item flex flex-col items-center justify-center text-gray-medium touch-friendly" onclick="location.href='sample-display.html'">
+                <i class="fa fa-picture-o text-lg mb-1"></i>
+                <span class="text-xs">样片</span>
+            </div>
+            <div class="tab-item flex flex-col items-center justify-center touch-friendly" onclick="location.href='user-selection.html'">
+                <div class="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center -mt-6 shadow-lg relative">
+                    <i class="fa fa-camera text-lg"></i>
+                </div>
+                <span class="text-xs text-primary font-medium mt-1">拍摄</span>
+            </div>
+            <div class="tab-item flex flex-col items-center justify-center text-primary touch-friendly active">
+                <i class="fa fa-user text-lg mb-1"></i>
+                <span class="text-xs">订单</span>
+            </div>
+            <div class="tab-item flex flex-col items-center justify-center text-gray-medium touch-friendly" onclick="location.href='after-service.html'">
+                <i class="fa fa-star text-lg mb-1"></i>
+                <span class="text-xs">定制</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 订单详情弹窗 -->
+    <div id="orderDetailModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg max-w-md w-full max-h-96 overflow-y-auto">
+            <div class="sticky top-0 bg-white border-b border-gray-light p-4">
+                <div class="flex items-center justify-between">
+                    <h3 class="font-bold text-dark">订单详情</h3>
+                    <button onclick="closeOrderDetail()" class="text-gray-medium text-xl">
+                        <i class="fa fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="p-4 space-y-4" id="orderDetailContent">
+                <!-- 订单详情内容会动态填充 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript交互代码 -->
+    <script>
+        let userInfo = JSON.parse(localStorage.getItem('userInfo')) || {};
+        let orders = JSON.parse(localStorage.getItem('orders')) || [];
+        let pendingOrder = null;
+        let paymentTimer = null;
+        let paymentTimeLeft = 15 * 60; // 15分钟
+
+        // 模拟订单数据
+        const sampleOrders = [
+            {
+                id: 'ORDER001',
+                location: '天台山观景台',
+                sampleName: '山顶俯拍全景',
+                price: 98,
+                status: 'completed',
+                date: '2025-01-15 14:30',
+                photos: 45,
+                videos: 1,
+                duration: '12分钟',
+                identityCode: 'ID001'
+            },
+            {
+                id: 'ORDER002',
+                location: '西湖景区',
+                sampleName: '湖畔追踪拍摄',
+                price: 98,
+                status: 'shooting',
+                date: '2025-01-16 10:15',
+                photos: 18,
+                videos: 1,
+                duration: '8分钟',
+                identityCode: 'ID002'
+            },
+            {
+                id: 'ORDER003',
+                location: '钱塘江大桥',
+                sampleName: '城市夜景航拍',
+                price: 98,
+                status: 'processing',
+                date: '2025-01-16 16:20',
+                photos: 25,
+                videos: 1,
+                duration: '预计5分钟',
+                identityCode: 'ID003'
+            },
+            {
+                id: 'ORDER004',
+                location: '灵隐寺',
+                sampleName: '森林俯拍',
+                price: 98,
+                status: 'failed',
+                date: '2025-01-17 09:30',
+                photos: 0,
+                videos: 0,
+                duration: '0分钟',
+                identityCode: 'ID004',
+                failReason: '天气原因无法起飞'
+            },
+            {
+                id: 'ORDER005',
+                location: '断桥残雪',
+                sampleName: '湖畔追踪拍摄',
+                price: 98,
+                status: 'cancelled',
+                date: '2025-01-17 14:15',
+                photos: 0,
+                videos: 0,
+                duration: '0分钟',
+                identityCode: 'ID005',
+                cancelReason: '用户临时有事'
+            },
+            {
+                id: 'ORDER006',
+                location: '雷峰塔',
+                sampleName: '山顶俯拍全景',
+                price: 98,
+                status: 'refunded',
+                date: '2025-01-18 11:00',
+                photos: 0,
+                videos: 0,
+                duration: '0分钟',
+                identityCode: 'ID006',
+                refundAmount: 98,
+                refundTime: '2025-01-18 15:30'
+            },
+            {
+                id: 'ORDER007',
+                location: '三潭印月',
+                sampleName: '森林俯拍',
+                price: 98,
+                status: 'expired',
+                date: '2025-01-10 10:00',
+                photos: 0,
+                videos: 0,
+                duration: '0分钟',
+                identityCode: 'ID007'
+            },
+            {
+                id: 'ORDER008',
+                location: '苏堤春晓',
+                sampleName: '湖畔追踪拍摄',
+                price: 98,
+                status: 'pending_customize',
+                date: '2025-01-18 15:30',
+                photos: 38,
+                videos: 1,
+                duration: '15分钟',
+                identityCode: 'ID008'
+            }
+        ];
+
+        // 小程序适配
+        document.addEventListener('DOMContentLoaded', function() {
+            // 解决底部导航栏遮挡内容的问题
+            adjustContentPadding();
+            
+            // 添加小程序风格的触摸反馈
+            const touchElements = document.querySelectorAll('.touch-friendly');
+            touchElements.forEach(element => {
+                element.addEventListener('touchstart', function() {
+                    this.style.opacity = '0.7';
+                    this.style.transform = 'scale(0.98)';
+                });
+                
+                element.addEventListener('touchend', function() {
+                    this.style.opacity = '1';
+                    this.style.transform = 'scale(1)';
+                });
+                
+                element.addEventListener('touchcancel', function() {
+                    this.style.opacity = '1';
+                    this.style.transform = 'scale(1)';
+                });
+            });
+
+            // 初始化页面
+            initializePage();
+        });
+
+        // 窗口大小变化时重新调整padding
+        window.addEventListener('resize', adjustContentPadding);
+
+        // 调整内容区域的padding-bottom以适应底部导航栏
+        function adjustContentPadding() {
+            const nav = document.getElementById('bottomNav');
+            const contentContainer = document.querySelector('.content-container');
+            
+            if (nav && contentContainer) {
+                // 获取导航栏的实际高度
+                const navHeight = nav.offsetHeight;
+                // 获取安全区域底部高度
+                const safeAreaBottom = getSafeAreaBottom();
+                // 设置内容区域底部内边距，确保内容不被导航栏遮挡
+                contentContainer.style.paddingBottom = `${navHeight + safeAreaBottom}px`;
+            }
+        }
+
+        // 获取安全区域底部高度
+        function getSafeAreaBottom() {
+            if (typeof window !== 'undefined' && window.screen) {
+                // 尝试从环境变量获取
+                const envSafeArea = getComputedStyle(document.documentElement).getPropertyValue('--safe-area-inset-bottom');
+                if (envSafeArea) {
+                    return parseFloat(envSafeArea);
+                }
+                
+                // 回退方案
+                return Math.max(
+                    0,
+                    window.innerHeight - document.documentElement.clientHeight
+                );
+            }
+            return 0;
+        }
+
+        // 初始化页面
+        function initializePage() {
+            checkLoginStatus();
+            
+            // 检查URL参数
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('action') === 'payment') {
+                processPendingOrder();
+            }
+        }
+
+        // 检查登录状态
+        function checkLoginStatus() {
+            const loginInfo = JSON.parse(localStorage.getItem('loginInfo') || '{}');
+            
+            if (loginInfo.isLoggedIn) {
+                // 已登录，显示用户信息
+                updateUserDisplay();
+                loadUserInfo();
+                checkPendingPayment();
+                loadOrders();
+                setupOrderFilters();
+            } else {
+                // 未登录，显示登录提示
+                document.getElementById('loginRequired').classList.remove('hidden');
+                document.getElementById('userSection').classList.add('hidden');
+                document.getElementById('ordersList').innerHTML = '';
+                document.getElementById('emptyState').style.display = 'none';
+            }
+        }
+
+        // 更新用户显示
+        function updateUserDisplay() {
+            document.getElementById('loginRequired').classList.add('hidden');
+            document.getElementById('userSection').classList.remove('hidden');
+        }
+
+        // 跳转到登录页面
+        function goToLogin() {
+            localStorage.setItem('returnUrl', window.location.href);
+            window.location.href = 'login.html';
+        }
+
+
+
+        // 退出登录
+        function logout() {
+            if (confirm('确定要退出登录吗？')) {
+                localStorage.removeItem('loginInfo');
+                localStorage.removeItem('userInfo');
+                localStorage.removeItem('orders');
+                window.location.reload();
+            }
+        }
+
+        // 加载用户信息
+        function loadUserInfo() {
+            if (userInfo.phone) {
+                document.getElementById('userPhone').textContent = userInfo.phone;
+                document.getElementById('userName').textContent = userInfo.name || '未填写';
+                document.getElementById('userGender').textContent = userInfo.gender === 'male' ? '先生' : (userInfo.gender === 'female' ? '女士' : '未选择');
+            }
+        }
+
+        // 编辑用户信息
+        function editUserInfo() {
+            document.getElementById('userInfoDisplay').classList.add('hidden');
+            document.getElementById('userInfoForm').classList.remove('hidden');
+            
+            // 填充当前信息
+            if (userInfo.phone) {
+                document.getElementById('phoneInput').value = userInfo.phone;
+                document.getElementById('nameInput').value = userInfo.name || '';
+                if (userInfo.gender) {
+                    document.querySelector(`input[name="gender"][value="${userInfo.gender}"]`).checked = true;
+                }
+            }
+        }
+
+        // 保存用户信息
+        function saveUserInfo() {
+            const phone = document.getElementById('phoneInput').value.trim();
+            const name = document.getElementById('nameInput').value.trim();
+            const gender = document.querySelector('input[name="gender"]:checked')?.value;
+
+            // 验证必填项
+            if (!phone || !name || !gender) {
+                alert('请填写完整信息');
+                return;
+            }
+
+            // 验证手机号
+            if (!/^1[3-9]\d{9}$/.test(phone)) {
+                alert('请输入正确的手机号码');
+                return;
+            }
+
+            // 保存信息
+            userInfo = { phone, name, gender };
+            localStorage.setItem('userInfo', JSON.stringify(userInfo));
+            
+            loadUserInfo();
+            cancelEdit();
+            
+            // 显示客服区域
+            document.getElementById('serviceSection').style.display = 'block';
+        }
+
+        // 取消编辑
+        function cancelEdit() {
+            document.getElementById('userInfoForm').classList.add('hidden');
+            document.getElementById('userInfoDisplay').classList.remove('hidden');
+        }
+
+        // 检查待支付订单
+        function checkPendingPayment() {
+            const pending = localStorage.getItem('pendingOrder');
+            if (pending) {
+                pendingOrder = JSON.parse(pending);
+                showPendingPayment();
+            }
+        }
+
+        // 处理待支付订单
+        function processPendingOrder() {
+            checkPendingPayment();
+            if (!pendingOrder) {
+                alert('未找到待支付订单');
+                return;
+            }
+            
+            // 检查用户信息
+            if (!userInfo.phone) {
+                alert('请先完善用户信息');
+                editUserInfo();
+                return;
+            }
+        }
+
+        // 显示待支付订单
+        function showPendingPayment() {
+            if (!pendingOrder) return;
+            
+            document.getElementById('pendingPaymentSection').style.display = 'block';
+            document.getElementById('pendingLocation').textContent = pendingOrder.locationName;
+            document.getElementById('pendingSample').textContent = pendingOrder.sampleName || '无人机拍摄服务';
+            document.getElementById('pendingPrice').textContent = `¥${pendingOrder.totalPrice}`;
+            
+            // 启动倒计时
+            startPaymentCountdown();
+        }
+
+        // 微信支付
+        function payWithWechat() {
+            if (!pendingOrder) return;
+            
+            // 小程序环境使用微信支付API
+            if (typeof wx !== 'undefined') {
+                wx.requestPayment({
+                    timeStamp: Math.floor(Date.now() / 1000).toString(),
+                    nonceStr: 'wechat' + Date.now(),
+                    package: `prepay_id=wx${Date.now()}`,
+                    signType: 'MD5',
+                    paySign: 'wechat_pay_sign_' + Date.now(),
+                    success: function() {
+                        completePayment();
+                    },
+                    fail: function() {
+                        showToast('支付取消');
+                    }
+                });
+            } else {
+                // 浏览器环境模拟支付
+                if (confirm('确认使用微信支付 ¥' + pendingOrder.totalPrice + '？')) {
+                    completePayment();
+                }
+            }
+        }
+
+        // 支付宝支付
+        function payWithAlipay() {
+            if (!pendingOrder) return;
+            
+            // 小程序环境跳转支付宝
+            if (typeof wx !== 'undefined') {
+                wx.navigateToMiniProgram({
+                    appId: 'alipay_mini_program_id',
+                    path: 'pages/payment',
+                    extraData: {
+                        amount: pendingOrder.totalPrice,
+                        orderId: 'temp_' + Date.now()
+                    },
+                    success: function() {
+                        // 支付宝支付成功后的回调处理
+                        setTimeout(() => completePayment(), 2000);
+                    },
+                    fail: function() {
+                        // 如果没有安装支付宝小程序，使用模拟支付
+                        if (confirm('确认使用支付宝支付 ¥' + pendingOrder.totalPrice + '？')) {
+                            completePayment();
+                        }
+                    }
+                });
+            } else {
+                // 浏览器环境模拟支付
+                if (confirm('确认使用支付宝支付 ¥' + pendingOrder.totalPrice + '？')) {
+                    completePayment();
+                }
+            }
+        }
+
+        // 启动支付倒计时
+        function startPaymentCountdown() {
+            paymentTimer = setInterval(() => {
+                paymentTimeLeft--;
+                
+                const minutes = Math.floor(paymentTimeLeft / 60);
+                const seconds = paymentTimeLeft % 60;
+                document.getElementById('paymentCountdown').textContent = 
+                    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                if (paymentTimeLeft <= 0) {
+                    clearInterval(paymentTimer);
+                    cancelOrder();
+                }
+            }, 1000);
+        }
+
+
+
+        // 完成支付
+        function completePayment() {
+            if (!pendingOrder) return;
+            
+            // 创建新订单
+            const newOrder = {
+                id: 'ORDER' + Date.now().toString().slice(-6),
+                location: pendingOrder.locationName,
+                sampleName: pendingOrder.sampleName || '无人机拍摄服务',
+                price: pendingOrder.totalPrice,
+                status: 'shooting',
+                date: new Date().toLocaleString('zh-CN', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                })
+            };
+            
+            orders.unshift(newOrder);
+            localStorage.setItem('orders', JSON.stringify(orders));
+            
+            // 清除待支付订单
+            localStorage.removeItem('pendingOrder');
+            pendingOrder = null;
+            
+            // 停止倒计时
+            if (paymentTimer) {
+                clearInterval(paymentTimer);
+                paymentTimer = null;
+            }
+            
+            // 隐藏支付区域
+            document.getElementById('pendingPaymentSection').style.display = 'none';
+            
+            // 显示客服区域
+            document.getElementById('serviceSection').style.display = 'block';
+            
+            // 刷新订单列表
+            loadOrders();
+            
+            alert('支付成功！请前往指定地点进行拍摄。');
+            
+            // 跳转到操作控制页面
+            setTimeout(() => {
+                location.href = 'operation-control.html?orderId=' + newOrder.id;
+            }, 2000);
+        }
+
+        // 取消订单
+        function cancelOrder() {
+            if (confirm('确定要取消此订单吗？')) {
+                localStorage.removeItem('pendingOrder');
+                pendingOrder = null;
+                
+                if (paymentTimer) {
+                    clearInterval(paymentTimer);
+                    paymentTimer = null;
+                }
+                
+                document.getElementById('pendingPaymentSection').style.display = 'none';
+                alert('订单已取消');
+            }
+        }
+
+        // 加载订单列表
+        function loadOrders() {
+            const ordersList = document.getElementById('ordersList');
+            const emptyState = document.getElementById('emptyState');
+            
+            // 如果没有历史订单，使用示例数据
+            if (orders.length === 0 && localStorage.getItem('showSampleData') !== 'false') {
+                orders = sampleOrders;
+            }
+            
+            if (orders.length === 0) {
+                ordersList.innerHTML = '';
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            renderOrders(orders);
+        }
+
+        // 渲染订单列表
+        function renderOrders(ordersToRender) {
+            const ordersList = document.getElementById('ordersList');
+            
+            ordersList.innerHTML = ordersToRender.map(order => {
+                const statusConfig = getStatusConfig(order.status);
+                const statusDescription = getStatusDescription(order);
+                const actionButtons = getActionButtons(order);
+                
+                return `
+                    <div class="miniprogram-card bg-white p-4 touch-friendly" onclick="showOrderDetail('${order.id}')">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex-1">
+                                <h3 class="font-bold text-dark">${order.location}</h3>
+                                <p class="text-gray-medium text-sm">${order.sampleName || order.package || '无人机拍摄服务'}</p>
+                            </div>
+                            <div class="text-right">
+                                <span class="px-2 py-1 rounded-full text-xs ${statusConfig.class}">
+                                    ${statusConfig.text}
+                                </span>
+                                <p class="text-primary font-bold mt-1">¥${order.price}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between text-sm text-gray-medium mb-2">
+                            <span>订单号：${order.id}</span>
+                            <span>${order.date}</span>
+                        </div>
+                        ${statusDescription ? `
+                            <div class="text-xs text-gray-600 mb-2">
+                                ${statusDescription}
+                            </div>
+                        ` : ''}
+                        ${actionButtons ? `
+                            <div class="mt-3 pt-3 border-t border-gray-light">
+                                ${actionButtons}
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 获取状态描述
+        function getStatusDescription(order) {
+            switch(order.status) {
+                case 'shooting':
+                    return '请前往拍摄地点，开始您的无人机拍摄之旅';
+                case 'processing':
+                    return 'AI正在为您精心制作专属大片，预计2-4小时完成';
+                case 'completed':
+                    return `成片已完成！共${order.photos}张照片，${order.videos}个视频`;
+                case 'pending_customize':
+                    return '拍摄完成，请选择您需要的定制选项，我们将为您制作专属成片';
+                case 'failed':
+                    return order.failReason ? `拍摄失败：${order.failReason}` : '拍摄失败，您可以申请退款或重新拍摄';
+                case 'cancelled':
+                    return order.cancelReason ? `取消原因：${order.cancelReason}` : '订单已取消';
+                case 'refunded':
+                    return order.refundTime ? `已于${order.refundTime}退款¥${order.refundAmount}` : '订单已退款';
+                case 'expired':
+                    return '订单已过期，如需帮助请联系客服';
+                default:
+                    return '';
+            }
+        }
+
+        // 获取操作按钮
+        function getActionButtons(order) {
+            switch(order.status) {
+                case 'shooting':
+                    return `
+                        <div class="flex space-x-2">
+                            <button onclick="event.stopPropagation(); goToShooting('${order.id}')" class="flex-1 bg-primary text-white py-2 rounded-lg text-sm font-medium">
+                                <i class="fa fa-camera mr-1"></i>
+                                前往拍摄
+                            </button>
+                            <button onclick="event.stopPropagation(); cancelOrder('${order.id}')" class="flex-1 bg-gray-light text-gray-medium py-2 rounded-lg text-sm font-medium">
+                                <i class="fa fa-times mr-1"></i>
+                                取消订单
+                            </button>
+                        </div>
+                    `;
+                case 'processing':
+                    return ``;
+                case 'completed':
+                    return `
+                        <div class="flex space-x-2">
+                            <button onclick="event.stopPropagation(); viewResults('${order.id}')" class="flex-1 bg-green-500 text-white py-2 rounded-lg text-sm font-medium">
+                                <i class="fa fa-eye mr-1"></i>
+                                查看成片
+                            </button>
+                            <button onclick="event.stopPropagation(); shareVideo('${order.id}')" class="flex-1 bg-blue-500 text-white py-2 rounded-lg text-sm font-medium">
+                                <i class="fa fa-share-alt mr-1"></i>
+                                分享视频
+                            </button>
+                        </div>
+                    `;
+                case 'pending_customize':
+                    return `
+                        <button onclick="event.stopPropagation(); customizeVideo('${order.id}')" class="w-full bg-indigo-500 text-white py-2 rounded-lg text-sm font-medium">
+                            <i class="fa fa-star mr-1"></i>
+                            成片定制
+                        </button>
+                    `;
+                case 'failed':
+                    return `
+                        <div class="flex space-x-2">
+                            <button onclick="event.stopPropagation(); retakeOrder('${order.id}')" class="flex-1 bg-primary text-white py-2 rounded-lg text-sm font-medium">
+                                <i class="fa fa-refresh mr-1"></i>
+                                重新拍摄
+                            </button>
+                            <button onclick="event.stopPropagation(); refundOrder('${order.id}')" class="flex-1 bg-red-500 text-white py-2 rounded-lg text-sm font-medium">
+                                <i class="fa fa-money mr-1"></i>
+                                申请退款
+                            </button>
+                        </div>
+                    `;
+                case 'expired':
+                    return ``;
+                default:
+                    return '';
+            }
+        }
+
+        // 获取状态配置
+        function getStatusConfig(status) {
+            const configs = {
+                'shooting': { text: '拍摄中', class: 'bg-orange-100 text-orange-600' },
+                'processing': { text: 'AI剪辑中', class: 'bg-blue-100 text-blue-600' },
+                'completed': { text: '已完成', class: 'bg-green-100 text-green-600' },
+                'pending_customize': { text: '待定制', class: 'bg-indigo-100 text-indigo-600' },
+                'cancelled': { text: '已取消', class: 'bg-gray-100 text-gray-600' },
+                'failed': { text: '拍摄失败', class: 'bg-red-100 text-red-600' },
+                'refunded': { text: '已退款', class: 'bg-purple-100 text-purple-600' },
+                'expired': { text: '已过期', class: 'bg-yellow-100 text-yellow-600' }
+            };
+            return configs[status] || configs['shooting'];
+        }
+
+        // 设置订单筛选
+        function setupOrderFilters() {
+            const filterButtons = document.querySelectorAll('.order-filter');
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // 更新按钮状态
+                    filterButtons.forEach(btn => {
+                        btn.classList.remove('bg-primary', 'text-white', 'active');
+                        btn.classList.add('bg-gray-light', 'text-gray-medium');
+                    });
+                    this.classList.remove('bg-gray-light', 'text-gray-medium');
+                    this.classList.add('bg-primary', 'text-white', 'active');
+                    
+                    // 筛选订单
+                    const status = this.dataset.status;
+                    let filteredOrders = orders;
+                    
+                    if (status !== 'all') {
+                        filteredOrders = orders.filter(order => order.status === status);
+                    }
+                    
+                    renderOrders(filteredOrders);
+                });
+            });
+        }
+
+        // 显示订单详情
+        function showOrderDetail(orderId) {
+            const order = orders.find(o => o.id === orderId);
+            if (!order) return;
+            
+            const content = document.getElementById('orderDetailContent');
+            content.innerHTML = `
+                <div class="space-y-4">
+                    <div>
+                        <h4 class="font-medium text-dark mb-2">基本信息</h4>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-gray-medium">订单号</span>
+                                <span>${order.id}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-medium">拍摄地点</span>
+                                <span>${order.location}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-medium">样片名称</span>
+                                <span>${order.sampleName || order.package || '无人机拍摄服务'}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-medium">订单金额</span>
+                                <span class="font-bold text-primary">¥${order.price}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-medium">下单时间</span>
+                                <span>${order.date}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    ${order.status === 'completed' ? `
+                        <div>
+                            <h4 class="font-medium text-dark mb-2">成果统计</h4>
+                            <div class="space-y-2 text-sm">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-medium">照片数量</span>
+                                    <span>${order.photos || 0} 张</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-medium">视频数量</span>
+                                    <span>${order.videos || 0} 个</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-medium">视频时长</span>
+                                    <span>${order.duration || '未知'}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-2">
+                            <button onclick="downloadMedia('${order.id}')" class="w-full bg-primary text-white py-3 rounded-lg font-medium">
+                                <i class="fa fa-download mr-2"></i>
+                                下载成片
+                            </button>
+                            <button onclick="shareOrder('${order.id}')" class="w-full bg-gray-light text-gray-medium py-3 rounded-lg font-medium">
+                                <i class="fa fa-share mr-2"></i>
+                                分享订单
+                            </button>
+                        </div>
+                    ` : order.status === 'shooting' ? `
+                        <div class="bg-orange-50 border border-orange-200 p-3 rounded-lg">
+                            <p class="text-orange-800 text-sm">
+                                <i class="fa fa-info-circle mr-1"></i>
+                                请前往指定地点进行拍摄，拍摄完成后我们将立即开始制作您的专属大片。
+                            </p>
+                        </div>
+                        
+                        <button onclick="goToShooting('${order.id}')" class="w-full bg-primary text-white py-3 rounded-lg font-medium">
+                            <i class="fa fa-camera mr-2"></i>
+                            前往拍摄
+                        </button>
+                    ` : ''}
+                </div>
+            `;
+            
+            document.getElementById('orderDetailModal').classList.remove('hidden');
+        }
+
+        // 关闭订单详情
+        function closeOrderDetail() {
+            document.getElementById('orderDetailModal').classList.add('hidden');
+        }
+
+        // 前往拍摄
+        function goToShooting(orderId) {
+            location.href = `operation-control.html?orderId=${orderId}`;
+        }
+
+        // 取消订单
+        function cancelOrder(orderId) {
+            const order = orders.find(o => o.id === orderId);
+            if (!order) return;
+            
+            // 显示取消原因选择弹窗
+            showCancelModal(orderId);
+        }
+
+        // 显示取消订单弹窗
+        function showCancelModal(orderId) {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 z-60 flex items-center justify-center p-4';
+            modal.innerHTML = `
+                <div class="bg-white rounded-lg max-w-sm w-full">
+                    <div class="p-4 border-b border-gray-light">
+                        <h3 class="font-bold text-dark">取消订单</h3>
+                    </div>
+                    <div class="p-4">
+                        <p class="text-gray-medium text-sm mb-4">请选择取消原因：</p>
+                        <div class="space-y-2">
+                            <label class="flex items-center">
+                                <input type="radio" name="cancelReason" value="临时有事" class="mr-2">
+                                <span class="text-sm">临时有事</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="cancelReason" value="天气不好" class="mr-2">
+                                <span class="text-sm">天气不好</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="cancelReason" value="时间冲突" class="mr-2">
+                                <span class="text-sm">时间冲突</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="cancelReason" value="其他原因" class="mr-2">
+                                <span class="text-sm">其他原因</span>
+                            </label>
+                        </div>
+                        <div class="mt-4">
+                            <textarea id="cancelNote" placeholder="请详细说明取消原因（可选）" class="w-full p-2 border border-gray-light rounded text-sm" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <div class="p-4 border-t border-gray-light flex space-x-3">
+                        <button onclick="closeCancelModal()" class="flex-1 bg-gray-light text-gray-medium py-2 rounded-lg text-sm">
+                            取消
+                        </button>
+                        <button onclick="confirmCancelOrder('${orderId}')" class="flex-1 bg-red-500 text-white py-2 rounded-lg text-sm">
+                            确认取消
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            window.currentCancelModal = modal;
+        }
+
+        // 关闭取消订单弹窗
+        function closeCancelModal() {
+            if (window.currentCancelModal) {
+                document.body.removeChild(window.currentCancelModal);
+                window.currentCancelModal = null;
+            }
+        }
+
+        // 确认取消订单
+        function confirmCancelOrder(orderId) {
+            const reason = document.querySelector('input[name="cancelReason"]:checked')?.value;
+            const note = document.getElementById('cancelNote').value.trim();
+            
+            if (!reason) {
+                alert('请选择取消原因');
+                return;
+            }
+            
+            // 更新订单状态
+            const orderIndex = orders.findIndex(o => o.id === orderId);
+            if (orderIndex !== -1) {
+                orders[orderIndex].status = 'cancelled';
+                orders[orderIndex].cancelReason = reason;
+                if (note) {
+                    orders[orderIndex].cancelNote = note;
+                }
+                localStorage.setItem('orders', JSON.stringify(orders));
+                
+                // 刷新订单列表
+                loadOrders();
+                
+                showToast('订单已取消');
+            }
+            
+            closeCancelModal();
+        }
+
+        // 查看拍摄位置
+        function goToLocation(orderId) {
+            location.href = `operation-control.html?orderId=${orderId}&action=location`;
+        }
+
+        // 查看成片
+        function viewResults(orderId) {
+            const order = orders.find(o => o.id === orderId) || sampleOrders.find(o => o.id === orderId);
+            if (!order) return;
+            
+            // 直接打开成片浏览器
+            openMediaViewer(order);
+        }
+
+        // 打开成片浏览器
+        function openMediaViewer(order) {
+            // 创建媒体数据
+            const mediaItems = [];
+            
+            // 添加视频（如果有）
+            for (let i = 1; i <= (order.videos || 1); i++) {
+                mediaItems.push({
+                    type: 'video',
+                    src: `https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_${i}mb.mp4`,
+                    poster: `https://picsum.photos/id/${1020 + i}/800/600`,
+                    title: `精彩视频 ${i}`,
+                    duration: order.duration || '12分钟'
+                });
+            }
+            
+            // 添加照片（如果有）
+            for (let i = 1; i <= (order.photos || 0); i++) {
+                mediaItems.push({
+                    type: 'photo',
+                    src: `https://picsum.photos/id/${1030 + i}/800/600`,
+                    title: `精彩照片 ${i}`
+                });
+            }
+            
+            if (mediaItems.length === 0) {
+                showToast('暂无成片内容');
+                return;
+            }
+            
+            // 创建全屏浏览器
+            createMediaViewer(order, mediaItems);
+        }
+
+        // 创建媒体浏览器
+        function createMediaViewer(order, mediaItems) {
+            const viewer = document.createElement('div');
+            viewer.id = 'mediaViewer';
+            viewer.className = 'fixed inset-0 bg-black z-[70] flex flex-col';
+            viewer.innerHTML = `
+                <!-- 顶部信息栏 -->
+                <div class="bg-black bg-opacity-50 text-white p-4 flex items-center justify-between">
+                    <div class="flex items-center">
+                        <button onclick="closeMediaViewer()" class="mr-4 text-white text-2xl">
+                            <i class="fa fa-times"></i>
+                        </button>
+                        <div>
+                            <h3 class="font-bold">${order.location}</h3>
+                            <p class="text-sm opacity-80">${order.package}</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm" id="mediaCounter">1 / ${mediaItems.length}</p>
+                        <p class="text-xs opacity-80">${order.date}</p>
+                    </div>
+                </div>
+                
+                <!-- 主要内容区域 -->
+                <div class="flex-1 relative overflow-hidden">
+                    <div id="mediaContainer" class="h-full flex transition-transform duration-300" style="width: ${mediaItems.length * 100}%;">
+                        ${mediaItems.map((item, index) => `
+                            <div class="media-slide h-full flex items-center justify-center bg-black" style="width: ${100 / mediaItems.length}%;" data-index="${index}">
+                                ${item.type === 'video' ? `
+                                    <video 
+                                        class="max-w-full max-h-full" 
+                                        controls 
+                                        poster="${item.poster}"
+                                        preload="metadata"
+                                        data-video-index="${index}"
+                                    >
+                                        <source src="${item.src}" type="video/mp4">
+                                        您的浏览器不支持视频播放
+                                    </video>
+                                ` : `
+                                    <img 
+                                        src="${item.src}" 
+                                        alt="${item.title}" 
+                                        class="max-w-full max-h-full object-contain"
+                                        loading="lazy"
+                                    >
+                                `}
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <!-- 左右切换按钮 -->
+                    ${mediaItems.length > 1 ? `
+                        <button id="prevBtn" onclick="previousMedia()" class="absolute left-4 top-1/2 transform -translate-y-1/2 w-12 h-12 bg-black bg-opacity-50 text-white rounded-full flex items-center justify-center text-xl hover:bg-opacity-70 transition-opacity">
+                            <i class="fa fa-angle-left"></i>
+                        </button>
+                        <button id="nextBtn" onclick="nextMedia()" class="absolute right-4 top-1/2 transform -translate-y-1/2 w-12 h-12 bg-black bg-opacity-50 text-white rounded-full flex items-center justify-center text-xl hover:bg-opacity-70 transition-opacity">
+                            <i class="fa fa-angle-right"></i>
+                        </button>
+                    ` : ''}
+                </div>
+                
+                <!-- 底部控制栏 -->
+                <div class="bg-black bg-opacity-50 text-white p-4 safe-area-bottom" style="padding-bottom: max(1rem, env(safe-area-inset-bottom, 1rem) + 4rem);">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex-1">
+                            <h4 class="font-medium" id="currentMediaTitle">${mediaItems[0].title}</h4>
+                            <p class="text-sm opacity-80" id="currentMediaInfo">
+                                ${mediaItems[0].type === 'video' ? `视频 · ${mediaItems[0].duration}` : '照片'}
+                            </p>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button onclick="shareCurrentMedia()" class="bg-blue-500 text-white px-4 py-2 rounded-lg text-sm">
+                                <i class="fa fa-share-alt mr-1"></i>
+                                分享
+                            </button>
+                            <button onclick="downloadCurrentMedia()" class="bg-green-500 text-white px-4 py-2 rounded-lg text-sm">
+                                <i class="fa fa-download mr-1"></i>
+                                下载
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 进度指示器 -->
+                    ${mediaItems.length > 1 ? `
+                        <div class="flex justify-center space-x-2">
+                            ${mediaItems.map((_, index) => `
+                                <button 
+                                    class="w-2 h-2 rounded-full transition-colors duration-200 indicator-dot ${index === 0 ? 'bg-white' : 'bg-white bg-opacity-30'}" 
+                                    onclick="goToMedia(${index})"
+                                    data-index="${index}"
+                                ></button>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+            
+            document.body.appendChild(viewer);
+            
+            // 隐藏底部导航栏
+            const bottomNav = document.getElementById('bottomNav');
+            if (bottomNav) {
+                bottomNav.style.display = 'none';
+            }
+            
+            // 初始化变量
+            window.currentMediaIndex = 0;
+            window.mediaViewerItems = mediaItems;
+            window.mediaViewerOrder = order;
+            
+            // 添加触摸滑动支持
+            addSwipeSupport();
+            
+            // 键盘支持
+            document.addEventListener('keydown', handleMediaViewerKeydown);
+        }
+
+        // 添加滑动支持
+        function addSwipeSupport() {
+            const container = document.getElementById('mediaContainer');
+            let startX = 0;
+            let isDragging = false;
+            let currentTransform = 0;
+            
+            container.addEventListener('touchstart', function(e) {
+                startX = e.touches[0].clientX;
+                isDragging = true;
+            });
+            
+            container.addEventListener('touchmove', function(e) {
+                if (!isDragging) return;
+                e.preventDefault();
+                
+                const currentX = e.touches[0].clientX;
+                const diff = currentX - startX;
+                const maxTransform = -(window.mediaViewerItems.length - 1) * (100 / window.mediaViewerItems.length);
+                
+                currentTransform = Math.max(maxTransform, Math.min(0, -(window.currentMediaIndex * (100 / window.mediaViewerItems.length)) + diff / window.innerWidth * 50));
+                container.style.transform = `translateX(${currentTransform}%)`;
+            });
+            
+            container.addEventListener('touchend', function(e) {
+                if (!isDragging) return;
+                isDragging = false;
+                
+                const threshold = 50;
+                const diff = e.changedTouches[0].clientX - startX;
+                
+                if (Math.abs(diff) > threshold) {
+                    if (diff > 0 && window.currentMediaIndex > 0) {
+                        previousMedia();
+                    } else if (diff < 0 && window.currentMediaIndex < window.mediaViewerItems.length - 1) {
+                        nextMedia();
+                    } else {
+                        updateMediaDisplay();
+                    }
+                } else {
+                    updateMediaDisplay();
+                }
+            });
+        }
+
+        // 键盘事件处理
+        function handleMediaViewerKeydown(e) {
+            if (!document.getElementById('mediaViewer')) return;
+            
+            switch(e.key) {
+                case 'Escape':
+                    closeMediaViewer();
+                    break;
+                case 'ArrowLeft':
+                    previousMedia();
+                    break;
+                case 'ArrowRight':
+                    nextMedia();
+                    break;
+            }
+        }
+
+        // 上一个媒体
+        function previousMedia() {
+            if (window.currentMediaIndex > 0) {
+                window.currentMediaIndex--;
+                updateMediaDisplay();
+            }
+        }
+
+        // 下一个媒体
+        function nextMedia() {
+            if (window.currentMediaIndex < window.mediaViewerItems.length - 1) {
+                window.currentMediaIndex++;
+                updateMediaDisplay();
+            }
+        }
+
+        // 跳转到指定媒体
+        function goToMedia(index) {
+            window.currentMediaIndex = index;
+            updateMediaDisplay();
+        }
+
+        // 更新媒体显示
+        function updateMediaDisplay() {
+            const container = document.getElementById('mediaContainer');
+            const counter = document.getElementById('mediaCounter');
+            const title = document.getElementById('currentMediaTitle');
+            const info = document.getElementById('currentMediaInfo');
+            const indicators = document.querySelectorAll('.indicator-dot');
+            
+            if (!container) return;
+            
+            // 更新容器位置
+            const translateX = -(window.currentMediaIndex * (100 / window.mediaViewerItems.length));
+            container.style.transform = `translateX(${translateX}%)`;
+            
+            // 更新计数器
+            if (counter) {
+                counter.textContent = `${window.currentMediaIndex + 1} / ${window.mediaViewerItems.length}`;
+            }
+            
+            // 更新当前媒体信息
+            const currentItem = window.mediaViewerItems[window.currentMediaIndex];
+            if (title) title.textContent = currentItem.title;
+            if (info) {
+                info.textContent = currentItem.type === 'video' ? 
+                    `视频 · ${currentItem.duration}` : '照片';
+            }
+            
+            // 更新指示器
+            indicators.forEach((dot, index) => {
+                if (index === window.currentMediaIndex) {
+                    dot.classList.remove('bg-opacity-30');
+                    dot.classList.add('bg-white');
+                } else {
+                    dot.classList.add('bg-opacity-30');
+                    dot.classList.remove('bg-white');
+                }
+            });
+            
+            // 停止其他视频播放
+            const videos = document.querySelectorAll('#mediaViewer video');
+            videos.forEach((video, index) => {
+                if (index !== window.currentMediaIndex) {
+                    video.pause();
+                }
+            });
+        }
+
+        // 分享当前媒体
+        function shareCurrentMedia() {
+            const currentItem = window.mediaViewerItems[window.currentMediaIndex];
+            if (typeof wx !== 'undefined') {
+                wx.showShareMenu({
+                    withShareTicket: true
+                });
+            } else {
+                showToast(`正在分享 ${currentItem.title}`);
+            }
+        }
+
+        // 下载当前媒体
+        function downloadCurrentMedia() {
+            const currentItem = window.mediaViewerItems[window.currentMediaIndex];
+            showToast(`正在下载 ${currentItem.title}`);
+            // 实际项目中这里应该调用下载API
+        }
+
+        // 关闭媒体浏览器
+        function closeMediaViewer() {
+            const viewer = document.getElementById('mediaViewer');
+            if (viewer) {
+                document.body.removeChild(viewer);
+                document.removeEventListener('keydown', handleMediaViewerKeydown);
+                
+                // 恢复底部导航栏显示
+                const bottomNav = document.getElementById('bottomNav');
+                if (bottomNav) {
+                    bottomNav.style.display = 'flex';
+                }
+                
+                // 清理全局变量
+                window.currentMediaIndex = null;
+                window.mediaViewerItems = null;
+                window.mediaViewerOrder = null;
+            }
+        }
+
+        // 定制视频
+        function customizeVideo(orderId) {
+            localStorage.setItem('customizeOrderId', orderId);
+            location.href = `after-service.html?orderId=${orderId}`;
+        }
+
+        // 重新拍摄
+        function retakeOrder(orderId) {
+            if (confirm('确定要重新拍摄吗？将为您创建新的拍摄订单。')) {
+                const order = orders.find(o => o.id === orderId);
+                if (order) {
+                    // 创建新订单
+                    const newOrder = {
+                        ...order,
+                        id: 'ORDER' + Date.now().toString().slice(-6),
+                        status: 'shooting',
+                        date: new Date().toLocaleString('zh-CN'),
+                        identityCode: 'ID' + Date.now().toString().slice(-3)
+                    };
+                    
+                    orders.unshift(newOrder);
+                    localStorage.setItem('orders', JSON.stringify(orders));
+                    
+                    showToast('重拍订单已创建');
+                    loadOrders();
+                }
+            }
+        }
+
+        // 申请退款
+        function refundOrder(orderId) {
+            const order = orders.find(o => o.id === orderId);
+            if (!order) return;
+            
+            if (confirm(`确定要申请退款吗？将退还您支付的¥${order.price}。`)) {
+                // 更新订单状态
+                const orderIndex = orders.findIndex(o => o.id === orderId);
+                if (orderIndex !== -1) {
+                    orders[orderIndex].status = 'refunded';
+                    orders[orderIndex].refundAmount = order.price;
+                    orders[orderIndex].refundTime = new Date().toLocaleString('zh-CN');
+                    localStorage.setItem('orders', JSON.stringify(orders));
+                    
+                    showToast('退款申请已提交，预计3-5个工作日到账');
+                    loadOrders();
+                }
+            }
+        }
+
+        // 显示小程序提示
+        function showToast(message, duration = 2000) {
+            // 创建临时提示元素
+            const toast = document.createElement('div');
+            toast.className = 'fixed top-4 left-1/2 transform -translate-x-1/2 z-60 bg-black bg-opacity-80 text-white px-4 py-2 rounded-lg text-sm';
+            toast.textContent = message;
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                if (document.body.contains(toast)) {
+                    document.body.removeChild(toast);
+                }
+            }, duration);
+        }
+
+        // 下载成片
+        function downloadMedia(orderId) {
+            showToast('正在准备下载链接，请稍候...');
+            // 实际项目中这里应该调用下载API
+        }
+
+        // 分享订单
+        function shareOrder(orderId) {
+            // 小程序分享功能
+            if (typeof wx !== 'undefined') {
+                wx.showShareMenu({
+                    withShareTicket: true
+                });
+            } else {
+                showToast('分享功能暂时不可用');
+            }
+        }
+
+        // 显示客服电话
+        function showServicePhone() {
+            document.getElementById('servicePhoneDisplay').textContent = '400-888-6666';
+        }
+
+        // 客服电话
+        function callService() {
+            // 小程序中应使用 wx.makePhoneCall
+            if (typeof wx !== 'undefined') {
+                wx.makePhoneCall({
+                    phoneNumber: '400-888-6666'
+                });
+            } else {
+                window.open('tel:400-888-6666');
+            }
+        }
+
+        // 添加企业微信
+        function addWechat() {
+            // 小程序中的微信联系逻辑
+            if (typeof wx !== 'undefined') {
+                wx.showModal({
+                    title: '添加企业微信',
+                    content: '请搜索企业微信号：DroneVideo2025 或扫描二维码添加，我们将通过企业微信发送您的拍摄成片。',
+                    showCancel: false
+                });
+            } else {
+                alert('请搜索企业微信号：DroneVideo2025\n我们将通过企业微信发送您的拍摄成片。');
+            }
+        }
+
+        // 点击遮罩关闭弹窗
+        document.getElementById('orderDetailModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeOrderDetail();
+            }
+        });
+    </script>
+</body>
+</html>
