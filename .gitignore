@@ -5,8 +5,6 @@ config.ini
 
 
 # 忽略整个文件夹（末尾加 /）
-3Drone_fit/
-2Drone_fit/
 ref_page/
 
 # 忽略特定类型的文件（用通配符 *）
@@ -17,6 +15,4 @@ ref_page/
 /css_sample.html
 /README.md
 
-/无人机打卡技术需求0.1版.txt
-/无人机自助打卡项目功能需求清单.md
 
