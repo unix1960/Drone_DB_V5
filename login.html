@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>用户登录 - 无人机自助打卡</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#1E40AF',
+                        accent: '#06B6D4',
+                        dark: '#1E293B',
+                        light: '#F8FAFC',
+                        'gray-medium': '#64748B',
+                        'gray-light': '#E2E8F0',
+                        'blue-primary': '#3B82F6',
+                        'blue-secondary': '#1D4ED8',
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            }
+            .touch-friendly {
+                touch-action: manipulation;
+                -webkit-tap-highlight-color: transparent;
+            }
+            .safe-area-bottom {
+                padding-bottom: constant(safe-area-inset-bottom);
+                padding-bottom: env(safe-area-inset-bottom);
+            }
+            .miniprogram-scroll {
+                -webkit-overflow-scrolling: touch;
+            }
+            .miniprogram-card {
+                box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+                border-radius: 8px;
+            }
+            .gradient-bg {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            }
+        }
+    </style>
+</head>
+<body class="font-inter bg-light text-dark antialiased touch-action-manipulation">
+    <!-- 背景渐变 -->
+    <div class="min-h-screen gradient-bg relative overflow-hidden">
+        <!-- 装饰元素 -->
+        <div class="absolute top-0 left-0 w-full h-full">
+            <div class="absolute top-20 right-10 w-32 h-32 bg-white/10 rounded-full blur-xl"></div>
+            <div class="absolute bottom-20 left-10 w-40 h-40 bg-white/5 rounded-full blur-2xl"></div>
+        </div>
+        
+        <!-- 头部导航 -->
+        <header class="relative z-10 flex items-center justify-between h-14 px-4 pt-8">
+            <button onclick="goBack()" class="flex items-center text-white/80 touch-friendly">
+                <i class="fa fa-angle-left text-xl mr-1"></i>
+                <span class="text-sm">返回</span>
+            </button>
+            <h1 class="font-bold text-white">登录</h1>
+            <div class="w-16"></div>
+        </header>
+
+        <!-- 登录内容 -->
+        <div class="relative z-10 px-6 mt-16">
+            <!-- Logo区域 -->
+            <div class="text-center mb-8">
+                <div class="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fa fa-user-circle-o text-3xl text-white"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-white mb-2">欢迎使用</h2>
+                <p class="text-white/80 text-sm">无人机自助打卡服务</p>
+            </div>
+
+            <!-- 登录方式 -->
+            <div class="space-y-4 mb-8">
+                <!-- 微信手机号快速登录 -->
+                <button id="wechatPhoneLogin" onclick="wechatPhoneLogin()" class="w-full bg-green-500 text-white py-4 rounded-lg font-medium touch-friendly flex items-center justify-center miniprogram-card">
+                    <i class="fa fa-wechat text-xl mr-3"></i>
+                    <span>微信手机号快速登录</span>
+                </button>
+
+                <!-- 手机号登录 -->
+                <button onclick="showPhoneLogin()" class="w-full bg-white text-dark py-4 rounded-lg font-medium touch-friendly flex items-center justify-center miniprogram-card">
+                    <i class="fa fa-mobile text-xl mr-3"></i>
+                    <span>手机号登录</span>
+                </button>
+            </div>
+
+            <!-- 服务条款 -->
+            <div class="text-center">
+                <p class="text-white/60 text-xs leading-relaxed">
+                    登录即表示您同意
+                    <span class="text-white underline">《用户服务协议》</span>
+                    和
+                    <span class="text-white underline">《隐私政策》</span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 手机号登录弹窗 -->
+    <div id="phoneLoginModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg max-w-sm w-full">
+            <div class="p-4 border-b border-gray-light">
+                <div class="flex items-center justify-between">
+                    <h3 class="font-bold text-dark">手机号登录</h3>
+                    <button onclick="closePhoneLogin()" class="text-gray-medium text-xl">
+                        <i class="fa fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="p-6">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-dark mb-2">手机号码</label>
+                        <input type="tel" id="phoneNumber" class="w-full p-3 border border-gray-light rounded-lg focus:border-primary focus:outline-none" placeholder="请输入手机号码" maxlength="11">
+                    </div>
+                    <div class="flex space-x-2">
+                        <input type="text" id="verifyCode" class="flex-1 p-3 border border-gray-light rounded-lg focus:border-primary focus:outline-none" placeholder="验证码" maxlength="6">
+                        <button id="sendCodeBtn" onclick="sendVerifyCode()" class="px-4 py-3 bg-primary text-white rounded-lg text-sm font-medium touch-friendly whitespace-nowrap">
+                            发送验证码
+                        </button>
+                    </div>
+                    <button onclick="phoneLogin()" class="w-full bg-primary text-white py-3 rounded-lg font-medium touch-friendly">
+                        登录
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript交互代码 -->
+    <script>
+        let countdownTimer = null;
+        let countdownSeconds = 60;
+
+        // 小程序适配
+        document.addEventListener('DOMContentLoaded', function() {
+            // 添加小程序风格的触摸反馈
+            const touchElements = document.querySelectorAll('.touch-friendly');
+            touchElements.forEach(element => {
+                element.addEventListener('touchstart', function() {
+                    this.style.opacity = '0.7';
+                    this.style.transform = 'scale(0.98)';
+                });
+                
+                element.addEventListener('touchend', function() {
+                    this.style.opacity = '1';
+                    this.style.transform = 'scale(1)';
+                });
+                
+                element.addEventListener('touchcancel', function() {
+                    this.style.opacity = '1';
+                    this.style.transform = 'scale(1)';
+                });
+            });
+
+            // 检查是否在微信小程序环境
+            if (typeof wx !== 'undefined') {
+                // 在小程序环境中，显示微信快速登录
+                document.getElementById('wechatPhoneLogin').style.display = 'flex';
+            }
+        });
+
+        // 返回上一页
+        function goBack() {
+            const returnUrl = localStorage.getItem('returnUrl');
+            if (returnUrl) {
+                localStorage.removeItem('returnUrl');
+                window.location.href = returnUrl;
+            } else {
+                history.back();
+            }
+        }
+
+        // 微信手机号快速登录
+        function wechatPhoneLogin() {
+            if (typeof wx !== 'undefined') {
+                // 调用微信小程序获取手机号API
+                wx.getPhoneNumber({
+                    success: function(res) {
+                        // 解密手机号码的逻辑应该在后端完成
+                        // 这里模拟获取到手机号码
+                        const phoneNumber = '138****' + Math.floor(Math.random() * 9000 + 1000);
+                        handleLoginSuccess({
+                            phone: phoneNumber,
+                            loginType: 'wechat',
+                            timestamp: Date.now()
+                        });
+                    },
+                    fail: function() {
+                        showToast('获取手机号码失败，请尝试其他登录方式');
+                    }
+                });
+            } else {
+                // 非小程序环境，模拟微信登录
+                if (confirm('模拟微信手机号快速登录？')) {
+                    const phoneNumber = '138****' + Math.floor(Math.random() * 9000 + 1000);
+                    handleLoginSuccess({
+                        phone: phoneNumber,
+                        loginType: 'wechat_simulation',
+                        timestamp: Date.now()
+                    });
+                }
+            }
+        }
+
+        // 显示手机号登录弹窗
+        function showPhoneLogin() {
+            document.getElementById('phoneLoginModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // 关闭手机号登录弹窗
+        function closePhoneLogin() {
+            document.getElementById('phoneLoginModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+            
+            // 清理倒计时
+            if (countdownTimer) {
+                clearInterval(countdownTimer);
+                countdownTimer = null;
+                resetSendCodeButton();
+            }
+        }
+
+        // 发送验证码
+        function sendVerifyCode() {
+            const phoneNumber = document.getElementById('phoneNumber').value.trim();
+            
+            // 验证手机号
+            if (!/^1[3-9]\d{9}$/.test(phoneNumber)) {
+                showToast('请输入正确的手机号码');
+                return;
+            }
+
+            // 开始倒计时
+            startCountdown();
+            
+            // 模拟发送验证码
+            showToast('验证码已发送，请注意查收');
+            
+            // 实际项目中这里应该调用发送验证码的API
+            console.log('发送验证码到:', phoneNumber);
+        }
+
+        // 开始倒计时
+        function startCountdown() {
+            const sendCodeBtn = document.getElementById('sendCodeBtn');
+            countdownSeconds = 60;
+            sendCodeBtn.disabled = true;
+            sendCodeBtn.classList.add('bg-gray-300');
+            sendCodeBtn.classList.remove('bg-primary');
+            
+            countdownTimer = setInterval(() => {
+                countdownSeconds--;
+                sendCodeBtn.textContent = `重新发送(${countdownSeconds})`;
+                
+                if (countdownSeconds <= 0) {
+                    clearInterval(countdownTimer);
+                    countdownTimer = null;
+                    resetSendCodeButton();
+                }
+            }, 1000);
+        }
+
+        // 重置发送验证码按钮
+        function resetSendCodeButton() {
+            const sendCodeBtn = document.getElementById('sendCodeBtn');
+            sendCodeBtn.disabled = false;
+            sendCodeBtn.classList.remove('bg-gray-300');
+            sendCodeBtn.classList.add('bg-primary');
+            sendCodeBtn.textContent = '发送验证码';
+        }
+
+        // 手机号登录
+        function phoneLogin() {
+            const phoneNumber = document.getElementById('phoneNumber').value.trim();
+            const verifyCode = document.getElementById('verifyCode').value.trim();
+            
+            // 验证手机号
+            if (!/^1[3-9]\d{9}$/.test(phoneNumber)) {
+                showToast('请输入正确的手机号码');
+                return;
+            }
+            
+            // 验证验证码
+            if (!verifyCode || verifyCode.length !== 6) {
+                showToast('请输入6位验证码');
+                return;
+            }
+            
+            // 模拟验证码验证（实际项目中应该调用后端API验证）
+            if (verifyCode !== '123456') {
+                showToast('验证码错误，请重新输入');
+                return;
+            }
+            
+            // 登录成功
+            handleLoginSuccess({
+                phone: phoneNumber,
+                loginType: 'phone',
+                timestamp: Date.now()
+            });
+        }
+
+        // 处理登录成功
+        function handleLoginSuccess(userInfo) {
+            // 保存登录信息
+            const loginInfo = {
+                isLoggedIn: true,
+                loginTime: new Date().toISOString(),
+                ...userInfo
+            };
+            
+            localStorage.setItem('loginInfo', JSON.stringify(loginInfo));
+            
+            // 保存用户信息
+            const userData = {
+                phone: userInfo.phone,
+                name: '',
+                gender: ''
+            };
+            localStorage.setItem('userInfo', JSON.stringify(userData));
+            
+            // 小程序提示
+            if (typeof wx !== 'undefined') {
+                wx.showToast({
+                    title: '登录成功',
+                    icon: 'success',
+                    duration: 1500
+                });
+                
+                setTimeout(() => {
+                    redirectAfterLogin();
+                }, 1500);
+            } else {
+                showToast('登录成功');
+                setTimeout(() => {
+                    redirectAfterLogin();
+                }, 1000);
+            }
+        }
+
+        // 登录成功后跳转
+        function redirectAfterLogin() {
+            const returnUrl = localStorage.getItem('returnUrl');
+            if (returnUrl) {
+                localStorage.removeItem('returnUrl');
+                window.location.href = returnUrl;
+            } else {
+                window.location.href = 'user-management.html';
+            }
+        }
+
+        // 显示小程序提示
+        function showToast(message, duration = 2000) {
+            // 创建临时提示元素
+            const toast = document.createElement('div');
+            toast.className = 'fixed top-4 left-1/2 transform -translate-x-1/2 z-60 bg-black bg-opacity-80 text-white px-4 py-2 rounded-lg text-sm';
+            toast.textContent = message;
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                if (document.body.contains(toast)) {
+                    document.body.removeChild(toast);
+                }
+            }, duration);
+        }
+
+        // 点击遮罩关闭弹窗
+        document.getElementById('phoneLoginModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closePhoneLogin();
+            }
+        });
+    </script>
+</body>
+</html>

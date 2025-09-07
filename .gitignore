@@ -1,8 +1,8 @@
+
 # 忽略单个文件
 debug.log
 config.ini
-合伙人移动端需求清单2.0.txt
-合伙人移动端需求清单.txt
+
 
 # 忽略整个文件夹（末尾加 /）
 3Drone_fit/
@@ -15,3 +15,10 @@ ref_page/
 
 # 例外规则（在前面加 !，表示不忽略该文件）
 !readme.txt  # 即使忽略了 *.txt，也会提交 readme.txt
+
+/css_sample.html
+/README.md
+/提示词.txt
+/无人机打卡技术需求0.1版.txt
+/无人机自助打卡项目功能需求清单.md
+

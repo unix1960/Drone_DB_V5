@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>服务说明 - 无人机自助打卡</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#1E40AF',
+                        accent: '#06B6D4',
+                        dark: '#1E293B',
+                        light: '#F8FAFC',
+                        'gray-medium': '#64748B',
+                        'gray-light': '#E2E8F0',
+                        'blue-primary': '#3B82F6',
+                        'blue-secondary': '#1D4ED8',
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            }
+            .touch-friendly {
+                touch-action: manipulation;
+                -webkit-tap-highlight-color: transparent;
+            }
+            .safe-area-bottom {
+                padding-bottom: constant(safe-area-inset-bottom);
+                padding-bottom: env(safe-area-inset-bottom);
+            }
+            .miniprogram-scroll {
+                -webkit-overflow-scrolling: touch;
+            }
+            .miniprogram-card {
+                box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+                border-radius: 8px;
+            }
+            .price-highlight {
+                background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+        }
+    </style>
+</head>
+<body class="font-inter bg-light text-dark antialiased touch-action-manipulation">
+    <!-- 页面容器 -->
+    <div class="min-h-screen w-full safe-area-bottom content-container">
+        <!-- 头部导航 -->
+        <header class="bg-white border-b border-gray-light sticky top-0 z-40">
+            <div class="flex items-center justify-between h-14 px-4">
+                <button onclick="history.back()" class="flex items-center text-gray-medium touch-friendly">
+                    <i class="fa fa-angle-left text-xl mr-1"></i>
+                    <span class="text-sm">返回</span>
+                </button>
+                <h1 class="font-bold text-dark">服务说明</h1>
+                <div class="w-12"></div>
+            </div>
+        </header>
+
+        <!-- 服务介绍区域 -->
+        <section class="p-4">
+            <div class="text-center mb-6">
+                <h2 class="text-xl font-bold text-dark mb-2">专业服务 贴心体验</h2>
+                <p class="text-gray-medium text-sm">根据样片选择拍摄内容，享受专业无人机拍摄服务</p>
+            </div>
+
+            <!-- 服务流程 -->
+            <div class="mb-6">
+                <h3 class="text-lg font-bold mb-4 flex items-center">
+                    <i class="fa fa-list-ol text-primary mr-2"></i>
+                    服务流程
+                </h3>
+                <div class="space-y-4">
+                    <div class="miniprogram-card bg-white p-4">
+                        <div class="flex items-start">
+                            <div class="w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center text-sm font-bold mr-4 mt-1">1</div>
+                            <div class="flex-1">
+                                <h4 class="font-medium text-dark mb-1">浏览样片</h4>
+                                <p class="text-gray-medium text-sm">查看不同地点、角度的拍摄样片，选择您喜欢的拍摄内容</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="miniprogram-card bg-white p-4">
+                        <div class="flex items-start">
+                            <div class="w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center text-sm font-bold mr-4 mt-1">2</div>
+                            <div class="flex-1">
+                                <h4 class="font-medium text-dark mb-1">确认地点</h4>
+                                <p class="text-gray-medium text-sm">根据选择的样片到达指定拍摄地点，系统自动定位确认</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="miniprogram-card bg-white p-4">
+                        <div class="flex items-start">
+                            <div class="w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center text-sm font-bold mr-4 mt-1">3</div>
+                            <div class="flex-1">
+                                <h4 class="font-medium text-dark mb-1">开始拍摄</h4>
+                                <p class="text-gray-medium text-sm">无人机自动执行拍摄任务，按照样片效果进行专业拍摄</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="miniprogram-card bg-white p-4">
+                        <div class="flex items-start">
+                            <div class="w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center text-sm font-bold mr-4 mt-1">4</div>
+                            <div class="flex-1">
+                                <h4 class="font-medium text-dark mb-1">AI剪辑</h4>
+                                <p class="text-gray-medium text-sm">AI智能剪辑制作成片，可选择定制服务优化效果</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="miniprogram-card bg-white p-4">
+                        <div class="flex items-start">
+                            <div class="w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center text-sm font-bold mr-4 mt-1">5</div>
+                            <div class="flex-1">
+                                <h4 class="font-medium text-dark mb-1">接收成片</h4>
+                                <p class="text-gray-medium text-sm">通过企业微信接收高清成片，支持分享和下载</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 使用说明 -->
+        <section class="px-4 pb-6">
+            <div class="miniprogram-card bg-white p-4">
+                <h3 class="text-lg font-bold mb-4 flex items-center">
+                    <i class="fa fa-info-circle text-primary mr-2"></i>
+                    使用说明
+                </h3>
+                <div class="space-y-4">
+                    <div>
+                        <h4 class="font-medium text-dark mb-2">📍 服务范围</h4>
+                        <p class="text-gray-medium text-sm leading-relaxed">目前服务区域覆盖主要景区和城市地标，具体可拍摄点位请查看样片展示。</p>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-medium text-dark mb-2">⏰ 服务时间</h4>
+                        <p class="text-gray-medium text-sm leading-relaxed">每日 09:00-18:00，黄金时段（日出日落）需提前预约，夜景拍摄需额外收费。</p>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-medium text-dark mb-2">🎬 交付时间</h4>
+                        <p class="text-gray-medium text-sm leading-relaxed">拍摄完成后24-48小时内交付成片，高峰期可能延长至72小时。</p>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-medium text-dark mb-2">📱 操作流程</h4>
+                        <div class="text-gray-medium text-sm space-y-1">
+                            <p>1. 选择套餐并完成支付</p>
+                            <p>2. 按导航到达指定拍摄点</p>
+                            <p>3. 确认位置后召唤无人机</p>
+                            <p>4. 配合拍摄并等待AI剪辑</p>
+                            <p>5. 通过企业微信接收成片</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 注意事项 -->
+        <section class="px-4 pb-6">
+            <div class="miniprogram-card bg-yellow-50 border border-yellow-200 p-4">
+                <h3 class="text-lg font-bold mb-4 flex items-center text-yellow-800">
+                    <i class="fa fa-exclamation-triangle text-yellow-600 mr-2"></i>
+                    注意事项
+                </h3>
+                <div class="space-y-3 text-sm text-yellow-800">
+                    <div class="flex items-start">
+                        <span class="mr-2">•</span>
+                        <span>请确保到达正确的拍摄点位，错误位置将影响拍摄效果</span>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="mr-2">•</span>
+                        <span>恶劣天气（大风、大雨、雾霾）将暂停服务并全额退款</span>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="mr-2">•</span>
+                        <span>拍摄过程中请配合无人机指令，确保安全拍摄</span>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="mr-2">•</span>
+                        <span>部分景区可能收取门票费用，费用不包含在套餐内</span>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="mr-2">•</span>
+                        <span>如遇设备故障导致拍摄失败，将安排重新拍摄或全额退款</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 免责声明 -->
+        <section class="px-4 pb-6">
+            <div class="miniprogram-card bg-gray-50 p-4">
+                <h3 class="text-lg font-bold mb-4 flex items-center text-gray-700">
+                    <i class="fa fa-shield text-gray-600 mr-2"></i>
+                    免责声明
+                </h3>
+                <div class="text-xs text-gray-600 space-y-2 leading-relaxed">
+                    <p>1. 本服务仅在指定区域和时间内提供，用户需严格按照指引操作。</p>
+                    <p>2. 因用户个人原因（未到达指定位置、不配合拍摄等）导致的拍摄失败，不予退款。</p>
+                    <p>3. 拍摄内容仅供个人使用，不得用于商业用途。如需商业使用请另行协商。</p>
+                    <p>4. 因不可抗力因素（自然灾害、政府管制等）导致的服务中断，不承担赔偿责任。</p>
+                    <p>5. 用户使用本服务即表示同意上述条款，最终解释权归本公司所有。</p>
+                </div>
+                <div class="mt-4 text-center">
+                    <button onclick="showFullTerms()" class="text-primary text-sm touch-friendly">
+                        查看完整服务条款 <i class="fa fa-angle-right"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 立即体验按钮 -->
+        <section class="px-4 pb-8">
+            <button onclick="location.href='sample-display.html'" class="w-full bg-gradient-to-r from-primary to-blue-secondary text-white py-4 rounded-lg font-bold text-lg touch-friendly">
+                <i class="fa fa-eye mr-2"></i>
+                浏览样片选择服务
+            </button>
+        </section>
+    </div>
+
+    <!-- 微信小程序底部导航栏 -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-light z-50 safe-area-bottom" id="bottomNav">
+        <div class="flex justify-around items-center h-16">
+            <div class="tab-item flex flex-col items-center justify-center text-gray-medium touch-friendly" onclick="location.href='index.html'">
+                <i class="fa fa-home text-lg mb-1"></i>
+                <span class="text-xs">首页</span>
+            </div>
+            <div class="tab-item flex flex-col items-center justify-center text-gray-medium touch-friendly" onclick="location.href='sample-display.html'">
+                <i class="fa fa-picture-o text-lg mb-1"></i>
+                <span class="text-xs">样片</span>
+            </div>
+            <div class="tab-item flex flex-col items-center justify-center touch-friendly" onclick="location.href='user-selection.html'">
+                <div class="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center -mt-6 shadow-lg relative">
+                    <i class="fa fa-camera text-lg"></i>
+                </div>
+                <span class="text-xs text-primary font-medium mt-1">拍摄</span>
+            </div>
+            <div class="tab-item flex flex-col items-center justify-center text-gray-medium touch-friendly" onclick="checkLoginAndGoToOrders()">
+                <i class="fa fa-user text-lg mb-1"></i>
+                <span class="text-xs">订单</span>
+            </div>
+            <div class="tab-item flex flex-col items-center justify-center text-gray-medium touch-friendly" onclick="checkLoginAndGoToCustomize()">
+                <i class="fa fa-star text-lg mb-1"></i>
+                <span class="text-xs">定制</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 服务条款弹窗 -->
+    <div id="termsModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg max-w-md w-full max-h-96 overflow-y-auto">
+            <div class="sticky top-0 bg-white border-b border-gray-light p-4">
+                <div class="flex items-center justify-between">
+                    <h3 class="font-bold text-dark">服务条款</h3>
+                    <button onclick="closeTerms()" class="text-gray-medium text-xl">
+                        <i class="fa fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="p-4 text-sm text-gray-600 space-y-3">
+                <p><strong>1. 服务内容</strong></p>
+                <p>本公司提供无人机航拍服务，包括但不限于拍摄、剪辑、后期制作等。</p>
+                
+                <p><strong>2. 用户责任</strong></p>
+                <p>用户需按时到达指定地点，配合拍摄流程，遵守安全规定。</p>
+                
+                <p><strong>3. 退款政策</strong></p>
+                <p>因天气原因导致无法拍摄可全额退款；因用户原因导致的拍摄失败不予退款。</p>
+                
+                <p><strong>4. 版权说明</strong></p>
+                <p>拍摄成果版权归用户所有，但不得用于违法违规用途。</p>
+                
+                <p><strong>5. 争议解决</strong></p>
+                <p>如有争议，双方友好协商解决，协商不成可向相关部门投诉。</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript交互代码 -->
+    <script>
+        // 小程序适配
+        document.addEventListener('DOMContentLoaded', function() {
+            // 解决底部导航栏遮挡内容的问题
+            adjustContentPadding();
+            
+            // 添加小程序风格的触摸反馈
+            const touchElements = document.querySelectorAll('.touch-friendly');
+            touchElements.forEach(element => {
+                element.addEventListener('touchstart', function() {
+                    this.style.opacity = '0.7';
+                    this.style.transform = 'scale(0.98)';
+                });
+                
+                element.addEventListener('touchend', function() {
+                    this.style.opacity = '1';
+                    this.style.transform = 'scale(1)';
+                });
+                
+                element.addEventListener('touchcancel', function() {
+                    this.style.opacity = '1';
+                    this.style.transform = 'scale(1)';
+                });
+            });
+        });
+
+        // 窗口大小变化时重新调整padding
+        window.addEventListener('resize', adjustContentPadding);
+
+        // 调整内容区域的padding-bottom以适应底部导航栏
+        function adjustContentPadding() {
+            const nav = document.getElementById('bottomNav');
+            const contentContainer = document.querySelector('.content-container');
+            
+            if (nav && contentContainer) {
+                // 获取导航栏的实际高度
+                const navHeight = nav.offsetHeight;
+                // 获取安全区域底部高度
+                const safeAreaBottom = getSafeAreaBottom();
+                // 设置内容区域底部内边距，确保内容不被导航栏遮挡
+                contentContainer.style.paddingBottom = `${navHeight + safeAreaBottom}px`;
+            }
+        }
+
+        // 获取安全区域底部高度
+        function getSafeAreaBottom() {
+            if (typeof window !== 'undefined' && window.screen) {
+                // 尝试从环境变量获取
+                const envSafeArea = getComputedStyle(document.documentElement).getPropertyValue('--safe-area-inset-bottom');
+                if (envSafeArea) {
+                    return parseFloat(envSafeArea);
+                }
+                
+                // 回退方案
+                return Math.max(
+                    0,
+                    window.innerHeight - document.documentElement.clientHeight
+                );
+            }
+            return 0;
+        }
+
+
+
+        // 显示完整服务条款
+        function showFullTerms() {
+            document.getElementById('termsModal').classList.remove('hidden');
+        }
+
+        // 关闭服务条款
+        function closeTerms() {
+            document.getElementById('termsModal').classList.add('hidden');
+        }
+
+        // 点击遮罩关闭弹窗
+        document.getElementById('termsModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeTerms();
+            }
+        });
+
+        // 检查登录状态并跳转到订单页面
+        function checkLoginAndGoToOrders() {
+            const loginInfo = JSON.parse(localStorage.getItem('loginInfo') || '{}');
+            if (!loginInfo.isLoggedIn) {
+                // 未登录，设置返回URL并跳转到登录页面
+                localStorage.setItem('returnUrl', 'user-management.html');
+                location.href = 'login.html';
+            } else {
+                // 已登录，直接跳转到订单页面
+                location.href = 'user-management.html';
+            }
+        }
+
+        // 检查登录状态并跳转到定制页面
+        function checkLoginAndGoToCustomize() {
+            const loginInfo = JSON.parse(localStorage.getItem('loginInfo') || '{}');
+            if (!loginInfo.isLoggedIn) {
+                // 未登录，设置返回URL并跳转到登录页面
+                localStorage.setItem('returnUrl', 'after-service.html');
+                location.href = 'login.html';
+            } else {
+                // 已登录，直接跳转到定制页面
+                location.href = 'after-service.html';
+            }
+        }
+    </script>
+</body>
+</html>

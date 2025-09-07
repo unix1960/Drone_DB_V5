@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>无人机自助打卡 - DroneSelfie</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#1E40AF',
+                        accent: '#06B6D4',
+                        dark: '#1E293B',
+                        light: '#F8FAFC',
+                        'gray-medium': '#64748B',
+                        'gray-light': '#E2E8F0',
+                        'blue-primary': '#3B82F6',
+                        'blue-secondary': '#1D4ED8',
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            }
+            .touch-friendly {
+                touch-action: manipulation;
+                -webkit-tap-highlight-color: transparent;
+            }
+            .safe-area-bottom {
+                padding-bottom: constant(safe-area-inset-bottom);
+                padding-bottom: env(safe-area-inset-bottom);
+            }
+            .miniprogram-scroll {
+                -webkit-overflow-scrolling: touch;
+            }
+            .miniprogram-card {
+                box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+                border-radius: 8px;
+            }
+        }
+    </style>
+</head>
+<body class="font-inter bg-light text-dark antialiased touch-action-manipulation">
+    <!-- 页面容器 -->
+    <div class="min-h-screen w-full safe-area-bottom content-container">
+        <!-- 英雄区域 -->
+        <section class="relative h-80 flex items-center justify-center overflow-hidden">
+            <div class="absolute inset-0 z-0">
+                <img src="https://picsum.photos/id/1015/1200/800" alt="无人机拍摄风景" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-gradient-to-b from-dark/40 via-dark/20 to-dark/60"></div>
+            </div>
+            <div class="container mx-auto px-4 z-10 text-center">
+                <h1 class="text-[clamp(1.8rem,5vw,2.5rem)] font-bold text-white text-shadow mb-4">
+                    <i class="fa fa-paper-plane mr-2"></i>探索无人机的壮丽视角
+                </h1>
+                <p class="text-white/90 text-sm mb-6 max-w-xs mx-auto">专业无人机自动拍摄，AI智能剪辑，留下精彩瞬间</p>
+                <button onclick="location.href='user-selection.html'" class="px-6 py-3 bg-primary text-white rounded-full font-medium hover:bg-primary/90 transition-colors touch-friendly">
+                    <i class="fa fa-camera mr-2"></i>立即体验
+                </button>
+            </div>
+        </section>
+        
+        <!-- 功能入口网格 -->
+        <section class="px-4 py-6">
+            <div class="grid grid-cols-2 gap-4">
+                <!-- 样片展示 -->
+                <div class="miniprogram-card bg-white p-5 text-center touch-friendly" onclick="location.href='sample-display.html'">
+                    <div class="w-12 h-12 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center mx-auto mb-3">
+                        <i class="fa fa-picture-o text-primary text-xl"></i>
+                    </div>
+                    <h3 class="font-medium text-dark mb-1">样片展示</h3>
+                    <p class="text-gray-medium text-xs leading-relaxed">查看拍摄效果样片</p>
+                </div>
+
+                <!-- 服务说明 -->
+                <div class="miniprogram-card bg-white p-5 text-center touch-friendly" onclick="location.href='info-display.html'">
+                    <div class="w-12 h-12 rounded-full bg-gradient-to-br from-accent/20 to-accent/10 flex items-center justify-center mx-auto mb-3">
+                        <i class="fa fa-info-circle text-accent text-xl"></i>
+                    </div>
+                    <h3 class="font-medium text-dark mb-1">服务说明</h3>
+                    <p class="text-gray-medium text-xs leading-relaxed">查看服务流程详情</p>
+                </div>
+
+                <!-- 开始拍摄 -->
+                <div class="miniprogram-card bg-gradient-to-br from-primary to-blue-secondary p-5 text-center text-white touch-friendly" onclick="location.href='user-selection.html'">
+                    <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center mx-auto mb-3">
+                        <i class="fa fa-camera text-white text-xl"></i>
+                    </div>
+                    <h3 class="font-medium mb-1">开始拍摄</h3>
+                    <p class="text-white/90 text-xs leading-relaxed">选择拍摄内容开始</p>
+                </div>
+
+                <!-- 我的订单 -->
+                <div class="miniprogram-card bg-white p-5 text-center touch-friendly" onclick="location.href='user-management.html'">
+                    <div class="w-12 h-12 rounded-full bg-gradient-to-br from-secondary/20 to-secondary/10 flex items-center justify-center mx-auto mb-3">
+                        <i class="fa fa-list-alt text-secondary text-xl"></i>
+                    </div>
+                    <h3 class="font-medium text-dark mb-1">我的订单</h3>
+                    <p class="text-gray-medium text-xs leading-relaxed">查看订单状态</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 使用步骤 -->
+        <section class="px-4 py-6">
+            <div class="miniprogram-card bg-white p-5">
+                <h2 class="text-lg font-bold mb-4 text-center">三步完成拍摄</h2>
+                <div class="space-y-4">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white font-bold text-sm flex-shrink-0">1</div>
+                        <div>
+                            <h4 class="font-medium text-sm">浏览样片</h4>
+                            <p class="text-gray-medium text-xs">查看拍摄样片选择服务内容</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white font-bold text-sm flex-shrink-0">2</div>
+                        <div>
+                            <h4 class="font-medium text-sm">到达地点</h4>
+                            <p class="text-gray-medium text-xs">按导航到达拍摄点确认位置</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white font-bold text-sm flex-shrink-0">3</div>
+                        <div>
+                            <h4 class="font-medium text-sm">拍摄完成</h4>
+                            <p class="text-gray-medium text-xs">无人机自动完成拍摄和AI剪辑</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 热门打卡点预览 -->
+        <section class="px-4 py-6">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-bold">热门打卡点</h2>
+                <button onclick="location.href='sample-display.html'" class="text-primary text-sm touch-friendly">
+                    更多 <i class="fa fa-angle-right"></i>
+                </button>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+                <div class="miniprogram-card overflow-hidden touch-friendly" onclick="location.href='sample-display.html'">
+                    <img src="https://picsum.photos/id/1018/400/300" alt="山顶观景台" class="w-full h-24 object-cover">
+                    <div class="p-3">
+                        <h4 class="font-medium text-sm">山顶观景台</h4>
+                        <p class="text-gray-medium text-xs">俯瞰城市全景</p>
+                    </div>
+                </div>
+                <div class="miniprogram-card overflow-hidden touch-friendly" onclick="location.href='sample-display.html'">
+                    <img src="https://picsum.photos/id/1031/400/300" alt="湖畔公园" class="w-full h-24 object-cover">
+                    <div class="p-3">
+                        <h4 class="font-medium text-sm">湖畔公园</h4>
+                        <p class="text-gray-medium text-xs">湖光山色美景</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 客服联系 -->
+        <section class="px-4 py-6">
+            <div class="miniprogram-card bg-gradient-to-r from-secondary to-secondary/80 p-5 text-white text-center">
+                <h3 class="font-bold mb-2">需要帮助？</h3>
+                <p class="text-white/90 text-sm mb-4">专业客服团队为您提供服务</p>
+                <div class="flex space-x-3">
+                    <button onclick="callService()" class="flex-1 bg-white/20 backdrop-blur-sm text-white py-2 rounded-lg text-sm font-medium touch-friendly">
+                        <i class="fa fa-phone mr-1"></i>客服电话
+                    </button>
+                    <button onclick="addWechat()" class="flex-1 bg-white/20 backdrop-blur-sm text-white py-2 rounded-lg text-sm font-medium touch-friendly">
+                        <i class="fa fa-wechat mr-1"></i>企业微信
+                    </button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- 微信小程序底部导航栏 -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-light z-50 safe-area-bottom" id="bottomNav">
+        <div class="flex justify-around items-center h-16">
+            <div class="tab-item flex flex-col items-center justify-center text-primary touch-friendly active" data-page="index">
+                <i class="fa fa-home text-lg mb-1"></i>
+                <span class="text-xs">首页</span>
+            </div>
+            <div class="tab-item flex flex-col items-center justify-center text-gray-medium touch-friendly" data-page="sample-display" onclick="location.href='sample-display.html'">
+                <i class="fa fa-picture-o text-lg mb-1"></i>
+                <span class="text-xs">样片</span>
+            </div>
+            <div class="tab-item flex flex-col items-center justify-center touch-friendly" data-page="user-selection" onclick="location.href='user-selection.html'">
+                <div class="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center -mt-6 shadow-lg relative">
+                    <i class="fa fa-camera text-lg"></i>
+                </div>
+                <span class="text-xs text-primary font-medium mt-1">拍摄</span>
+            </div>
+            <div class="tab-item flex flex-col items-center justify-center text-gray-medium touch-friendly no-scale" data-page="user-management" onclick="checkLoginAndGoToOrders()">
+                <i class="fa fa-user text-lg mb-1"></i>
+                <span class="text-xs">订单</span>
+            </div>
+            <div class="tab-item flex flex-col items-center justify-center text-gray-medium touch-friendly" data-page="after-service" onclick="checkLoginAndGoToCustomize()">
+                <i class="fa fa-star text-lg mb-1"></i>
+                <span class="text-xs">定制</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- JavaScript交互代码 -->
+    <script>
+        // 小程序适配
+        document.addEventListener('DOMContentLoaded', function() {
+            // 解决底部导航栏遮挡内容的问题
+            adjustContentPadding();
+            
+            // 添加小程序风格的触摸反馈
+            const touchElements = document.querySelectorAll('.touch-friendly');
+            touchElements.forEach(element => {
+                // 跳过有 no-scale 类的元素
+                if (element.classList.contains('no-scale')) {
+                    element.addEventListener('touchstart', function() {
+                        this.style.opacity = '0.7';
+                    });
+                    
+                    element.addEventListener('touchend', function() {
+                        this.style.opacity = '1';
+                    });
+                    
+                    element.addEventListener('touchcancel', function() {
+                        this.style.opacity = '1';
+                    });
+                } else {
+                    element.addEventListener('touchstart', function() {
+                        this.style.opacity = '0.7';
+                        this.style.transform = 'scale(0.98)';
+                    });
+                    
+                    element.addEventListener('touchend', function() {
+                        this.style.opacity = '1';
+                        this.style.transform = 'scale(1)';
+                    });
+                    
+                    element.addEventListener('touchcancel', function() {
+                        this.style.opacity = '1';
+                        this.style.transform = 'scale(1)';
+                    });
+                }
+            });
+        });
+
+        // 窗口大小变化时重新调整padding
+        window.addEventListener('resize', adjustContentPadding);
+
+        // 调整内容区域的padding-bottom以适应底部导航栏
+        function adjustContentPadding() {
+            const nav = document.getElementById('bottomNav');
+            const contentContainer = document.querySelector('.content-container');
+            
+            if (nav && contentContainer) {
+                // 获取导航栏的实际高度
+                const navHeight = nav.offsetHeight;
+                // 获取安全区域底部高度
+                const safeAreaBottom = getSafeAreaBottom();
+                // 设置内容区域底部内边距，确保内容不被导航栏遮挡
+                contentContainer.style.paddingBottom = `${navHeight + safeAreaBottom}px`;
+            }
+        }
+
+        // 获取安全区域底部高度
+        function getSafeAreaBottom() {
+            if (typeof window !== 'undefined' && window.screen) {
+                // 尝试从环境变量获取
+                const envSafeArea = getComputedStyle(document.documentElement).getPropertyValue('--safe-area-inset-bottom');
+                if (envSafeArea) {
+                    return parseFloat(envSafeArea);
+                }
+                
+                // 回退方案
+                return Math.max(
+                    0,
+                    window.innerHeight - document.documentElement.clientHeight
+                );
+            }
+            return 0;
+        }
+
+        // 客服电话
+        function callService() {
+            // 小程序中应使用 wx.makePhoneCall
+            if (typeof wx !== 'undefined') {
+                wx.makePhoneCall({
+                    phoneNumber: '400-888-6666'
+                });
+            } else {
+                window.open('tel:400-888-6666');
+            }
+        }
+
+        // 添加企业微信
+        function addWechat() {
+            // 小程序中的微信联系逻辑
+            if (typeof wx !== 'undefined') {
+                wx.showModal({
+                    title: '添加企业微信',
+                    content: '请搜索企业微信号：DroneVideo2023 或扫描二维码添加',
+                    showCancel: false
+                });
+            } else {
+                alert('请搜索企业微信号：DroneVideo2023');
+            }
+        }
+
+        // 底部导航栏状态管理
+        function updateTabBar(activePage) {
+            const tabItems = document.querySelectorAll('.tab-item');
+            tabItems.forEach(item => {
+                const page = item.getAttribute('data-page');
+                if (page === activePage) {
+                    item.classList.remove('text-gray-medium');
+                    item.classList.add('text-primary', 'active');
+                } else {
+                    item.classList.remove('text-primary', 'active');
+                    item.classList.add('text-gray-medium');
+                }
+            });
+        }
+
+        // 页面跳转记录
+        function navigateToPage(page) {
+            // 记录用户行为（小程序分析）
+            if (typeof wx !== 'undefined') {
+                wx.reportAnalytics('page_visit', {
+                    page: page,
+                    timestamp: Date.now()
+                });
+            }
+        }
+
+        // 检查登录状态并跳转到订单页面
+        function checkLoginAndGoToOrders() {
+            const loginInfo = JSON.parse(localStorage.getItem('loginInfo') || '{}');
+            if (!loginInfo.isLoggedIn) {
+                // 未登录，设置返回URL并跳转到登录页面
+                localStorage.setItem('returnUrl', 'user-management.html');
+                location.href = 'login.html';
+            } else {
+                // 已登录，直接跳转到订单页面
+                location.href = 'user-management.html';
+            }
+        }
+
+        // 检查登录状态并跳转到定制页面
+        function checkLoginAndGoToCustomize() {
+            const loginInfo = JSON.parse(localStorage.getItem('loginInfo') || '{}');
+            if (!loginInfo.isLoggedIn) {
+                // 未登录，设置返回URL并跳转到登录页面
+                localStorage.setItem('returnUrl', 'after-service.html');
+                location.href = 'login.html';
+            } else {
+                // 已登录，直接跳转到定制页面
+                location.href = 'after-service.html';
+            }
+        }
+    </script>
+</body>
+</html>
