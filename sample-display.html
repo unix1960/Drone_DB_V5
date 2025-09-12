@@ -24,17 +24,17 @@
                 <button class="filter-btn flex-shrink-0 px-4 py-2 bg-primary text-white rounded-full text-sm font-medium whitespace-nowrap touch-friendly" data-filter="all">
                     <i class="fa fa-th-large mr-1"></i>全部
                 </button>
-                <button class="filter-btn flex-shrink-0 px-4 py-2 bg-gray-100 text-dark rounded-full text-sm font-medium whitespace-nowrap touch-friendly" data-filter="mountain">
-                    <i class="fa fa-flag mr-1"></i>山顶景观
+                <button class="filter-btn flex-shrink-0 px-4 py-2 bg-gray-100 text-dark rounded-full text-sm font-medium whitespace-nowrap touch-friendly" data-filter="temple">
+                    <i class="fa fa-home mr-1"></i>古寺名刹
                 </button>
-                <button class="filter-btn flex-shrink-0 px-4 py-2 bg-gray-100 text-dark rounded-full text-sm font-medium whitespace-nowrap touch-friendly" data-filter="lake">
-                    <i class="fa fa-tint mr-1"></i>湖畔风光
+                <button class="filter-btn flex-shrink-0 px-4 py-2 bg-gray-100 text-dark rounded-full text-sm font-medium whitespace-nowrap touch-friendly" data-filter="peak">
+                    <i class="fa fa-flag mr-1"></i>山峰奇景
                 </button>
-                <button class="filter-btn flex-shrink-0 px-4 py-2 bg-gray-100 text-dark rounded-full text-sm font-medium whitespace-nowrap touch-friendly" data-filter="city">
-                    <i class="fa fa-building mr-1"></i>城市地标
+                <button class="filter-btn flex-shrink-0 px-4 py-2 bg-gray-100 text-dark rounded-full text-sm font-medium whitespace-nowrap touch-friendly" data-filter="cave">
+                    <i class="fa fa-circle-o mr-1"></i>洞穴仙境
                 </button>
-                <button class="filter-btn flex-shrink-0 px-4 py-2 bg-gray-100 text-dark rounded-full text-sm font-medium whitespace-nowrap touch-friendly" data-filter="forest">
-                    <i class="fa fa-tree mr-1"></i>森林公园
+                <button class="filter-btn flex-shrink-0 px-4 py-2 bg-gray-100 text-dark rounded-full text-sm font-medium whitespace-nowrap touch-friendly" data-filter="heritage">
+                    <i class="fa fa-bookmark mr-1"></i>文化遗迹
                 </button>
             </div>
         </div>
@@ -42,13 +42,10 @@
         <!-- 样片网格 -->
         <div class="px-4 py-4 miniprogram-scroll">
             <div class="grid grid-cols-2 gap-3">
-                <!-- 视频样片1 - 山顶俯拍全景 -->
-                <div class="gallery-item miniprogram-card overflow-hidden touch-friendly" data-category="mountain" onclick="openModal('山顶俯拍全景', '360度环绕拍摄，展现壮丽山景，包含日出时分的金色光影效果', 'assets/images/mountain-1015.jpg', 'video', 'mountain')">
+                <!-- 涌泉寺样片 -->
+                <div class="gallery-item miniprogram-card overflow-hidden touch-friendly" data-category="temple" onclick="openModal('涌泉寺全景', '千年古刹，佛教圣地，展现古建筑的庄严与宁静', 'https://picsum.photos/id/1018/150/120', 'video', 'temple')">
                     <div class="relative">
-                        <img src="assets/images/mountain-1015.jpg" alt="山顶俯拍全景" class="w-full h-32 object-cover">
-                        <div class="absolute top-2 right-2 bg-accent/90 backdrop-blur-sm rounded-full px-2 py-1 text-xs text-white">
-                            <i class="fa fa-play mr-1"></i> 视频
-                        </div>
+                        <img src="https://picsum.photos/id/1018/150/120" alt="涌泉寺全景" class="w-full h-32 object-cover">
                         <div class="absolute inset-0 flex items-center justify-center">
                             <div class="w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center">
                                 <i class="fa fa-play text-white"></i>
@@ -59,24 +56,21 @@
                         </div>
                     </div>
                     <div class="p-3">
-                        <h4 class="font-medium text-sm mb-1">山顶俯拍全景</h4>
-                        <p class="text-gray-medium text-xs mb-2">天台山观景台</p>
+                        <h4 class="font-medium text-sm mb-1">涌泉寺全景</h4>
+                        <p class="text-gray-medium text-xs mb-2">千年古刹，佛教圣地</p>
                         <div class="flex justify-between items-center">
                             <div class="text-xs text-primary">
-                                <i class="fa fa-star mr-1"></i> 4.9 (128)
+                                <i class="fa fa-star mr-1"></i> 4.9 (156)
                             </div>
                             <div class="text-xs text-gray-medium">¥128</div>
                         </div>
                     </div>
                 </div>
                 
-                <!-- 视频样片2 - 湖畔追踪拍摄 -->
-                <div class="gallery-item miniprogram-card overflow-hidden touch-friendly" data-category="lake" onclick="openModal('湖畔追踪拍摄', '智能跟拍功能，捕捉湖边漫步的美好瞬间，配合夕阳余晖', 'assets/images/lake-1031.jpg', 'video', 'lake')">
+                <!-- 摩崖石刻样片 -->
+                <div class="gallery-item miniprogram-card overflow-hidden touch-friendly" data-category="heritage" onclick="openModal('摩崖石刻航拍', '历史文化遗迹，石刻艺术精品，记录千年文明', 'https://picsum.photos/id/1019/150/120', 'video', 'heritage')">
                     <div class="relative">
-                        <img src="assets/images/lake-1031.jpg" alt="湖畔追踪拍摄" class="w-full h-32 object-cover">
-                        <div class="absolute top-2 right-2 bg-accent/90 backdrop-blur-sm rounded-full px-2 py-1 text-xs text-white">
-                            <i class="fa fa-play mr-1"></i> 视频
-                        </div>
+                        <img src="https://picsum.photos/id/1019/150/120" alt="摩崖石刻航拍" class="w-full h-32 object-cover">
                         <div class="absolute inset-0 flex items-center justify-center">
                             <div class="w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center">
                                 <i class="fa fa-play text-white"></i>
@@ -87,24 +81,21 @@
                         </div>
                     </div>
                     <div class="p-3">
-                        <h4 class="font-medium text-sm mb-1">湖畔追踪拍摄</h4>
-                        <p class="text-gray-medium text-xs mb-2">西湖景区</p>
+                        <h4 class="font-medium text-sm mb-1">摩崖石刻航拍</h4>
+                        <p class="text-gray-medium text-xs mb-2">历史文化遗迹</p>
                         <div class="flex justify-between items-center">
                             <div class="text-xs text-primary">
-                                <i class="fa fa-star mr-1"></i> 4.8 (96)
+                                <i class="fa fa-star mr-1"></i> 4.8 (98)
                             </div>
-                            <div class="text-xs text-gray-medium">¥98</div>
+                            <div class="text-xs text-gray-medium">¥118</div>
                         </div>
                     </div>
                 </div>
                 
-                <!-- 视频样片3 - 城市夜景航拍 -->
-                <div class="gallery-item miniprogram-card overflow-hidden touch-friendly" data-category="city" onclick="openModal('城市夜景航拍', '现代都市灯火辉煌，夜景航拍展现城市魅力', 'assets/images/city-1016.jpg', 'video', 'city')">
+                <!-- 登山古径样片 -->
+                <div class="gallery-item miniprogram-card overflow-hidden touch-friendly" data-category="heritage" onclick="openModal('登山古径跟拍', '古道悠悠，历史足迹，展现朝圣者的虔诚之路', 'https://picsum.photos/id/1020/150/120', 'video', 'heritage')">
                     <div class="relative">
-                        <img src="assets/images/city-1016.jpg" alt="城市夜景航拍" class="w-full h-32 object-cover">
-                        <div class="absolute top-2 right-2 bg-accent/90 backdrop-blur-sm rounded-full px-2 py-1 text-xs text-white">
-                            <i class="fa fa-play mr-1"></i> 视频
-                        </div>
+                        <img src="https://picsum.photos/id/1020/150/120" alt="登山古径跟拍" class="w-full h-32 object-cover">
                         <div class="absolute inset-0 flex items-center justify-center">
                             <div class="w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center">
                                 <i class="fa fa-play text-white"></i>
@@ -115,24 +106,46 @@
                         </div>
                     </div>
                     <div class="p-3">
-                        <h4 class="font-medium text-sm mb-1">城市夜景航拍</h4>
-                        <p class="text-gray-medium text-xs mb-2">城市中心广场</p>
+                        <h4 class="font-medium text-sm mb-1">登山古径跟拍</h4>
+                        <p class="text-gray-medium text-xs mb-2">古道悠悠，朝圣之路</p>
                         <div class="flex justify-between items-center">
                             <div class="text-xs text-primary">
-                                <i class="fa fa-star mr-1"></i> 4.7 (82)
+                                <i class="fa fa-star mr-1"></i> 4.7 (89)
                             </div>
-                            <div class="text-xs text-gray-medium">¥158</div>
+                            <div class="text-xs text-gray-medium">¥108</div>
                         </div>
                     </div>
                 </div>
                 
-                <!-- 视频样片4 - 森林俯拍 -->
-                <div class="gallery-item miniprogram-card overflow-hidden touch-friendly" data-category="forest" onclick="openModal('森林俯拍', '绿意盎然的自然画卷，展现大自然的美丽', 'assets/images/forest-1020.jpg', 'video', 'forest')">
+                <!-- 屴崱峰样片 -->
+                <div class="gallery-item miniprogram-card overflow-hidden touch-friendly" data-category="peak" onclick="openModal('屴崱峰俯瞰', '天台山主峰，壮丽山景，360度环绕拍摄展现雄伟气势', 'https://picsum.photos/id/1021/150/120', 'video', 'peak')">
                     <div class="relative">
-                        <img src="assets/images/forest-1020.jpg" alt="森林俯拍" class="w-full h-32 object-cover">
-                        <div class="absolute top-2 right-2 bg-accent/90 backdrop-blur-sm rounded-full px-2 py-1 text-xs text-white">
-                            <i class="fa fa-play mr-1"></i> 视频
+                        <img src="https://picsum.photos/id/1021/150/120" alt="屴崱峰俯瞰" class="w-full h-32 object-cover">
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <div class="w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center">
+                                <i class="fa fa-play text-white"></i>
+                            </div>
                         </div>
+                        <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-2">
+                            <div class="text-white text-xs font-medium">3:50</div>
+                        </div>
+                    </div>
+                    <div class="p-3">
+                        <h4 class="font-medium text-sm mb-1">屴崱峰俯瞰</h4>
+                        <p class="text-gray-medium text-xs mb-2">天台山主峰，壮丽山景</p>
+                        <div class="flex justify-between items-center">
+                            <div class="text-xs text-primary">
+                                <i class="fa fa-star mr-1"></i> 4.9 (142)
+                            </div>
+                            <div class="text-xs text-gray-medium">¥148</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 回龙阁样片 -->
+                <div class="gallery-item miniprogram-card overflow-hidden touch-friendly" data-category="heritage" onclick="openModal('回龙阁建筑拍摄', '古典楼阁，建筑瑰宝，展现传统建筑的精美工艺', 'https://picsum.photos/id/1022/150/120', 'video', 'heritage')">
+                    <div class="relative">
+                        <img src="https://picsum.photos/id/1022/150/120" alt="回龙阁建筑拍摄" class="w-full h-32 object-cover">
                         <div class="absolute inset-0 flex items-center justify-center">
                             <div class="w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center">
                                 <i class="fa fa-play text-white"></i>
@@ -143,13 +156,113 @@
                         </div>
                     </div>
                     <div class="p-3">
-                        <h4 class="font-medium text-sm mb-1">森林俯拍</h4>
-                        <p class="text-gray-medium text-xs mb-2">翠竹森林公园</p>
+                        <h4 class="font-medium text-sm mb-1">回龙阁建筑拍摄</h4>
+                        <p class="text-gray-medium text-xs mb-2">古典楼阁，建筑瑰宝</p>
                         <div class="flex justify-between items-center">
                             <div class="text-xs text-primary">
-                                <i class="fa fa-star mr-1"></i> 4.6 (74)
+                                <i class="fa fa-star mr-1"></i> 4.8 (76)
                             </div>
-                            <div class="text-xs text-gray-medium">¥88</div>
+                            <div class="text-xs text-gray-medium">¥98</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 灵源洞样片 -->
+                <div class="gallery-item miniprogram-card overflow-hidden touch-friendly" data-category="cave" onclick="openModal('灵源洞探秘', '神秘洞穴，自然造化，展现地下世界的奇妙景观', 'https://picsum.photos/id/1023/150/120', 'video', 'cave')">
+                    <div class="relative">
+                        <img src="https://picsum.photos/id/1023/150/120" alt="灵源洞探秘" class="w-full h-32 object-cover">
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <div class="w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center">
+                                <i class="fa fa-play text-white"></i>
+                            </div>
+                        </div>
+                        <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-2">
+                            <div class="text-white text-xs font-medium">3:15</div>
+                        </div>
+                    </div>
+                    <div class="p-3">
+                        <h4 class="font-medium text-sm mb-1">灵源洞探秘</h4>
+                        <p class="text-gray-medium text-xs mb-2">神秘洞穴，自然造化</p>
+                        <div class="flex justify-between items-center">
+                            <div class="text-xs text-primary">
+                                <i class="fa fa-star mr-1"></i> 4.7 (93)
+                            </div>
+                            <div class="text-xs text-gray-medium">¥128</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 罗汉台样片 -->
+                <div class="gallery-item miniprogram-card overflow-hidden touch-friendly" data-category="temple" onclick="openModal('罗汉台禅境', '佛教圣地，庄严肃穆，展现禅修文化的深邃意境', 'https://picsum.photos/id/1024/150/120', 'video', 'temple')">
+                    <div class="relative">
+                        <img src="https://picsum.photos/id/1024/150/120" alt="罗汉台禅境" class="w-full h-32 object-cover">
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <div class="w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center">
+                                <i class="fa fa-play text-white"></i>
+                            </div>
+                        </div>
+                        <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-2">
+                            <div class="text-white text-xs font-medium">2:55</div>
+                        </div>
+                    </div>
+                    <div class="p-3">
+                        <h4 class="font-medium text-sm mb-1">罗汉台禅境</h4>
+                        <p class="text-gray-medium text-xs mb-2">佛教圣地，庄严肃穆</p>
+                        <div class="flex justify-between items-center">
+                            <div class="text-xs text-primary">
+                                <i class="fa fa-star mr-1"></i> 4.8 (87)
+                            </div>
+                            <div class="text-xs text-gray-medium">¥118</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 香炉峰样片 -->
+                <div class="gallery-item miniprogram-card overflow-hidden touch-friendly" data-category="peak" onclick="openModal('香炉峰日出', '山峰奇景，日出壮观，捕捉第一缕阳光的绚烂时刻', 'https://picsum.photos/id/1025/150/120', 'video', 'peak')">
+                    <div class="relative">
+                        <img src="https://picsum.photos/id/1025/150/120" alt="香炉峰日出" class="w-full h-32 object-cover">
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <div class="w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center">
+                                <i class="fa fa-play text-white"></i>
+                            </div>
+                        </div>
+                        <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-2">
+                            <div class="text-white text-xs font-medium">4:25</div>
+                        </div>
+                    </div>
+                    <div class="p-3">
+                        <h4 class="font-medium text-sm mb-1">香炉峰日出</h4>
+                        <p class="text-gray-medium text-xs mb-2">山峰奇景，日出壮观</p>
+                        <div class="flex justify-between items-center">
+                            <div class="text-xs text-primary">
+                                <i class="fa fa-star mr-1"></i> 4.9 (134)
+                            </div>
+                            <div class="text-xs text-gray-medium">¥158</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 白云洞样片 -->
+                <div class="gallery-item miniprogram-card overflow-hidden touch-friendly" data-category="cave" onclick="openModal('白云洞仙境', '云雾缭绕，仙境般美景，展现天台山的神秘魅力', 'https://picsum.photos/id/1026/150/120', 'video', 'cave')">
+                    <div class="relative">
+                        <img src="https://picsum.photos/id/1026/150/120" alt="白云洞仙境" class="w-full h-32 object-cover">
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <div class="w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center">
+                                <i class="fa fa-play text-white"></i>
+                            </div>
+                        </div>
+                        <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-2">
+                            <div class="text-white text-xs font-medium">3:40</div>
+                        </div>
+                    </div>
+                    <div class="p-3">
+                        <h4 class="font-medium text-sm mb-1">白云洞仙境</h4>
+                        <p class="text-gray-medium text-xs mb-2">云雾缭绕，仙境般美景</p>
+                        <div class="flex justify-between items-center">
+                            <div class="text-xs text-primary">
+                                <i class="fa fa-star mr-1"></i> 4.8 (105)
+                            </div>
+                            <div class="text-xs text-gray-medium">¥138</div>
                         </div>
                     </div>
                 </div>
@@ -184,9 +297,6 @@
                 <h2 id="gallery-detail-title" class="text-white text-lg font-bold mb-2">样片标题</h2>
                 <p id="gallery-detail-desc" class="text-white/80 text-sm mb-4">样片描述</p>
                 <div class="flex justify-center space-x-4 mb-4">
-                    <div class="text-white text-sm">
-                        <i class="fa fa-video-camera mr-1"></i> <span id="detail-type">视频</span>
-                    </div>
                     <div class="text-white text-sm">
                         <i class="fa fa-star mr-1"></i> <span id="detail-rating">4.9</span>
                     </div>
@@ -228,12 +338,12 @@
                 <span class="text-xs text-primary font-medium mt-1">拍摄</span>
             </div>
             <div class="tab-item flex flex-col items-center justify-center text-gray-medium touch-friendly" onclick="checkLoginAndGoToOrders()">
-                <i class="fa fa-user text-lg mb-1"></i>
+                <i class="fa fa-list-alt text-lg mb-1"></i>
                 <span class="text-xs">订单</span>
             </div>
-            <div class="tab-item flex flex-col items-center justify-center text-gray-medium touch-friendly" onclick="checkLoginAndGoToCustomize()">
-                <i class="fa fa-star text-lg mb-1"></i>
-                <span class="text-xs">定制</span>
+            <div class="tab-item flex flex-col items-center justify-center text-gray-medium touch-friendly" onclick="checkLoginAndGoToProfile()">
+                <i class="fa fa-user text-lg mb-1"></i>
+                <span class="text-xs">我的</span>
             </div>
         </div>
     </nav>
@@ -314,7 +424,7 @@
             galleryDetailTitle.textContent = title;
             galleryDetailDesc.textContent = desc;
             galleryDetailImg.src = imgSrc;
-            detailType.textContent = type === 'video' ? '视频' : '照片';
+            // 不再显示类型信息
             detailRating.textContent = (Math.random() * 0.5 + 4.5).toFixed(1);
             
             // 存储当前样片的地点类型，用于跳转时传递
@@ -465,7 +575,7 @@
 
         // 跳转到拍摄页面并传递样片信息
         function goToShooting() {
-            const category = window.currentSampleCategory || 'mountain'; // 默认选择山景
+            const category = window.currentSampleCategory || 'temple'; // 默认选择古寺名刹
             location.href = `user-selection.html?sample=${category}`;
         }
 
@@ -482,16 +592,16 @@
             }
         }
 
-        // 检查登录状态并跳转到定制页面
-        function checkLoginAndGoToCustomize() {
+        // 检查登录状态并跳转到个人页面
+        function checkLoginAndGoToProfile() {
             const loginInfo = JSON.parse(localStorage.getItem('loginInfo') || '{}');
             if (!loginInfo.isLoggedIn) {
                 // 未登录，设置返回URL并跳转到登录页面
-                localStorage.setItem('returnUrl', 'after-service.html');
+                localStorage.setItem('returnUrl', 'user-management.html');
                 location.href = 'login.html';
             } else {
-                // 已登录，直接跳转到定制页面
-                location.href = 'after-service.html';
+                // 已登录，直接跳转到个人管理页面
+                location.href = 'user-management.html';
             }
         }
 
