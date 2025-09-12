@@ -85,6 +85,59 @@
             .step-active::after {
                 background: #3B82F6;
             }
+            .sample-card-compact {
+                transition: transform 0.2s ease, box-shadow 0.2s ease;
+            }
+            .sample-card-compact:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            }
+            .sample-card-compact.sample-selected {
+                border: 2px solid #3B82F6;
+                background: #EFF6FF;
+            }
+            .sample-checkbox-compact.selected {
+                background: #3B82F6 !important;
+                border-color: #3B82F6 !important;
+            }
+            .location-samples {
+                transition: all 0.3s ease;
+                overflow: hidden;
+            }
+            .selected-details-transition {
+                transition: all 0.3s ease;
+                overflow: hidden;
+            }
+            #toggleIcon {
+                transition: transform 0.3s ease;
+            }
+            .location-card {
+                transition: transform 0.2s ease, box-shadow 0.2s ease;
+            }
+            .location-card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            }
+            .location-card:active {
+                transform: translateY(0px);
+                box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            }
+            .sample-card-integrated {
+                transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+                border: 2px solid transparent;
+            }
+            .sample-card-integrated:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            }
+            .sample-card-integrated.sample-selected {
+                border: 2px solid #3B82F6;
+                background: #EFF6FF;
+            }
+            .sample-checkbox-integrated.selected {
+                background: #3B82F6 !important;
+                border-color: #3B82F6 !important;
+            }
         }
     </style>
 </head>
@@ -100,201 +153,908 @@
                 </button>
                 <div class="w-6" id="leftSpacer"></div>
                 <h1 class="font-bold text-dark">选择拍摄</h1>
-                <button onclick="showHelp()" class="text-gray-medium touch-friendly">
-                    <i class="fa fa-question-circle text-xl"></i>
-                </button>
+                <div class="w-6"></div>
             </div>
         </header>
 
 
 
-        <!-- 拍摄地点选择 -->
-        <section class="p-4" id="locationSection">
-            <div class="mb-4">
-                <h2 class="text-lg font-bold mb-2">选择拍摄地点</h2>
-                <p class="text-gray-medium text-sm">请选择您要拍摄的景点位置</p>
-            </div>
-
-            <div class="space-y-3">
-                <!-- 山顶观景台 -->
-                <div class="miniprogram-card bg-white overflow-hidden touch-friendly location-card" onclick="selectLocation('mountain')" data-location="mountain">
-                    <div class="flex">
-                        <img src="https://picsum.photos/id/1015/150/120" alt="天台山观景台" class="w-24 h-20 object-cover flex-shrink-0">
-                        <div class="p-4 flex-1">
-                            <div class="flex items-center justify-between mb-2">
-                                <h3 class="font-bold text-dark">天台山观景台</h3>
-                                <div class="w-5 h-5 border-2 border-gray-300 rounded-full location-checkbox" data-location="mountain">
-                                    <i class="fa fa-check text-primary text-xs hidden"></i>
-                                </div>
-                            </div>
-                            <p class="text-gray-medium text-sm mb-2">海拔1200米，360度全景视野</p>
-                            <div class="flex items-center space-x-3 text-xs text-gray-medium">
-                                <span><i class="fa fa-map-marker mr-1"></i>距离5.2km</span>
-                                <span><i class="fa fa-clock-o mr-1"></i>15分钟车程</span>
-                                <span><i class="fa fa-star mr-1"></i>4.8分</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 西湖景区 -->
-                <div class="miniprogram-card bg-white overflow-hidden touch-friendly location-card" onclick="selectLocation('lake')" data-location="lake">
-                    <div class="flex">
-                        <img src="https://picsum.photos/id/1031/150/120" alt="西湖景区" class="w-24 h-20 object-cover flex-shrink-0">
-                        <div class="p-4 flex-1">
-                            <div class="flex items-center justify-between mb-2">
-                                <h3 class="font-bold text-dark">西湖景区</h3>
-                                <div class="w-5 h-5 border-2 border-gray-300 rounded-full location-checkbox" data-location="lake">
-                                    <i class="fa fa-check text-primary text-xs hidden"></i>
-                                </div>
-                            </div>
-                            <p class="text-gray-medium text-sm mb-2">湖光山色，四季皆美</p>
-                            <div class="flex items-center space-x-3 text-xs text-gray-medium">
-                                <span><i class="fa fa-map-marker mr-1"></i>距离3.8km</span>
-                                <span><i class="fa fa-clock-o mr-1"></i>12分钟车程</span>
-                                <span><i class="fa fa-star mr-1"></i>4.9分</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 城市地标 -->
-                <div class="miniprogram-card bg-white overflow-hidden touch-friendly location-card" onclick="selectLocation('city')" data-location="city">
-                    <div class="flex">
-                        <img src="https://picsum.photos/id/1016/150/120" alt="城市中心广场" class="w-24 h-20 object-cover flex-shrink-0">
-                        <div class="p-4 flex-1">
-                            <div class="flex items-center justify-between mb-2">
-                                <h3 class="font-bold text-dark">城市中心广场</h3>
-                                <div class="w-5 h-5 border-2 border-gray-300 rounded-full location-checkbox" data-location="city">
-                                    <i class="fa fa-check text-primary text-xs hidden"></i>
-                                </div>
-                            </div>
-                            <p class="text-gray-medium text-sm mb-2">现代都市，霓虹璀璨</p>
-                            <div class="flex items-center space-x-3 text-xs text-gray-medium">
-                                <span><i class="fa fa-map-marker mr-1"></i>距离2.1km</span>
-                                <span><i class="fa fa-clock-o mr-1"></i>8分钟车程</span>
-                                <span><i class="fa fa-star mr-1"></i>4.7分</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 森林公园 -->
-                <div class="miniprogram-card bg-white overflow-hidden touch-friendly location-card" onclick="selectLocation('forest')" data-location="forest">
-                    <div class="flex">
-                        <img src="https://picsum.photos/id/1020/150/120" alt="翠竹森林公园" class="w-24 h-20 object-cover flex-shrink-0">
-                        <div class="p-4 flex-1">
-                            <div class="flex items-center justify-between mb-2">
-                                <h3 class="font-bold text-dark">翠竹森林公园</h3>
-                                <div class="w-5 h-5 border-2 border-gray-300 rounded-full location-checkbox" data-location="forest">
-                                    <i class="fa fa-check text-primary text-xs hidden"></i>
-                                </div>
-                            </div>
-                            <p class="text-gray-medium text-sm mb-2">绿意盎然，天然氧吧</p>
-                            <div class="flex items-center space-x-3 text-xs text-gray-medium">
-                                <span><i class="fa fa-map-marker mr-1"></i>距离4.5km</span>
-                                <span><i class="fa fa-clock-o mr-1"></i>13分钟车程</span>
-                                <span><i class="fa fa-star mr-1"></i>4.6分</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 选择拍摄样片 -->
-        <section class="p-4" id="sampleSection">
+        <!-- 样片选择页面 -->
+        <section class="p-4" id="locationListSection">
             <div class="mb-4">
                 <h2 class="text-lg font-bold mb-2">选择拍摄样片</h2>
-                <p class="text-gray-medium text-sm">请选择您想要的拍摄效果样片</p>
+                <p class="text-gray-medium text-sm">请选择您要拍摄的样片内容（可多选）</p>
             </div>
 
-            <div class="space-y-3">
-                <!-- 山顶俯拍全景 -->
-                <div class="miniprogram-card bg-white overflow-hidden touch-friendly sample-card" onclick="selectSample('mountain')" data-sample="mountain">
-                    <div class="flex">
-                        <img src="https://picsum.photos/id/1015/150/120" alt="山顶俯拍全景" class="w-24 h-20 object-cover flex-shrink-0">
-                        <div class="p-4 flex-1">
-                            <div class="flex items-center justify-between mb-2">
-                                <h3 class="font-bold text-dark">山顶俯拍全景</h3>
-                                <div class="w-5 h-5 border-2 border-gray-300 rounded-full sample-checkbox" data-sample="mountain">
-                                    <i class="fa fa-check text-primary text-xs hidden"></i>
+
+            <div class="space-y-4">
+                <!-- 涌泉寺样片组 -->
+                <div class="location-group">
+                    <div class="miniprogram-card bg-white location-card">
+                        <!-- 景点头部信息（可点击展开/收缩） -->
+                        <div class="flex items-center p-4 cursor-pointer" onclick="toggleLocationGroup('yongquansi')">
+                            <img src="https://picsum.photos/id/1015/150/120" alt="涌泉寺" class="w-16 h-16 object-cover rounded-full mr-4">
+                            <div class="flex-1">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <h3 class="font-bold text-dark">涌泉寺</h3>
+                                        <p class="text-gray-medium text-xs mt-1">千年古刹，佛教圣地 • 4个样片</p>
                                 </div>
+                                    <div class="flex items-center space-x-2">
+                                        <div class="location-selected-info hidden text-xs text-primary" id="yongquansi-selected">
+                                            <i class="fa fa-check-circle mr-1"></i>
+                                            <span>已选 0 个</span>
                             </div>
-                            <p class="text-gray-medium text-sm mb-2">360度环绕拍摄，展现壮丽山景</p>
-                            <div class="flex items-center space-x-3 text-xs text-gray-medium">
-                                <span><i class="fa fa-video-camera mr-1"></i>视频时长 3:20</span>
-                                <span><i class="fa fa-star mr-1"></i>4.9分</span>
-                                <span class="text-primary font-bold">¥128</span>
+                                        <i class="fa fa-angle-down text-gray-medium transition-transform duration-200" id="yongquansi-arrow"></i>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- 湖畔追踪拍摄 -->
-                <div class="miniprogram-card bg-white overflow-hidden touch-friendly sample-card" onclick="selectSample('lake')" data-sample="lake">
-                    <div class="flex">
-                        <img src="https://picsum.photos/id/1031/150/120" alt="湖畔追踪拍摄" class="w-24 h-20 object-cover flex-shrink-0">
-                        <div class="p-4 flex-1">
-                            <div class="flex items-center justify-between mb-2">
-                                <h3 class="font-bold text-dark">湖畔追踪拍摄</h3>
-                                <div class="w-5 h-5 border-2 border-gray-300 rounded-full sample-checkbox" data-sample="lake">
-                                    <i class="fa fa-check text-primary text-xs hidden"></i>
+                        <!-- 样片区域（可展开/收缩） -->
+                        <div class="location-samples" id="yongquansi-samples">
+                            <div class="border-t border-gray-100 p-4">
+                                <div class="grid grid-cols-2 gap-3">
+                                    <!-- 涌泉寺全景航拍 -->
+                                    <div class="bg-gray-50 rounded-lg overflow-hidden touch-friendly sample-card-integrated" onclick="toggleSample('yongquansi_panorama')" data-sample="yongquansi_panorama">
+                                        <div class="relative">
+                                            <img src="https://picsum.photos/id/1015/150/120" alt="涌泉寺全景航拍" class="w-full h-20 object-cover">
+                                            <div class="absolute top-2 right-2 w-5 h-5 border-2 border-white rounded-full sample-checkbox-integrated flex items-center justify-center bg-black bg-opacity-30" data-sample="yongquansi_panorama">
+                                                <i class="fa fa-check text-white text-xs hidden"></i>
                                 </div>
                             </div>
-                            <p class="text-gray-medium text-sm mb-2">智能跟拍功能，捕捉湖边漫步美好瞬间</p>
-                            <div class="flex items-center space-x-3 text-xs text-gray-medium">
-                                <span><i class="fa fa-video-camera mr-1"></i>视频时长 2:45</span>
-                                <span><i class="fa fa-star mr-1"></i>4.8分</span>
-                                <span class="text-primary font-bold">¥98</span>
+                                        <div class="p-2">
+                                            <h4 class="font-medium text-dark text-xs leading-tight mb-1">涌泉寺全景航拍</h4>
+                                            <div class="flex items-center justify-between text-xs">
+                                                <span class="text-gray-medium"><i class="fa fa-video-camera mr-1"></i>2:30</span>
+                                                <span class="text-primary font-bold">¥128</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- 涌泉寺建筑细节 -->
+                                    <div class="bg-gray-50 rounded-lg overflow-hidden touch-friendly sample-card-integrated" onclick="toggleSample('yongquansi_detail')" data-sample="yongquansi_detail">
+                                        <div class="relative">
+                                            <img src="https://picsum.photos/id/1016/150/120" alt="涌泉寺建筑细节" class="w-full h-20 object-cover">
+                                            <div class="absolute top-2 right-2 w-5 h-5 border-2 border-white rounded-full sample-checkbox-integrated flex items-center justify-center bg-black bg-opacity-30" data-sample="yongquansi_detail">
+                                                <i class="fa fa-check text-white text-xs hidden"></i>
+                                            </div>
+                                        </div>
+                                        <div class="p-2">
+                                            <h4 class="font-medium text-dark text-xs leading-tight mb-1">涌泉寺建筑细节</h4>
+                                            <div class="flex items-center justify-between text-xs">
+                                                <span class="text-gray-medium"><i class="fa fa-video-camera mr-1"></i>1:45</span>
+                                                <span class="text-primary font-bold">¥98</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- 涌泉寺晨曦 -->
+                                    <div class="bg-gray-50 rounded-lg overflow-hidden touch-friendly sample-card-integrated" onclick="toggleSample('yongquansi_morning')" data-sample="yongquansi_morning">
+                                        <div class="relative">
+                                            <img src="https://picsum.photos/id/1017/150/120" alt="涌泉寺晨曦" class="w-full h-20 object-cover">
+                                            <div class="absolute top-2 right-2 w-5 h-5 border-2 border-white rounded-full sample-checkbox-integrated flex items-center justify-center bg-black bg-opacity-30" data-sample="yongquansi_morning">
+                                                <i class="fa fa-check text-white text-xs hidden"></i>
+                                            </div>
+                                        </div>
+                                        <div class="p-2">
+                                            <h4 class="font-medium text-dark text-xs leading-tight mb-1">涌泉寺晨曦</h4>
+                                            <div class="flex items-center justify-between text-xs">
+                                                <span class="text-gray-medium"><i class="fa fa-video-camera mr-1"></i>2:10</span>
+                                                <span class="text-primary font-bold">¥118</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- 涌泉寺夕照 -->
+                                    <div class="bg-gray-50 rounded-lg overflow-hidden touch-friendly sample-card-integrated" onclick="toggleSample('yongquansi_sunset')" data-sample="yongquansi_sunset">
+                                        <div class="relative">
+                                            <img src="https://picsum.photos/id/1018/150/120" alt="涌泉寺夕照" class="w-full h-20 object-cover">
+                                            <div class="absolute top-2 right-2 w-5 h-5 border-2 border-white rounded-full sample-checkbox-integrated flex items-center justify-center bg-black bg-opacity-30" data-sample="yongquansi_sunset">
+                                                <i class="fa fa-check text-white text-xs hidden"></i>
+                                            </div>
+                                        </div>
+                                        <div class="p-2">
+                                            <h4 class="font-medium text-dark text-xs leading-tight mb-1">涌泉寺夕照</h4>
+                                            <div class="flex items-center justify-between text-xs">
+                                                <span class="text-gray-medium"><i class="fa fa-video-camera mr-1"></i>2:20</span>
+                                                <span class="text-primary font-bold">¥128</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- 城市夜景航拍 -->
-                <div class="miniprogram-card bg-white overflow-hidden touch-friendly sample-card" onclick="selectSample('city')" data-sample="city">
-                    <div class="flex">
-                        <img src="https://picsum.photos/id/1016/150/120" alt="城市夜景航拍" class="w-24 h-20 object-cover flex-shrink-0">
-                        <div class="p-4 flex-1">
-                            <div class="flex items-center justify-between mb-2">
-                                <h3 class="font-bold text-dark">城市夜景航拍</h3>
-                                <div class="w-5 h-5 border-2 border-gray-300 rounded-full sample-checkbox" data-sample="city">
-                                    <i class="fa fa-check text-primary text-xs hidden"></i>
+                <!-- 摩崖石刻样片组 -->
+                <div class="location-group">
+                    <div class="miniprogram-card bg-white location-card">
+                        <!-- 景点头部信息（可点击展开/收缩） -->
+                        <div class="flex items-center p-4 cursor-pointer" onclick="toggleLocationGroup('moyai')">
+                            <img src="https://picsum.photos/id/1020/150/120" alt="摩崖石刻" class="w-16 h-16 object-cover rounded-full mr-4">
+                            <div class="flex-1">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <h3 class="font-bold text-dark">摩崖石刻</h3>
+                                        <p class="text-gray-medium text-xs mt-1">历史文化遗迹，石刻艺术精品 • 4个样片</p>
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        <div class="location-selected-info hidden text-xs text-primary" id="moyai-selected">
+                                            <i class="fa fa-check-circle mr-1"></i>
+                                            <span>已选 0 个</span>
+                                        </div>
+                                        <i class="fa fa-angle-down text-gray-medium transition-transform duration-200" id="moyai-arrow"></i>
+                                    </div>
                                 </div>
                             </div>
-                            <p class="text-gray-medium text-sm mb-2">现代都市灯火辉煌，夜景航拍展现城市魅力</p>
-                            <div class="flex items-center space-x-3 text-xs text-gray-medium">
-                                <span><i class="fa fa-video-camera mr-1"></i>视频时长 4:10</span>
-                                <span><i class="fa fa-star mr-1"></i>4.7分</span>
-                                <span class="text-primary font-bold">¥158</span>
+                        </div>
+                        
+                        <!-- 样片区域（可展开/收缩） -->
+                        <div class="location-samples hidden" id="moyai-samples">
+                            <div class="border-t border-gray-100 p-4">
+                                <div class="grid grid-cols-2 gap-3">
+                                    <!-- 摩崖石刻特写 -->
+                                    <div class="bg-gray-50 rounded-lg overflow-hidden touch-friendly sample-card-integrated" onclick="toggleSample('moyai_close')" data-sample="moyai_close">
+                                        <div class="relative">
+                                            <img src="https://picsum.photos/id/1020/150/120" alt="摩崖石刻特写" class="w-full h-20 object-cover">
+                                            <div class="absolute top-2 right-2 w-5 h-5 border-2 border-white rounded-full sample-checkbox-integrated flex items-center justify-center bg-black bg-opacity-30" data-sample="moyai_close">
+                                                <i class="fa fa-check text-white text-xs hidden"></i>
+                                            </div>
+                                        </div>
+                                        <div class="p-2">
+                                            <h4 class="font-medium text-dark text-xs leading-tight mb-1">摩崖石刻特写</h4>
+                                            <div class="flex items-center justify-between text-xs">
+                                                <span class="text-gray-medium"><i class="fa fa-video-camera mr-1"></i>2:00</span>
+                                                <span class="text-primary font-bold">¥108</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- 摩崖石刻环境 -->
+                                    <div class="bg-gray-50 rounded-lg overflow-hidden touch-friendly sample-card-integrated" onclick="toggleSample('moyai_environment')" data-sample="moyai_environment">
+                                        <div class="relative">
+                                            <img src="https://picsum.photos/id/1021/150/120" alt="摩崖石刻环境" class="w-full h-20 object-cover">
+                                            <div class="absolute top-2 right-2 w-5 h-5 border-2 border-white rounded-full sample-checkbox-integrated flex items-center justify-center bg-black bg-opacity-30" data-sample="moyai_environment">
+                                                <i class="fa fa-check text-white text-xs hidden"></i>
+                                            </div>
+                                        </div>
+                                        <div class="p-2">
+                                            <h4 class="font-medium text-dark text-xs leading-tight mb-1">摩崖石刻环境</h4>
+                                            <div class="flex items-center justify-between text-xs">
+                                                <span class="text-gray-medium"><i class="fa fa-video-camera mr-1"></i>1:30</span>
+                                                <span class="text-primary font-bold">¥88</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- 石刻文字细节 -->
+                                    <div class="bg-gray-50 rounded-lg overflow-hidden touch-friendly sample-card-integrated" onclick="toggleSample('moyai_detail')" data-sample="moyai_detail">
+                                        <div class="relative">
+                                            <img src="https://picsum.photos/id/1031/150/120" alt="石刻文字细节" class="w-full h-20 object-cover">
+                                            <div class="absolute top-2 right-2 w-5 h-5 border-2 border-white rounded-full sample-checkbox-integrated flex items-center justify-center bg-black bg-opacity-30" data-sample="moyai_detail">
+                                                <i class="fa fa-check text-white text-xs hidden"></i>
+                                            </div>
+                                        </div>
+                                        <div class="p-2">
+                                            <h4 class="font-medium text-dark text-xs leading-tight mb-1">石刻文字细节</h4>
+                                            <div class="flex items-center justify-between text-xs">
+                                                <span class="text-gray-medium"><i class="fa fa-video-camera mr-1"></i>1:40</span>
+                                                <span class="text-primary font-bold">¥98</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- 石刻历史背景 -->
+                                    <div class="bg-gray-50 rounded-lg overflow-hidden touch-friendly sample-card-integrated" onclick="toggleSample('moyai_context')" data-sample="moyai_context">
+                                        <div class="relative">
+                                            <img src="https://picsum.photos/id/1032/150/120" alt="石刻历史背景" class="w-full h-20 object-cover">
+                                            <div class="absolute top-2 right-2 w-5 h-5 border-2 border-white rounded-full sample-checkbox-integrated flex items-center justify-center bg-black bg-opacity-30" data-sample="moyai_context">
+                                                <i class="fa fa-check text-white text-xs hidden"></i>
+                                            </div>
+                                        </div>
+                                        <div class="p-2">
+                                            <h4 class="font-medium text-dark text-xs leading-tight mb-1">石刻历史背景</h4>
+                                            <div class="flex items-center justify-between text-xs">
+                                                <span class="text-gray-medium"><i class="fa fa-video-camera mr-1"></i>2:15</span>
+                                                <span class="text-primary font-bold">¥118</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- 森林俯拍 -->
-                <div class="miniprogram-card bg-white overflow-hidden touch-friendly sample-card" onclick="selectSample('forest')" data-sample="forest">
-                    <div class="flex">
-                        <img src="https://picsum.photos/id/1020/150/120" alt="森林俯拍" class="w-24 h-20 object-cover flex-shrink-0">
-                        <div class="p-4 flex-1">
-                            <div class="flex items-center justify-between mb-2">
-                                <h3 class="font-bold text-dark">森林俯拍</h3>
-                                <div class="w-5 h-5 border-2 border-gray-300 rounded-full sample-checkbox" data-sample="forest">
-                                    <i class="fa fa-check text-primary text-xs hidden"></i>
+                <!-- 屴崱峰样片组 -->
+                <div class="location-group">
+                    <div class="miniprogram-card bg-white location-card">
+                        <!-- 景点头部信息（可点击展开/收缩） -->
+                        <div class="flex items-center p-4 cursor-pointer" onclick="toggleLocationGroup('lidang')">
+                            <img src="https://picsum.photos/id/1022/150/120" alt="屴崱峰" class="w-16 h-16 object-cover rounded-full mr-4">
+                            <div class="flex-1">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <h3 class="font-bold text-dark">屴崱峰</h3>
+                                        <p class="text-gray-medium text-xs mt-1">天台山主峰，壮丽山景 • 4个样片</p>
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        <div class="location-selected-info hidden text-xs text-primary" id="lidang-selected">
+                                            <i class="fa fa-check-circle mr-1"></i>
+                                            <span>已选 0 个</span>
+                                        </div>
+                                        <i class="fa fa-angle-down text-gray-medium transition-transform duration-200" id="lidang-arrow"></i>
+                                    </div>
                                 </div>
                             </div>
-                            <p class="text-gray-medium text-sm mb-2">绿意盎然的自然画卷，展现大自然的美丽</p>
-                            <div class="flex items-center space-x-3 text-xs text-gray-medium">
-                                <span><i class="fa fa-video-camera mr-1"></i>视频时长 2:30</span>
-                                <span><i class="fa fa-star mr-1"></i>4.6分</span>
-                                <span class="text-primary font-bold">¥88</span>
+                        </div>
+                        
+                        <!-- 样片区域（可展开/收缩） -->
+                        <div class="location-samples hidden" id="lidang-samples">
+                            <div class="border-t border-gray-100 p-4">
+                                <div class="grid grid-cols-2 gap-3">
+                                    <!-- 屴崱峰山顶俯拍 -->
+                                    <div class="bg-gray-50 rounded-lg overflow-hidden touch-friendly sample-card-integrated" onclick="toggleSample('lidang_summit')" data-sample="lidang_summit">
+                                        <div class="relative">
+                                            <img src="https://picsum.photos/id/1022/150/120" alt="屴崱峰山顶俯拍" class="w-full h-20 object-cover">
+                                            <div class="absolute top-2 right-2 w-5 h-5 border-2 border-white rounded-full sample-checkbox-integrated flex items-center justify-center bg-black bg-opacity-30" data-sample="lidang_summit">
+                                                <i class="fa fa-check text-white text-xs hidden"></i>
+                                            </div>
+                                        </div>
+                                        <div class="p-2">
+                                            <h4 class="font-medium text-dark text-xs leading-tight mb-1">屴崱峰山顶俯拍</h4>
+                                            <div class="flex items-center justify-between text-xs">
+                                                <span class="text-gray-medium"><i class="fa fa-video-camera mr-1"></i>3:20</span>
+                                                <span class="text-primary font-bold">¥158</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- 屴崱峰云海 -->
+                                    <div class="bg-gray-50 rounded-lg overflow-hidden touch-friendly sample-card-integrated" onclick="toggleSample('lidang_clouds')" data-sample="lidang_clouds">
+                                        <div class="relative">
+                                            <img src="https://picsum.photos/id/1036/150/120" alt="屴崱峰云海" class="w-full h-20 object-cover">
+                                            <div class="absolute top-2 right-2 w-5 h-5 border-2 border-white rounded-full sample-checkbox-integrated flex items-center justify-center bg-black bg-opacity-30" data-sample="lidang_clouds">
+                                                <i class="fa fa-check text-white text-xs hidden"></i>
+                                            </div>
+                                        </div>
+                                        <div class="p-2">
+                                            <h4 class="font-medium text-dark text-xs leading-tight mb-1">屴崱峰云海</h4>
+                                            <div class="flex items-center justify-between text-xs">
+                                                <span class="text-gray-medium"><i class="fa fa-video-camera mr-1"></i>2:45</span>
+                                                <span class="text-primary font-bold">¥138</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- 屴崱峰日出 -->
+                                    <div class="bg-gray-50 rounded-lg overflow-hidden touch-friendly sample-card-integrated" onclick="toggleSample('lidang_sunrise')" data-sample="lidang_sunrise">
+                                        <div class="relative">
+                                            <img src="https://picsum.photos/id/1037/150/120" alt="屴崱峰日出" class="w-full h-20 object-cover">
+                                            <div class="absolute top-2 right-2 w-5 h-5 border-2 border-white rounded-full sample-checkbox-integrated flex items-center justify-center bg-black bg-opacity-30" data-sample="lidang_sunrise">
+                                                <i class="fa fa-check text-white text-xs hidden"></i>
+                                            </div>
+                                        </div>
+                                        <div class="p-2">
+                                            <h4 class="font-medium text-dark text-xs leading-tight mb-1">屴崱峰日出</h4>
+                                            <div class="flex items-center justify-between text-xs">
+                                                <span class="text-gray-medium"><i class="fa fa-video-camera mr-1"></i>3:00</span>
+                                                <span class="text-primary font-bold">¥148</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- 屴崱峰奇石 -->
+                                    <div class="bg-gray-50 rounded-lg overflow-hidden touch-friendly sample-card-integrated" onclick="toggleSample('lidang_rocks')" data-sample="lidang_rocks">
+                                        <div class="relative">
+                                            <img src="https://picsum.photos/id/1038/150/120" alt="屴崱峰奇石" class="w-full h-20 object-cover">
+                                            <div class="absolute top-2 right-2 w-5 h-5 border-2 border-white rounded-full sample-checkbox-integrated flex items-center justify-center bg-black bg-opacity-30" data-sample="lidang_rocks">
+                                                <i class="fa fa-check text-white text-xs hidden"></i>
+                                            </div>
+                                        </div>
+                                        <div class="p-2">
+                                            <h4 class="font-medium text-dark text-xs leading-tight mb-1">屴崱峰奇石</h4>
+                                            <div class="flex items-center justify-between text-xs">
+                                                <span class="text-gray-medium"><i class="fa fa-video-camera mr-1"></i>2:30</span>
+                                                <span class="text-primary font-bold">¥128</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 回龙阁样片组 -->
+                <div class="location-group">
+                    <div class="miniprogram-card bg-white location-card">
+                        <!-- 景点头部信息（可点击展开/收缩） -->
+                        <div class="flex items-center p-4 cursor-pointer" onclick="toggleLocationGroup('huilong')">
+                            <img src="https://picsum.photos/id/1023/150/120" alt="回龙阁" class="w-16 h-16 object-cover rounded-full mr-4">
+                            <div class="flex-1">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <h3 class="font-bold text-dark">回龙阁</h3>
+                                        <p class="text-gray-medium text-xs mt-1">古典楼阁，建筑瑰宝 • 4个样片</p>
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        <div class="location-selected-info hidden text-xs text-primary" id="huilong-selected">
+                                            <i class="fa fa-check-circle mr-1"></i>
+                                            <span>已选 0 个</span>
+                                        </div>
+                                        <i class="fa fa-angle-down text-gray-medium transition-transform duration-200" id="huilong-arrow"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 样片区域（可展开/收缩） -->
+                        <div class="location-samples hidden" id="huilong-samples">
+                            <div class="border-t border-gray-100 p-4">
+                                <div class="grid grid-cols-2 gap-3">
+                                    <!-- 回龙阁建筑航拍 -->
+                                    <div class="bg-gray-50 rounded-lg overflow-hidden touch-friendly sample-card-integrated" onclick="toggleSample('huilong_architecture')" data-sample="huilong_architecture">
+                                        <div class="relative">
+                                            <img src="https://picsum.photos/id/1023/150/120" alt="回龙阁建筑航拍" class="w-full h-20 object-cover">
+                                            <div class="absolute top-2 right-2 w-5 h-5 border-2 border-white rounded-full sample-checkbox-integrated flex items-center justify-center bg-black bg-opacity-30" data-sample="huilong_architecture">
+                                                <i class="fa fa-check text-white text-xs hidden"></i>
+                                            </div>
+                                        </div>
+                                        <div class="p-2">
+                                            <h4 class="font-medium text-dark text-xs leading-tight mb-1">回龙阁建筑航拍</h4>
+                                            <div class="flex items-center justify-between text-xs">
+                                                <span class="text-gray-medium"><i class="fa fa-video-camera mr-1"></i>2:15</span>
+                                                <span class="text-primary font-bold">¥118</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- 回龙阁内景 -->
+                                    <div class="bg-gray-50 rounded-lg overflow-hidden touch-friendly sample-card-integrated" onclick="toggleSample('huilong_interior')" data-sample="huilong_interior">
+                                        <div class="relative">
+                                            <img src="https://picsum.photos/id/1039/150/120" alt="回龙阁内景" class="w-full h-20 object-cover">
+                                            <div class="absolute top-2 right-2 w-5 h-5 border-2 border-white rounded-full sample-checkbox-integrated flex items-center justify-center bg-black bg-opacity-30" data-sample="huilong_interior">
+                                                <i class="fa fa-check text-white text-xs hidden"></i>
+                                            </div>
+                                        </div>
+                                        <div class="p-2">
+                                            <h4 class="font-medium text-dark text-xs leading-tight mb-1">回龙阁内景</h4>
+                                            <div class="flex items-center justify-between text-xs">
+                                                <span class="text-gray-medium"><i class="fa fa-video-camera mr-1"></i>2:00</span>
+                                                <span class="text-primary font-bold">¥108</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- 回龙阁花园 -->
+                                    <div class="bg-gray-50 rounded-lg overflow-hidden touch-friendly sample-card-integrated" onclick="toggleSample('huilong_garden')" data-sample="huilong_garden">
+                                        <div class="relative">
+                                            <img src="https://picsum.photos/id/1040/150/120" alt="回龙阁花园" class="w-full h-20 object-cover">
+                                            <div class="absolute top-2 right-2 w-5 h-5 border-2 border-white rounded-full sample-checkbox-integrated flex items-center justify-center bg-black bg-opacity-30" data-sample="huilong_garden">
+                                                <i class="fa fa-check text-white text-xs hidden"></i>
+                                            </div>
+                                        </div>
+                                        <div class="p-2">
+                                            <h4 class="font-medium text-dark text-xs leading-tight mb-1">回龙阁花园</h4>
+                                            <div class="flex items-center justify-between text-xs">
+                                                <span class="text-gray-medium"><i class="fa fa-video-camera mr-1"></i>1:50</span>
+                                                <span class="text-primary font-bold">¥98</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- 回龙阁夜景 -->
+                                    <div class="bg-gray-50 rounded-lg overflow-hidden touch-friendly sample-card-integrated" onclick="toggleSample('huilong_night')" data-sample="huilong_night">
+                                        <div class="relative">
+                                            <img src="https://picsum.photos/id/1041/150/120" alt="回龙阁夜景" class="w-full h-20 object-cover">
+                                            <div class="absolute top-2 right-2 w-5 h-5 border-2 border-white rounded-full sample-checkbox-integrated flex items-center justify-center bg-black bg-opacity-30" data-sample="huilong_night">
+                                                <i class="fa fa-check text-white text-xs hidden"></i>
+                                            </div>
+                                        </div>
+                                        <div class="p-2">
+                                            <h4 class="font-medium text-dark text-xs leading-tight mb-1">回龙阁夜景</h4>
+                                            <div class="flex items-center justify-between text-xs">
+                                                <span class="text-gray-medium"><i class="fa fa-video-camera mr-1"></i>2:40</span>
+                                                <span class="text-primary font-bold">¥138</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 香炉峰样片组 -->
+                <div class="location-group">
+                    <div class="miniprogram-card bg-white location-card">
+                        <!-- 景点头部信息（可点击展开/收缩） -->
+                        <div class="flex items-center p-4 cursor-pointer" onclick="toggleLocationGroup('xianglu')">
+                            <img src="https://picsum.photos/id/1024/150/120" alt="香炉峰" class="w-16 h-16 object-cover rounded-full mr-4">
+                            <div class="flex-1">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <h3 class="font-bold text-dark">香炉峰</h3>
+                                        <p class="text-gray-medium text-xs mt-1">奇峰异石，自然奇观 • 4个样片</p>
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        <div class="location-selected-info hidden text-xs text-primary" id="xianglu-selected">
+                                            <i class="fa fa-check-circle mr-1"></i>
+                                            <span>已选 0 个</span>
+                                        </div>
+                                        <i class="fa fa-angle-down text-gray-medium transition-transform duration-200" id="xianglu-arrow"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 样片区域（可展开/收缩） -->
+                        <div class="location-samples hidden" id="xianglu-samples">
+                            <div class="border-t border-gray-100 p-4">
+                                <div class="grid grid-cols-2 gap-3">
+                                    <!-- 香炉峰奇石 -->
+                                    <div class="bg-gray-50 rounded-lg overflow-hidden touch-friendly sample-card-integrated" onclick="toggleSample('xianglu_peak')" data-sample="xianglu_peak">
+                                        <div class="relative">
+                                            <img src="https://picsum.photos/id/1024/150/120" alt="香炉峰奇石" class="w-full h-20 object-cover">
+                                            <div class="absolute top-2 right-2 w-5 h-5 border-2 border-white rounded-full sample-checkbox-integrated flex items-center justify-center bg-black bg-opacity-30" data-sample="xianglu_peak">
+                                                <i class="fa fa-check text-white text-xs hidden"></i>
+                                            </div>
+                                        </div>
+                                        <div class="p-2">
+                                            <h4 class="font-medium text-dark text-xs leading-tight mb-1">香炉峰奇石</h4>
+                                            <div class="flex items-center justify-between text-xs">
+                                                <span class="text-gray-medium"><i class="fa fa-video-camera mr-1"></i>2:45</span>
+                                                <span class="text-primary font-bold">¥138</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- 香炉峰云雾 -->
+                                    <div class="bg-gray-50 rounded-lg overflow-hidden touch-friendly sample-card-integrated" onclick="toggleSample('xianglu_mist')" data-sample="xianglu_mist">
+                                        <div class="relative">
+                                            <img src="https://picsum.photos/id/1042/150/120" alt="香炉峰云雾" class="w-full h-20 object-cover">
+                                            <div class="absolute top-2 right-2 w-5 h-5 border-2 border-white rounded-full sample-checkbox-integrated flex items-center justify-center bg-black bg-opacity-30" data-sample="xianglu_mist">
+                                                <i class="fa fa-check text-white text-xs hidden"></i>
+                                            </div>
+                                        </div>
+                                        <div class="p-2">
+                                            <h4 class="font-medium text-dark text-xs leading-tight mb-1">香炉峰云雾</h4>
+                                            <div class="flex items-center justify-between text-xs">
+                                                <span class="text-gray-medium"><i class="fa fa-video-camera mr-1"></i>2:20</span>
+                                                <span class="text-primary font-bold">¥118</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- 香炉峰夕阳 -->
+                                    <div class="bg-gray-50 rounded-lg overflow-hidden touch-friendly sample-card-integrated" onclick="toggleSample('xianglu_sunset')" data-sample="xianglu_sunset">
+                                        <div class="relative">
+                                            <img src="https://picsum.photos/id/1043/150/120" alt="香炉峰夕阳" class="w-full h-20 object-cover">
+                                            <div class="absolute top-2 right-2 w-5 h-5 border-2 border-white rounded-full sample-checkbox-integrated flex items-center justify-center bg-black bg-opacity-30" data-sample="xianglu_sunset">
+                                                <i class="fa fa-check text-white text-xs hidden"></i>
+                                            </div>
+                                        </div>
+                                        <div class="p-2">
+                                            <h4 class="font-medium text-dark text-xs leading-tight mb-1">香炉峰夕阳</h4>
+                                            <div class="flex items-center justify-between text-xs">
+                                                <span class="text-gray-medium"><i class="fa fa-video-camera mr-1"></i>2:30</span>
+                                                <span class="text-primary font-bold">¥128</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- 香炉峰石林 -->
+                                    <div class="bg-gray-50 rounded-lg overflow-hidden touch-friendly sample-card-integrated" onclick="toggleSample('xianglu_rocks')" data-sample="xianglu_rocks">
+                                        <div class="relative">
+                                            <img src="https://picsum.photos/id/1044/150/120" alt="香炉峰石林" class="w-full h-20 object-cover">
+                                            <div class="absolute top-2 right-2 w-5 h-5 border-2 border-white rounded-full sample-checkbox-integrated flex items-center justify-center bg-black bg-opacity-30" data-sample="xianglu_rocks">
+                                                <i class="fa fa-check text-white text-xs hidden"></i>
+                                            </div>
+                                        </div>
+                                        <div class="p-2">
+                                            <h4 class="font-medium text-dark text-xs leading-tight mb-1">香炉峰石林</h4>
+                                            <div class="flex items-center justify-between text-xs">
+                                                <span class="text-gray-medium"><i class="fa fa-video-camera mr-1"></i>2:10</span>
+                                                <span class="text-primary font-bold">¥108</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 登山古径样片组 -->
+                <div class="location-group">
+                    <div class="miniprogram-card bg-white location-card">
+                        <!-- 景点头部信息（可点击展开/收缩） -->
+                        <div class="flex items-center p-4 cursor-pointer" onclick="toggleLocationGroup('ancient')">
+                            <img src="https://picsum.photos/id/1025/150/120" alt="登山古径" class="w-16 h-16 object-cover rounded-full mr-4">
+                            <div class="flex-1">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <h3 class="font-bold text-dark">登山古径</h3>
+                                        <p class="text-gray-medium text-xs mt-1">千年古道，历史足迹 • 4个样片</p>
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        <div class="location-selected-info hidden text-xs text-primary" id="ancient-selected">
+                                            <i class="fa fa-check-circle mr-1"></i>
+                                            <span>已选 0 个</span>
+                                        </div>
+                                        <i class="fa fa-angle-down text-gray-medium transition-transform duration-200" id="ancient-arrow"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 样片区域（可展开/收缩） -->
+                        <div class="location-samples hidden" id="ancient-samples">
+                            <div class="border-t border-gray-100 p-4">
+                                <div class="grid grid-cols-2 gap-3">
+                                    <!-- 古径蜿蜒 -->
+                                    <div class="bg-gray-50 rounded-lg overflow-hidden touch-friendly sample-card-integrated" onclick="toggleSample('ancient_path')" data-sample="ancient_path">
+                                        <div class="relative">
+                                            <img src="https://picsum.photos/id/1025/150/120" alt="古径蜿蜒" class="w-full h-20 object-cover">
+                                            <div class="absolute top-2 right-2 w-5 h-5 border-2 border-white rounded-full sample-checkbox-integrated flex items-center justify-center bg-black bg-opacity-30" data-sample="ancient_path">
+                                                <i class="fa fa-check text-white text-xs hidden"></i>
+                                            </div>
+                                        </div>
+                                        <div class="p-2">
+                                            <h4 class="font-medium text-dark text-xs leading-tight mb-1">古径蜿蜒</h4>
+                                            <div class="flex items-center justify-between text-xs">
+                                                <span class="text-gray-medium"><i class="fa fa-video-camera mr-1"></i>2:10</span>
+                                                <span class="text-primary font-bold">¥108</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- 古径石阶 -->
+                                    <div class="bg-gray-50 rounded-lg overflow-hidden touch-friendly sample-card-integrated" onclick="toggleSample('ancient_stone')" data-sample="ancient_stone">
+                                        <div class="relative">
+                                            <img src="https://picsum.photos/id/1045/150/120" alt="古径石阶" class="w-full h-20 object-cover">
+                                            <div class="absolute top-2 right-2 w-5 h-5 border-2 border-white rounded-full sample-checkbox-integrated flex items-center justify-center bg-black bg-opacity-30" data-sample="ancient_stone">
+                                                <i class="fa fa-check text-white text-xs hidden"></i>
+                                            </div>
+                                        </div>
+                                        <div class="p-2">
+                                            <h4 class="font-medium text-dark text-xs leading-tight mb-1">古径石阶</h4>
+                                            <div class="flex items-center justify-between text-xs">
+                                                <span class="text-gray-medium"><i class="fa fa-video-camera mr-1"></i>1:40</span>
+                                                <span class="text-primary font-bold">¥88</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- 古径森林 -->
+                                    <div class="bg-gray-50 rounded-lg overflow-hidden touch-friendly sample-card-integrated" onclick="toggleSample('ancient_forest')" data-sample="ancient_forest">
+                                        <div class="relative">
+                                            <img src="https://picsum.photos/id/1046/150/120" alt="古径森林" class="w-full h-20 object-cover">
+                                            <div class="absolute top-2 right-2 w-5 h-5 border-2 border-white rounded-full sample-checkbox-integrated flex items-center justify-center bg-black bg-opacity-30" data-sample="ancient_forest">
+                                                <i class="fa fa-check text-white text-xs hidden"></i>
+                                            </div>
+                                        </div>
+                                        <div class="p-2">
+                                            <h4 class="font-medium text-dark text-xs leading-tight mb-1">古径森林</h4>
+                                            <div class="flex items-center justify-between text-xs">
+                                                <span class="text-gray-medium"><i class="fa fa-video-camera mr-1"></i>1:55</span>
+                                                <span class="text-primary font-bold">¥98</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- 古径石桥 -->
+                                    <div class="bg-gray-50 rounded-lg overflow-hidden touch-friendly sample-card-integrated" onclick="toggleSample('ancient_bridge')" data-sample="ancient_bridge">
+                                        <div class="relative">
+                                            <img src="https://picsum.photos/id/1047/150/120" alt="古径石桥" class="w-full h-20 object-cover">
+                                            <div class="absolute top-2 right-2 w-5 h-5 border-2 border-white rounded-full sample-checkbox-integrated flex items-center justify-center bg-black bg-opacity-30" data-sample="ancient_bridge">
+                                                <i class="fa fa-check text-white text-xs hidden"></i>
+                                            </div>
+                                        </div>
+                                        <div class="p-2">
+                                            <h4 class="font-medium text-dark text-xs leading-tight mb-1">古径石桥</h4>
+                                            <div class="flex items-center justify-between text-xs">
+                                                <span class="text-gray-medium"><i class="fa fa-video-camera mr-1"></i>2:15</span>
+                                                <span class="text-primary font-bold">¥118</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 灵源洞样片组 -->
+                <div class="location-group">
+                    <div class="miniprogram-card bg-white location-card">
+                        <!-- 景点头部信息（可点击展开/收缩） -->
+                        <div class="flex items-center p-4 cursor-pointer" onclick="toggleLocationGroup('lingyuan')">
+                            <img src="https://picsum.photos/id/1026/150/120" alt="灵源洞" class="w-16 h-16 object-cover rounded-full mr-4">
+                            <div class="flex-1">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <h3 class="font-bold text-dark">灵源洞</h3>
+                                        <p class="text-gray-medium text-xs mt-1">神秘洞窟，自然造化 • 4个样片</p>
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        <div class="location-selected-info hidden text-xs text-primary" id="lingyuan-selected">
+                                            <i class="fa fa-check-circle mr-1"></i>
+                                            <span>已选 0 个</span>
+                                        </div>
+                                        <i class="fa fa-angle-down text-gray-medium transition-transform duration-200" id="lingyuan-arrow"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 样片区域（可展开/收缩） -->
+                        <div class="location-samples hidden" id="lingyuan-samples">
+                            <div class="border-t border-gray-100 p-4">
+                                <div class="grid grid-cols-2 gap-3">
+                                    <!-- 灵源洞外景 -->
+                                    <div class="bg-gray-50 rounded-lg overflow-hidden touch-friendly sample-card-integrated" onclick="toggleSample('lingyuan_cave')" data-sample="lingyuan_cave">
+                                        <div class="relative">
+                                            <img src="https://picsum.photos/id/1026/150/120" alt="灵源洞外景" class="w-full h-20 object-cover">
+                                            <div class="absolute top-2 right-2 w-5 h-5 border-2 border-white rounded-full sample-checkbox-integrated flex items-center justify-center bg-black bg-opacity-30" data-sample="lingyuan_cave">
+                                                <i class="fa fa-check text-white text-xs hidden"></i>
+                                            </div>
+                                        </div>
+                                        <div class="p-2">
+                                            <h4 class="font-medium text-dark text-xs leading-tight mb-1">灵源洞外景</h4>
+                                            <div class="flex items-center justify-between text-xs">
+                                                <span class="text-gray-medium"><i class="fa fa-video-camera mr-1"></i>1:50</span>
+                                                <span class="text-primary font-bold">¥98</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- 灵源洞瀑布 -->
+                                    <div class="bg-gray-50 rounded-lg overflow-hidden touch-friendly sample-card-integrated" onclick="toggleSample('lingyuan_waterfall')" data-sample="lingyuan_waterfall">
+                                        <div class="relative">
+                                            <img src="https://picsum.photos/id/1048/150/120" alt="灵源洞瀑布" class="w-full h-20 object-cover">
+                                            <div class="absolute top-2 right-2 w-5 h-5 border-2 border-white rounded-full sample-checkbox-integrated flex items-center justify-center bg-black bg-opacity-30" data-sample="lingyuan_waterfall">
+                                                <i class="fa fa-check text-white text-xs hidden"></i>
+                                            </div>
+                                        </div>
+                                        <div class="p-2">
+                                            <h4 class="font-medium text-dark text-xs leading-tight mb-1">灵源洞瀑布</h4>
+                                            <div class="flex items-center justify-between text-xs">
+                                                <span class="text-gray-medium"><i class="fa fa-video-camera mr-1"></i>2:25</span>
+                                                <span class="text-primary font-bold">¥128</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- 灵源洞钟乳石 -->
+                                    <div class="bg-gray-50 rounded-lg overflow-hidden touch-friendly sample-card-integrated" onclick="toggleSample('lingyuan_stalactite')" data-sample="lingyuan_stalactite">
+                                        <div class="relative">
+                                            <img src="https://picsum.photos/id/1049/150/120" alt="灵源洞钟乳石" class="w-full h-20 object-cover">
+                                            <div class="absolute top-2 right-2 w-5 h-5 border-2 border-white rounded-full sample-checkbox-integrated flex items-center justify-center bg-black bg-opacity-30" data-sample="lingyuan_stalactite">
+                                                <i class="fa fa-check text-white text-xs hidden"></i>
+                                            </div>
+                                        </div>
+                                        <div class="p-2">
+                                            <h4 class="font-medium text-dark text-xs leading-tight mb-1">灵源洞钟乳石</h4>
+                                            <div class="flex items-center justify-between text-xs">
+                                                <span class="text-gray-medium"><i class="fa fa-video-camera mr-1"></i>2:05</span>
+                                                <span class="text-primary font-bold">¥108</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- 灵源洞地下河 -->
+                                    <div class="bg-gray-50 rounded-lg overflow-hidden touch-friendly sample-card-integrated" onclick="toggleSample('lingyuan_underground')" data-sample="lingyuan_underground">
+                                        <div class="relative">
+                                            <img src="https://picsum.photos/id/1050/150/120" alt="灵源洞地下河" class="w-full h-20 object-cover">
+                                            <div class="absolute top-2 right-2 w-5 h-5 border-2 border-white rounded-full sample-checkbox-integrated flex items-center justify-center bg-black bg-opacity-30" data-sample="lingyuan_underground">
+                                                <i class="fa fa-check text-white text-xs hidden"></i>
+                                            </div>
+                                        </div>
+                                        <div class="p-2">
+                                            <h4 class="font-medium text-dark text-xs leading-tight mb-1">灵源洞地下河</h4>
+                                            <div class="flex items-center justify-between text-xs">
+                                                <span class="text-gray-medium"><i class="fa fa-video-camera mr-1"></i>2:50</span>
+                                                <span class="text-primary font-bold">¥138</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 罗汉台样片组 -->
+                <div class="location-group">
+                    <div class="miniprogram-card bg-white location-card">
+                        <!-- 景点头部信息（可点击展开/收缩） -->
+                        <div class="flex items-center p-4 cursor-pointer" onclick="toggleLocationGroup('luohan')">
+                            <img src="https://picsum.photos/id/1027/150/120" alt="罗汉台" class="w-16 h-16 object-cover rounded-full mr-4">
+                            <div class="flex-1">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <h3 class="font-bold text-dark">罗汉台</h3>
+                                        <p class="text-gray-medium text-xs mt-1">佛教圣地，庄严肃穆 • 4个样片</p>
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        <div class="location-selected-info hidden text-xs text-primary" id="luohan-selected">
+                                            <i class="fa fa-check-circle mr-1"></i>
+                                            <span>已选 0 个</span>
+                                        </div>
+                                        <i class="fa fa-angle-down text-gray-medium transition-transform duration-200" id="luohan-arrow"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 样片区域（可展开/收缩） -->
+                        <div class="location-samples hidden" id="luohan-samples">
+                            <div class="border-t border-gray-100 p-4">
+                                <div class="grid grid-cols-2 gap-3">
+                                    <!-- 罗汉台全景 -->
+                                    <div class="bg-gray-50 rounded-lg overflow-hidden touch-friendly sample-card-integrated" onclick="toggleSample('luohan_terrace')" data-sample="luohan_terrace">
+                                        <div class="relative">
+                                            <img src="https://picsum.photos/id/1027/150/120" alt="罗汉台全景" class="w-full h-20 object-cover">
+                                            <div class="absolute top-2 right-2 w-5 h-5 border-2 border-white rounded-full sample-checkbox-integrated flex items-center justify-center bg-black bg-opacity-30" data-sample="luohan_terrace">
+                                                <i class="fa fa-check text-white text-xs hidden"></i>
+                                            </div>
+                                        </div>
+                                        <div class="p-2">
+                                            <h4 class="font-medium text-dark text-xs leading-tight mb-1">罗汉台全景</h4>
+                                            <div class="flex items-center justify-between text-xs">
+                                                <span class="text-gray-medium"><i class="fa fa-video-camera mr-1"></i>2:20</span>
+                                                <span class="text-primary font-bold">¥118</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- 罗汉台佛像 -->
+                                    <div class="bg-gray-50 rounded-lg overflow-hidden touch-friendly sample-card-integrated" onclick="toggleSample('luohan_statue')" data-sample="luohan_statue">
+                                        <div class="relative">
+                                            <img src="https://picsum.photos/id/1051/150/120" alt="罗汉台佛像" class="w-full h-20 object-cover">
+                                            <div class="absolute top-2 right-2 w-5 h-5 border-2 border-white rounded-full sample-checkbox-integrated flex items-center justify-center bg-black bg-opacity-30" data-sample="luohan_statue">
+                                                <i class="fa fa-check text-white text-xs hidden"></i>
+                                            </div>
+                                        </div>
+                                        <div class="p-2">
+                                            <h4 class="font-medium text-dark text-xs leading-tight mb-1">罗汉台佛像</h4>
+                                            <div class="flex items-center justify-between text-xs">
+                                                <span class="text-gray-medium"><i class="fa fa-video-camera mr-1"></i>2:00</span>
+                                                <span class="text-primary font-bold">¥108</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- 罗汉台禅修 -->
+                                    <div class="bg-gray-50 rounded-lg overflow-hidden touch-friendly sample-card-integrated" onclick="toggleSample('luohan_meditation')" data-sample="luohan_meditation">
+                                        <div class="relative">
+                                            <img src="https://picsum.photos/id/1052/150/120" alt="罗汉台禅修" class="w-full h-20 object-cover">
+                                            <div class="absolute top-2 right-2 w-5 h-5 border-2 border-white rounded-full sample-checkbox-integrated flex items-center justify-center bg-black bg-opacity-30" data-sample="luohan_meditation">
+                                                <i class="fa fa-check text-white text-xs hidden"></i>
+                                            </div>
+                                        </div>
+                                        <div class="p-2">
+                                            <h4 class="font-medium text-dark text-xs leading-tight mb-1">罗汉台禅修</h4>
+                                            <div class="flex items-center justify-between text-xs">
+                                                <span class="text-gray-medium"><i class="fa fa-video-camera mr-1"></i>1:45</span>
+                                                <span class="text-primary font-bold">¥98</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- 罗汉台远景 -->
+                                    <div class="bg-gray-50 rounded-lg overflow-hidden touch-friendly sample-card-integrated" onclick="toggleSample('luohan_panorama')" data-sample="luohan_panorama">
+                                        <div class="relative">
+                                            <img src="https://picsum.photos/id/1053/150/120" alt="罗汉台远景" class="w-full h-20 object-cover">
+                                            <div class="absolute top-2 right-2 w-5 h-5 border-2 border-white rounded-full sample-checkbox-integrated flex items-center justify-center bg-black bg-opacity-30" data-sample="luohan_panorama">
+                                                <i class="fa fa-check text-white text-xs hidden"></i>
+                                            </div>
+                                        </div>
+                                        <div class="p-2">
+                                            <h4 class="font-medium text-dark text-xs leading-tight mb-1">罗汉台远景</h4>
+                                            <div class="flex items-center justify-between text-xs">
+                                                <span class="text-gray-medium"><i class="fa fa-video-camera mr-1"></i>2:35</span>
+                                                <span class="text-primary font-bold">¥128</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 白云洞样片组 -->
+                <div class="location-group">
+                    <div class="miniprogram-card bg-white location-card">
+                        <!-- 景点头部信息（可点击展开/收缩） -->
+                        <div class="flex items-center p-4 cursor-pointer" onclick="toggleLocationGroup('baiyun')">
+                            <img src="https://picsum.photos/id/1028/150/120" alt="白云洞" class="w-16 h-16 object-cover rounded-full mr-4">
+                            <div class="flex-1">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <h3 class="font-bold text-dark">白云洞</h3>
+                                        <p class="text-gray-medium text-xs mt-1">云雾缭绕，仙境般美景 • 4个样片</p>
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        <div class="location-selected-info hidden text-xs text-primary" id="baiyun-selected">
+                                            <i class="fa fa-check-circle mr-1"></i>
+                                            <span>已选 0 个</span>
+                                        </div>
+                                        <i class="fa fa-angle-down text-gray-medium transition-transform duration-200" id="baiyun-arrow"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 样片区域（可展开/收缩） -->
+                        <div class="location-samples hidden" id="baiyun-samples">
+                            <div class="border-t border-gray-100 p-4">
+                                <div class="grid grid-cols-2 gap-3">
+                                    <!-- 白云洞仙境 -->
+                                    <div class="bg-gray-50 rounded-lg overflow-hidden touch-friendly sample-card-integrated" onclick="toggleSample('baiyun_cave')" data-sample="baiyun_cave">
+                                        <div class="relative">
+                                            <img src="https://picsum.photos/id/1028/150/120" alt="白云洞仙境" class="w-full h-20 object-cover">
+                                            <div class="absolute top-2 right-2 w-5 h-5 border-2 border-white rounded-full sample-checkbox-integrated flex items-center justify-center bg-black bg-opacity-30" data-sample="baiyun_cave">
+                                                <i class="fa fa-check text-white text-xs hidden"></i>
+                                            </div>
+                                        </div>
+                                        <div class="p-2">
+                                            <h4 class="font-medium text-dark text-xs leading-tight mb-1">白云洞仙境</h4>
+                                            <div class="flex items-center justify-between text-xs">
+                                                <span class="text-gray-medium"><i class="fa fa-video-camera mr-1"></i>2:35</span>
+                                                <span class="text-primary font-bold">¥128</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- 白云洞云海 -->
+                                    <div class="bg-gray-50 rounded-lg overflow-hidden touch-friendly sample-card-integrated" onclick="toggleSample('baiyun_clouds')" data-sample="baiyun_clouds">
+                                        <div class="relative">
+                                            <img src="https://picsum.photos/id/1054/150/120" alt="白云洞云海" class="w-full h-20 object-cover">
+                                            <div class="absolute top-2 right-2 w-5 h-5 border-2 border-white rounded-full sample-checkbox-integrated flex items-center justify-center bg-black bg-opacity-30" data-sample="baiyun_clouds">
+                                                <i class="fa fa-check text-white text-xs hidden"></i>
+                                            </div>
+                                        </div>
+                                        <div class="p-2">
+                                            <h4 class="font-medium text-dark text-xs leading-tight mb-1">白云洞云海</h4>
+                                            <div class="flex items-center justify-between text-xs">
+                                                <span class="text-gray-medium"><i class="fa fa-video-camera mr-1"></i>2:45</span>
+                                                <span class="text-primary font-bold">¥138</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- 白云洞晨光 -->
+                                    <div class="bg-gray-50 rounded-lg overflow-hidden touch-friendly sample-card-integrated" onclick="toggleSample('baiyun_morning')" data-sample="baiyun_morning">
+                                        <div class="relative">
+                                            <img src="https://picsum.photos/id/1055/150/120" alt="白云洞晨光" class="w-full h-20 object-cover">
+                                            <div class="absolute top-2 right-2 w-5 h-5 border-2 border-white rounded-full sample-checkbox-integrated flex items-center justify-center bg-black bg-opacity-30" data-sample="baiyun_morning">
+                                                <i class="fa fa-check text-white text-xs hidden"></i>
+                                            </div>
+                                        </div>
+                                        <div class="p-2">
+                                            <h4 class="font-medium text-dark text-xs leading-tight mb-1">白云洞晨光</h4>
+                                            <div class="flex items-center justify-between text-xs">
+                                                <span class="text-gray-medium"><i class="fa fa-video-camera mr-1"></i>2:20</span>
+                                                <span class="text-primary font-bold">¥118</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- 白云洞秘境 -->
+                                    <div class="bg-gray-50 rounded-lg overflow-hidden touch-friendly sample-card-integrated" onclick="toggleSample('baiyun_mystery')" data-sample="baiyun_mystery">
+                                        <div class="relative">
+                                            <img src="https://picsum.photos/id/1056/150/120" alt="白云洞秘境" class="w-full h-20 object-cover">
+                                            <div class="absolute top-2 right-2 w-5 h-5 border-2 border-white rounded-full sample-checkbox-integrated flex items-center justify-center bg-black bg-opacity-30" data-sample="baiyun_mystery">
+                                                <i class="fa fa-check text-white text-xs hidden"></i>
+                                            </div>
+                                        </div>
+                                        <div class="p-2">
+                                            <h4 class="font-medium text-dark text-xs leading-tight mb-1">白云洞秘境</h4>
+                                            <div class="flex items-center justify-between text-xs">
+                                                <span class="text-gray-medium"><i class="fa fa-video-camera mr-1"></i>3:10</span>
+                                                <span class="text-primary font-bold">¥148</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
+
+        <!-- 样片选择页面 -->
+        <section class="p-4 hidden" id="sampleSelectionSection">
+            <div class="mb-4">
+                <h2 class="text-lg font-bold mb-2" id="locationTitle">选择拍摄样片</h2>
+                <p class="text-gray-medium text-sm" id="locationDescription">请选择您要拍摄的机位样片（可多选）</p>
+            </div>
+
+            <div id="sampleList" class="space-y-3">
+                <!-- 样片列表将通过JavaScript动态生成 -->
+            </div>
+        </section>
+
 
         <!-- 订单确认 -->
         <section class="p-4 hidden" id="confirmSection">
@@ -359,14 +1119,33 @@
     </div>
 
     <!-- 底部操作栏 -->
-    <div class="fixed bottom-16 left-0 right-0 bg-white border-t border-gray-light p-4 z-40" id="actionBar">
-        <div class="flex items-center justify-between">
+    <div class="fixed bottom-16 left-0 right-0 bg-white border-t border-gray-light z-40" id="actionBar">
+        <!-- 选中信息展示区 -->
+        <div id="selectedSummary" class="hidden px-4 py-2 bg-blue-50 border-b border-blue-200">
+            <div class="flex items-center justify-between text-sm">
+                <div class="flex items-center text-blue-800">
+                    <i class="fa fa-check-circle mr-2"></i>
+                    <span>已选择 <span id="selectedCount">0</span> 个样片</span>
+                </div>
+                <button onclick="toggleSelectedDetails()" class="text-blue-600 text-xs">
+                    <span id="toggleText">查看详情</span>
+                    <i class="fa fa-angle-down ml-1" id="toggleIcon"></i>
+                </button>
+            </div>
+            <!-- 详情列表 -->
+            <div id="selectedDetailsList" class="hidden mt-2 space-y-1 text-xs text-blue-700 max-h-32 overflow-y-auto">
+                <!-- 动态生成的选中项目列表 -->
+            </div>
+        </div>
+        
+        <!-- 操作按钮区 -->
+        <div class="flex items-center justify-between p-4">
             <div>
                 <span class="text-gray-medium text-sm">总计:</span>
-                <span class="text-2xl font-bold text-primary ml-2" id="bottomTotalPrice">¥98</span>
+                <span class="text-2xl font-bold text-primary ml-2" id="bottomTotalPrice">¥0</span>
             </div>
             <button id="nextStepBtn" onclick="nextStep()" disabled class="px-8 py-3 bg-gray-300 text-gray-500 rounded-lg font-bold touch-friendly">
-                下一步
+                确认订单
             </button>
         </div>
     </div>
@@ -392,9 +1171,9 @@
                 <i class="fa fa-user text-lg mb-1"></i>
                 <span class="text-xs">订单</span>
             </div>
-            <div class="tab-item flex flex-col items-center justify-center text-gray-medium touch-friendly" onclick="checkLoginAndGoToCustomize()">
-                <i class="fa fa-star text-lg mb-1"></i>
-                <span class="text-xs">定制</span>
+            <div class="tab-item flex flex-col items-center justify-center text-gray-medium touch-friendly" onclick="checkLoginAndGoToProfile()">
+                <i class="fa fa-user-circle text-lg mb-1"></i>
+                <span class="text-xs">我的</span>
             </div>
         </div>
     </nav>
@@ -429,45 +1208,641 @@
     <!-- JavaScript交互代码 -->
     <script>
         let currentStep = 1;
-        let selectedLocation = null;
-        let selectedSample = null;
+        let selectedSamples = new Set(); // 存储已选择的样片
+        let currentLocation = null; // 当前查看的景点
 
-        
-        const locationNames = {
-            'mountain': '天台山观景台',
-            'lake': '西湖景区',
-            'city': '城市中心广场',
-            'forest': '翠竹森林公园'
+        // 景点数据
+        const locationData = {
+            'yongquansi': {
+                name: '涌泉寺',
+                description: '千年古刹，佛教圣地',
+                image: 'https://picsum.photos/id/1015/150/120',
+                samples: ['yongquansi_panorama', 'yongquansi_detail', 'yongquansi_morning', 'yongquansi_sunset']
+            },
+            'moyai': {
+                name: '摩崖石刻',
+                description: '历史文化遗迹，石刻艺术精品',
+                image: 'https://picsum.photos/id/1020/150/120',
+                samples: ['moyai_close', 'moyai_environment', 'moyai_detail', 'moyai_context']
+            },
+            'lidang': {
+                name: '屴崱峰',
+                description: '天台山主峰，壮丽山景',
+                image: 'https://picsum.photos/id/1022/150/120',
+                samples: ['lidang_summit', 'lidang_clouds', 'lidang_sunrise', 'lidang_rocks']
+            },
+            'huilong': {
+                name: '回龙阁',
+                description: '古典楼阁，建筑瑰宝',
+                image: 'https://picsum.photos/id/1023/150/120',
+                samples: ['huilong_architecture', 'huilong_interior', 'huilong_garden', 'huilong_night']
+            },
+            'xianglu': {
+                name: '香炉峰',
+                description: '奇峰异石，自然奇观',
+                image: 'https://picsum.photos/id/1024/150/120',
+                samples: ['xianglu_peak', 'xianglu_mist', 'xianglu_sunset', 'xianglu_rocks']
+            },
+            'ancient': {
+                name: '登山古径',
+                description: '千年古道，历史足迹',
+                image: 'https://picsum.photos/id/1025/150/120',
+                samples: ['ancient_path', 'ancient_stone', 'ancient_forest', 'ancient_bridge']
+            },
+            'lingyuan': {
+                name: '灵源洞',
+                description: '神秘洞窟，自然造化',
+                image: 'https://picsum.photos/id/1026/150/120',
+                samples: ['lingyuan_cave', 'lingyuan_waterfall', 'lingyuan_stalactite', 'lingyuan_underground']
+            },
+            'luohan': {
+                name: '罗汉台',
+                description: '佛教圣地，庄严肃穆',
+                image: 'https://picsum.photos/id/1027/150/120',
+                samples: ['luohan_terrace', 'luohan_statue', 'luohan_meditation', 'luohan_panorama']
+            },
+            'baiyun': {
+                name: '白云洞',
+                description: '云雾缭绕，仙境般美景',
+                image: 'https://picsum.photos/id/1028/150/120',
+                samples: ['baiyun_cave', 'baiyun_clouds', 'baiyun_morning', 'baiyun_mystery']
+            }
         };
 
-        const sampleNames = {
-            'mountain': '山顶俯拍全景',
-            'lake': '湖畔追踪拍摄',
-            'city': '城市夜景航拍',
-            'forest': '森林俯拍'
-        };
-
-        const samplePrices = {
-            'mountain': 128,
-            'lake': 98,
-            'city': 158,
-            'forest': 88
+        // 样片数据
+        const sampleData = {
+            'yongquansi_panorama': {
+                name: '涌泉寺全景航拍',
+                location: '涌泉寺',
+                price: 128,
+                duration: '2:30',
+                description: '俯瞰千年古刹全貌，展现佛教建筑之美',
+                image: 'https://picsum.photos/id/1015/150/120'
+            },
+            'yongquansi_detail': {
+                name: '涌泉寺建筑细节',
+                location: '涌泉寺',
+                price: 98,
+                duration: '1:45',
+                description: '近距离展现古建筑精美细节',
+                image: 'https://picsum.photos/id/1016/150/120'
+            },
+            'yongquansi_morning': {
+                name: '涌泉寺晨曦',
+                location: '涌泉寺',
+                price: 118,
+                duration: '2:10',
+                description: '朝阳初升时的寺庙美景',
+                image: 'https://picsum.photos/id/1017/150/120'
+            },
+            'yongquansi_sunset': {
+                name: '涌泉寺夕照',
+                location: '涌泉寺',
+                price: 128,
+                duration: '2:20',
+                description: '夕阳西下的禅意时光',
+                image: 'https://picsum.photos/id/1018/150/120'
+            },
+            'yongquansi_interior': {
+                name: '涌泉寺大殿内景',
+                location: '涌泉寺',
+                price: 88,
+                duration: '1:30',
+                description: '庄严肃穆的大殿内部',
+                image: 'https://picsum.photos/id/1019/150/120'
+            },
+            'yongquansi_garden': {
+                name: '涌泉寺禅意花园',
+                location: '涌泉寺',
+                price: 108,
+                duration: '1:55',
+                description: '静谧优雅的寺庙花园',
+                image: 'https://picsum.photos/id/1030/150/120'
+            },
+            'moyai_close': {
+                name: '摩崖石刻特写',
+                location: '摩崖石刻',
+                price: 108,
+                duration: '2:00',
+                description: '高清展现古代石刻文字与图案',
+                image: 'https://picsum.photos/id/1020/150/120'
+            },
+            'moyai_environment': {
+                name: '摩崖石刻环境',
+                location: '摩崖石刻',
+                price: 88,
+                duration: '1:30',
+                description: '展现石刻所在的自然环境',
+                image: 'https://picsum.photos/id/1021/150/120'
+            },
+            'moyai_detail': {
+                name: '石刻文字细节',
+                location: '摩崖石刻',
+                price: 98,
+                duration: '1:40',
+                description: '高清展现古代文字雕刻',
+                image: 'https://picsum.photos/id/1031/150/120'
+            },
+            'moyai_context': {
+                name: '石刻历史背景',
+                location: '摩崖石刻',
+                price: 118,
+                duration: '2:15',
+                description: '结合周边环境讲述历史',
+                image: 'https://picsum.photos/id/1032/150/120'
+            },
+            'moyai_history': {
+                name: '摩崖石刻史记',
+                location: '摩崖石刻',
+                price: 128,
+                duration: '2:30',
+                description: '千年石刻的历史变迁',
+                image: 'https://picsum.photos/id/1033/150/120'
+            },
+            'moyai_art': {
+                name: '石刻艺术价值',
+                location: '摩崖石刻',
+                price: 108,
+                duration: '1:50',
+                description: '展现古代雕刻艺术之美',
+                image: 'https://picsum.photos/id/1034/150/120'
+            },
+            'moyai_culture': {
+                name: '石刻文化内涵',
+                location: '摩崖石刻',
+                price: 138,
+                duration: '2:40',
+                description: '深度解读文化内涵',
+                image: 'https://picsum.photos/id/1035/150/120'
+            },
+            'lidang_summit': {
+                name: '屴崱峰山顶俯拍',
+                location: '屴崱峰',
+                price: 158,
+                duration: '3:20',
+                description: '360度俯瞰天台山全景',
+                image: 'https://picsum.photos/id/1022/150/120'
+            },
+            'huilong_architecture': {
+                name: '回龙阁建筑航拍',
+                location: '回龙阁',
+                price: 118,
+                duration: '2:15',
+                description: '展现古典楼阁建筑之美',
+                image: 'https://picsum.photos/id/1023/150/120'
+            },
+            'xianglu_peak': {
+                name: '香炉峰奇石',
+                location: '香炉峰',
+                price: 138,
+                duration: '2:45',
+                description: '展现独特的山峰地貌',
+                image: 'https://picsum.photos/id/1024/150/120'
+            },
+            'ancient_path': {
+                name: '古径蜿蜒',
+                location: '登山古径',
+                price: 108,
+                duration: '2:10',
+                description: '俯拍千年古道的蜿蜒之美',
+                image: 'https://picsum.photos/id/1025/150/120'
+            },
+            'lingyuan_cave': {
+                name: '灵源洞外景',
+                location: '灵源洞',
+                price: 98,
+                duration: '1:50',
+                description: '展现洞窟的神秘与壮观',
+                image: 'https://picsum.photos/id/1026/150/120'
+            },
+            'luohan_terrace': {
+                name: '罗汉台全景',
+                location: '罗汉台',
+                price: 118,
+                duration: '2:20',
+                description: '展现佛教文化的庄严之美',
+                image: 'https://picsum.photos/id/1027/150/120'
+            },
+            'lidang_clouds': {
+                name: '屴崱峰云海',
+                location: '屴崱峰',
+                price: 138,
+                duration: '2:45',
+                description: '壮观云海景象',
+                image: 'https://picsum.photos/id/1036/150/120'
+            },
+            'lidang_sunrise': {
+                name: '屴崱峰日出',
+                location: '屴崱峰',
+                price: 148,
+                duration: '3:00',
+                description: '震撼日出美景',
+                image: 'https://picsum.photos/id/1037/150/120'
+            },
+            'lidang_rocks': {
+                name: '屴崱峰奇石',
+                location: '屴崱峰',
+                price: 128,
+                duration: '2:30',
+                description: '独特奇石地貌',
+                image: 'https://picsum.photos/id/1038/150/120'
+            },
+            'huilong_interior': {
+                name: '回龙阁内景',
+                location: '回龙阁',
+                price: 108,
+                duration: '2:00',
+                description: '古典内部装饰',
+                image: 'https://picsum.photos/id/1039/150/120'
+            },
+            'huilong_garden': {
+                name: '回龙阁花园',
+                location: '回龙阁',
+                price: 98,
+                duration: '1:50',
+                description: '精致园林景观',
+                image: 'https://picsum.photos/id/1040/150/120'
+            },
+            'huilong_night': {
+                name: '回龙阁夜景',
+                location: '回龙阁',
+                price: 138,
+                duration: '2:40',
+                description: '灯火辉煌夜景',
+                image: 'https://picsum.photos/id/1041/150/120'
+            },
+            'xianglu_mist': {
+                name: '香炉峰云雾',
+                location: '香炉峰',
+                price: 118,
+                duration: '2:20',
+                description: '云雾缭绕美景',
+                image: 'https://picsum.photos/id/1042/150/120'
+            },
+            'xianglu_sunset': {
+                name: '香炉峰夕阳',
+                location: '香炉峰',
+                price: 128,
+                duration: '2:30',
+                description: '绚烂夕阳西下',
+                image: 'https://picsum.photos/id/1043/150/120'
+            },
+            'xianglu_rocks': {
+                name: '香炉峰石林',
+                location: '香炉峰',
+                price: 108,
+                duration: '2:10',
+                description: '奇特石林景观',
+                image: 'https://picsum.photos/id/1044/150/120'
+            },
+            'ancient_stone': {
+                name: '古径石阶',
+                location: '登山古径',
+                price: 88,
+                duration: '1:40',
+                description: '千年石阶古道',
+                image: 'https://picsum.photos/id/1045/150/120'
+            },
+            'ancient_forest': {
+                name: '古径森林',
+                location: '登山古径',
+                price: 98,
+                duration: '1:55',
+                description: '幽深森林小径',
+                image: 'https://picsum.photos/id/1046/150/120'
+            },
+            'ancient_bridge': {
+                name: '古径石桥',
+                location: '登山古径',
+                price: 118,
+                duration: '2:15',
+                description: '古朴石桥风景',
+                image: 'https://picsum.photos/id/1047/150/120'
+            },
+            'lingyuan_waterfall': {
+                name: '灵源洞瀑布',
+                location: '灵源洞',
+                price: 128,
+                duration: '2:25',
+                description: '洞内瀑布奇观',
+                image: 'https://picsum.photos/id/1048/150/120'
+            },
+            'lingyuan_stalactite': {
+                name: '灵源洞钟乳石',
+                location: '灵源洞',
+                price: 108,
+                duration: '2:05',
+                description: '神奇钟乳石景',
+                image: 'https://picsum.photos/id/1049/150/120'
+            },
+            'lingyuan_underground': {
+                name: '灵源洞地下河',
+                location: '灵源洞',
+                price: 138,
+                duration: '2:50',
+                description: '神秘地下河流',
+                image: 'https://picsum.photos/id/1050/150/120'
+            },
+            'luohan_statue': {
+                name: '罗汉台佛像',
+                location: '罗汉台',
+                price: 108,
+                duration: '2:00',
+                description: '庄严佛像雕塑',
+                image: 'https://picsum.photos/id/1051/150/120'
+            },
+            'luohan_meditation': {
+                name: '罗汉台禅修',
+                location: '罗汉台',
+                price: 98,
+                duration: '1:45',
+                description: '静谧禅修空间',
+                image: 'https://picsum.photos/id/1052/150/120'
+            },
+            'luohan_panorama': {
+                name: '罗汉台远景',
+                location: '罗汉台',
+                price: 128,
+                duration: '2:35',
+                description: '全景俯瞰视角',
+                image: 'https://picsum.photos/id/1053/150/120'
+            },
+            'baiyun_cave': {
+                name: '白云洞仙境',
+                location: '白云洞',
+                price: 128,
+                duration: '2:35',
+                description: '云雾中的神秘洞窟美景',
+                image: 'https://picsum.photos/id/1028/150/120'
+            },
+            'baiyun_clouds': {
+                name: '白云洞云海',
+                location: '白云洞',
+                price: 138,
+                duration: '2:45',
+                description: '壮丽云海奇观',
+                image: 'https://picsum.photos/id/1054/150/120'
+            },
+            'baiyun_morning': {
+                name: '白云洞晨光',
+                location: '白云洞',
+                price: 118,
+                duration: '2:20',
+                description: '晨光透云美景',
+                image: 'https://picsum.photos/id/1055/150/120'
+            },
+            'baiyun_mystery': {
+                name: '白云洞秘境',
+                location: '白云洞',
+                price: 148,
+                duration: '3:10',
+                description: '神秘深邃洞穴',
+                image: 'https://picsum.photos/id/1056/150/120'
+            }
         };
         
         // 统一服务价格和时长
         const servicePrice = 98;
         const serviceDuration = '20-30分钟';
 
-        // 根据地点获取对应的样片名称
-        function getSampleNameByLocation(location) {
-            const sampleMapping = {
-                'mountain': '山顶俯拍全景',
-                'lake': '湖畔追踪拍摄',
-                'city': '城市夜景航拍',
-                'forest': '森林俯拍'
-            };
-            return sampleMapping[location] || '无人机拍摄服务';
+
+        // 切换样片选择状态
+        function toggleSample(sampleId) {
+            if (selectedSamples.has(sampleId)) {
+                selectedSamples.delete(sampleId);
+            } else {
+                selectedSamples.add(sampleId);
+            }
+            
+            updateSampleUI(sampleId);
+            updateSelectedItemsDisplay();
+            updateNextButton();
         }
+        
+        // 更新样片UI状态
+        function updateSampleUI(sampleId) {
+            // 支持多种样片卡片类型
+            const card = document.querySelector(`.sample-card-integrated[data-sample="${sampleId}"]`) ||
+                        document.querySelector(`.sample-card-compact[data-sample="${sampleId}"]`) || 
+                        document.querySelector(`.sample-card[data-sample="${sampleId}"]`);
+            const checkbox = document.querySelector(`.sample-checkbox-integrated[data-sample="${sampleId}"]`) ||
+                           document.querySelector(`.sample-checkbox-compact[data-sample="${sampleId}"]`) || 
+                           document.querySelector(`.sample-checkbox[data-sample="${sampleId}"]`);
+            const checkIcon = checkbox ? checkbox.querySelector('i') : null;
+            
+            if (selectedSamples.has(sampleId)) {
+                if (card) card.classList.add('sample-selected');
+                if (checkbox) {
+                    checkbox.classList.remove('border-gray-300', 'bg-black', 'bg-opacity-30');
+                    checkbox.classList.add('bg-primary', 'border-primary', 'selected');
+                }
+                if (checkIcon) {
+                    checkIcon.classList.remove('hidden');
+                    checkIcon.classList.add('text-white');
+                }
+            } else {
+                if (card) card.classList.remove('sample-selected');
+                if (checkbox) {
+                    checkbox.classList.remove('bg-primary', 'border-primary', 'selected');
+                    checkbox.classList.add('border-white', 'bg-black', 'bg-opacity-30');
+                }
+                if (checkIcon) {
+                    checkIcon.classList.add('hidden');
+                    checkIcon.classList.remove('text-white');
+                }
+            }
+            
+            // 更新景点组的选中状态显示
+            updateLocationGroupStatus();
+        }
+        
+        // 景点组折叠展开功能（手风琴效果）
+        function toggleLocationGroup(locationId) {
+            const samplesDiv = document.getElementById(`${locationId}-samples`);
+            const arrow = document.getElementById(`${locationId}-arrow`);
+            const locationCard = samplesDiv.closest('.location-group').querySelector('.location-card');
+            
+            // 如果当前景点是收缩状态，则展开它并收缩其他所有景点
+            if (samplesDiv.classList.contains('hidden')) {
+                // 先收缩所有其他景点
+                Object.keys(locationData).forEach(otherLocationId => {
+                    if (otherLocationId !== locationId) {
+                        const otherSamplesDiv = document.getElementById(`${otherLocationId}-samples`);
+                        const otherArrow = document.getElementById(`${otherLocationId}-arrow`);
+                        
+                        if (otherSamplesDiv && !otherSamplesDiv.classList.contains('hidden')) {
+                            otherSamplesDiv.classList.add('hidden');
+                            if (otherArrow) {
+                                otherArrow.classList.remove('rotate-180');
+                            }
+                        }
+                    }
+                });
+                
+                // 然后展开当前景点
+                samplesDiv.classList.remove('hidden');
+                arrow.classList.add('rotate-180');
+                
+                // 检查景点卡片位置并自动滚动到居中
+                setTimeout(() => {
+                    scrollLocationToCenter(locationCard);
+                }, 300); // 等待展开动画完成后再滚动
+                
+            } else {
+                // 如果当前景点是展开状态，则收缩它
+                samplesDiv.classList.add('hidden');
+                arrow.classList.remove('rotate-180');
+            }
+        }
+        
+        // 将景点卡片滚动到合适位置，确保能看到下一个景点卡片
+        function scrollLocationToCenter(locationCard) {
+            if (!locationCard) return;
+            
+            // 获取当前景点组和下一个景点组
+            const currentLocationGroup = locationCard.closest('.location-group');
+            const nextLocationGroup = currentLocationGroup ? currentLocationGroup.nextElementSibling : null;
+            
+            // 计算滚动目标位置
+            const cardRect = locationCard.getBoundingClientRect();
+            const viewportHeight = window.innerHeight;
+            
+            // 获取头部和底部固定元素的高度
+            const header = document.querySelector('header');
+            const actionBar = document.getElementById('actionBar');
+            const bottomNav = document.getElementById('bottomNav');
+            const headerHeight = header ? header.offsetHeight : 56;
+            const actionBarHeight = actionBar ? actionBar.offsetHeight : 0;
+            const bottomNavHeight = bottomNav ? bottomNav.offsetHeight : 64;
+            
+            // 计算可用的视口高度
+            const availableHeight = viewportHeight - headerHeight - actionBarHeight - bottomNavHeight;
+            
+            // 计算理想的滚动位置：
+            // 1. 当前景点卡片在可视区域上部1/4位置
+            // 2. 确保有足够空间显示展开的样片和下一个景点卡片
+            const idealCardPosition = headerHeight + (availableHeight * 0.15); // 可视区域上方15%的位置
+            const currentCardTop = cardRect.top;
+            const scrollOffset = currentCardTop - idealCardPosition;
+            
+            // 如果有下一个景点卡片，确保它也在可视范围内
+            if (nextLocationGroup) {
+                const nextCardRect = nextLocationGroup.getBoundingClientRect();
+                const nextCardBottom = nextCardRect.bottom;
+                const maxVisibleBottom = viewportHeight - actionBarHeight - bottomNavHeight;
+                
+                // 如果按照理想位置滚动后，下一个卡片会被遮挡，则调整滚动距离
+                const nextCardBottomAfterScroll = nextCardBottom - scrollOffset;
+                if (nextCardBottomAfterScroll > maxVisibleBottom) {
+                    const adjustment = nextCardBottomAfterScroll - maxVisibleBottom + 20; // 额外20px边距
+                    scrollOffset += adjustment;
+                }
+            }
+            
+            // 执行平滑滚动
+            if (Math.abs(scrollOffset) > 10) { // 只有需要滚动超过10px才执行
+                window.scrollBy({
+                    top: scrollOffset,
+                    behavior: 'smooth'
+                });
+            }
+        }
+        
+        // 更新景点组选中状态显示
+        function updateLocationGroupStatus() {
+            // 统计每个景点的已选择样片数量
+            const locationSelectedCount = {};
+            
+            selectedSamples.forEach(sampleId => {
+                const sample = sampleData[sampleId];
+                if (sample) {
+                    // 根据样片数据找到对应的景点ID
+                    for (const [locationId, locationInfo] of Object.entries(locationData)) {
+                        if (locationInfo.samples.includes(sampleId)) {
+                            locationSelectedCount[locationId] = (locationSelectedCount[locationId] || 0) + 1;
+                            break;
+                        }
+                    }
+                }
+            });
+            
+            // 更新每个景点组的显示
+            Object.keys(locationData).forEach(locationId => {
+                const selectedCount = locationSelectedCount[locationId] || 0;
+                const selectedInfo = document.getElementById(`${locationId}-selected`);
+                const selectedSpan = selectedInfo ? selectedInfo.querySelector('span') : null;
+                
+                if (selectedCount > 0) {
+                    if (selectedInfo) {
+                        selectedInfo.classList.remove('hidden');
+                        if (selectedSpan) {
+                            selectedSpan.textContent = `已选 ${selectedCount} 个`;
+                        }
+                    }
+                } else {
+                    if (selectedInfo) {
+                        selectedInfo.classList.add('hidden');
+                    }
+                }
+            });
+        }
+        
+        // 更新已选择项目显示
+        function updateSelectedItemsDisplay() {
+            const selectedSummary = document.getElementById('selectedSummary');
+            const selectedCountElement = document.getElementById('selectedCount');
+            const selectedDetailsList = document.getElementById('selectedDetailsList');
+            
+            if (selectedSamples.size === 0) {
+                selectedSummary.classList.add('hidden');
+                document.getElementById('bottomTotalPrice').textContent = '¥0';
+                return;
+            }
+            
+            selectedSummary.classList.remove('hidden');
+            selectedDetailsList.innerHTML = '';
+            let totalPrice = 0;
+            
+            // 按景点分组显示
+            const locationGroups = {};
+            selectedSamples.forEach(sampleId => {
+                const sample = sampleData[sampleId];
+                if (sample) {
+                    totalPrice += sample.price;
+                    if (!locationGroups[sample.location]) {
+                        locationGroups[sample.location] = [];
+                    }
+                    locationGroups[sample.location].push(sample);
+                }
+            });
+            
+            // 生成详情列表
+            Object.entries(locationGroups).forEach(([location, samples]) => {
+                const locationDiv = document.createElement('div');
+                locationDiv.className = 'mb-2';
+                
+                const locationHeader = document.createElement('div');
+                locationHeader.className = 'font-medium text-blue-800 mb-1';
+                locationHeader.innerHTML = `<i class="fa fa-map-marker mr-1"></i>${location} (${samples.length}个)`;
+                locationDiv.appendChild(locationHeader);
+                
+                samples.forEach(sample => {
+                    const sampleDiv = document.createElement('div');
+                    sampleDiv.className = 'flex justify-between items-center pl-4 py-1';
+                    sampleDiv.innerHTML = `
+                        <span class="text-blue-600">${sample.name}</span>
+                        <span class="font-medium text-blue-800">¥${sample.price}</span>
+                    `;
+                    locationDiv.appendChild(sampleDiv);
+                });
+                
+                selectedDetailsList.appendChild(locationDiv);
+            });
+            
+            selectedCountElement.textContent = selectedSamples.size;
+            document.getElementById('bottomTotalPrice').textContent = `¥${totalPrice}`;
+        }
+
 
         // 小程序适配
         document.addEventListener('DOMContentLoaded', function() {
@@ -493,21 +1868,16 @@
                 });
             });
 
-            // 检查URL参数，如果有location或sample参数则默认选择对应项目
+            // 检查URL参数，如果有sample参数则默认选择对应项目
             const urlParams = new URLSearchParams(window.location.search);
-            const defaultLocation = urlParams.get('location');
             const defaultSample = urlParams.get('sample');
             
-            if (defaultLocation && locationNames[defaultLocation]) {
-                selectLocation(defaultLocation);
+            if (defaultSample && sampleData[defaultSample]) {
+                toggleSample(defaultSample);
             }
             
-            if (defaultSample && sampleNames[defaultSample]) {
-                selectSample(defaultSample);
-            } else if (defaultLocation && sampleNames[defaultLocation]) {
-                // 如果没有指定样片但有地点，则默认选择对应的样片
-                selectSample(defaultLocation);
-            }
+            // 初始化底部操作栏显示
+            updateSelectedItemsDisplay();
         });
 
         // 窗口大小变化时重新调整padding
@@ -549,55 +1919,6 @@
             return 0;
         }
 
-        // 选择地点
-        function selectLocation(location) {
-            selectedLocation = location;
-            
-            // 更新UI
-            document.querySelectorAll('.location-card').forEach(card => {
-                card.classList.remove('location-selected');
-            });
-            document.querySelectorAll('.location-checkbox').forEach(checkbox => {
-                checkbox.classList.remove('bg-primary', 'border-primary');
-                checkbox.classList.add('border-gray-300');
-                checkbox.querySelector('i').classList.add('hidden');
-            });
-            
-            const selectedCard = document.querySelector(`.location-card[data-location="${location}"]`);
-            const selectedCheckbox = document.querySelector(`.location-checkbox[data-location="${location}"]`);
-            
-            selectedCard.classList.add('location-selected');
-            selectedCheckbox.classList.remove('border-gray-300');
-            selectedCheckbox.classList.add('bg-primary', 'border-primary');
-            selectedCheckbox.querySelector('i').classList.remove('hidden');
-            
-            updateNextButton();
-        }
-
-        // 选择样片
-        function selectSample(sample) {
-            selectedSample = sample;
-            
-            // 更新UI
-            document.querySelectorAll('.sample-card').forEach(card => {
-                card.classList.remove('sample-selected');
-            });
-            document.querySelectorAll('.sample-checkbox').forEach(checkbox => {
-                checkbox.classList.remove('bg-primary', 'border-primary');
-                checkbox.classList.add('border-gray-300');
-                checkbox.querySelector('i').classList.add('hidden');
-            });
-            
-            const selectedCard = document.querySelector(`.sample-card[data-sample="${sample}"]`);
-            const selectedCheckbox = document.querySelector(`.sample-checkbox[data-sample="${sample}"]`);
-            
-            selectedCard.classList.add('sample-selected');
-            selectedCheckbox.classList.remove('border-gray-300');
-            selectedCheckbox.classList.add('bg-primary', 'border-primary');
-            selectedCheckbox.querySelector('i').classList.remove('hidden');
-            
-            updateNextButton();
-        }
 
 
 
@@ -607,7 +1928,7 @@
         function updateNextButton() {
             const nextBtn = document.getElementById('nextStepBtn');
             
-            if (currentStep === 1 && selectedLocation && selectedSample) {
+            if (currentStep === 1 && selectedSamples.size > 0) {
                 nextBtn.disabled = false;
                 nextBtn.classList.remove('bg-gray-300', 'text-gray-500');
                 nextBtn.classList.add('bg-primary', 'text-white');
@@ -627,7 +1948,7 @@
 
         // 下一步
         function nextStep() {
-            if (currentStep === 1 && selectedLocation && selectedSample) {
+            if (currentStep === 1 && selectedSamples.size > 0) {
                 currentStep = 2;
                 showConfirmSection();
             } else if (currentStep === 2) {
@@ -637,25 +1958,26 @@
 
         // 回退到选择界面
         function goBackToSelection() {
-            // 隐藏确认订单页面
+            if (currentStep === 2) {
+                // 从订单确认页面回退到样片选择页面
             document.getElementById('confirmSection').classList.add('hidden');
-            // 显示地点和样片选择页面
-            document.getElementById('locationSection').classList.remove('hidden');
-            document.getElementById('sampleSection').classList.remove('hidden');
+                document.getElementById('locationListSection').classList.remove('hidden');
             
             // 隐藏返回按钮，显示左侧占位符
             document.getElementById('backButton').classList.add('hidden');
             document.getElementById('leftSpacer').classList.remove('hidden');
             
-            // 重置步骤
             currentStep = 1;
             updateNextButton();
+            }
         }
 
         // 显示订单确认
         function showConfirmSection() {
-            document.getElementById('locationSection').classList.add('hidden');
-            document.getElementById('sampleSection').classList.add('hidden');
+            // 隐藏样片选择页面
+            document.getElementById('locationListSection').classList.add('hidden');
+            
+            // 显示订单确认页面
             document.getElementById('confirmSection').classList.remove('hidden');
             
             // 显示返回按钮，隐藏左侧占位符
@@ -663,18 +1985,67 @@
             document.getElementById('leftSpacer').classList.add('hidden');
             
             // 更新订单信息
-            document.getElementById('selectedLocationName').textContent = locationNames[selectedLocation];
-            document.getElementById('selectedSampleName').textContent = sampleNames[selectedSample];
-            document.getElementById('estimatedDuration').textContent = serviceDuration;
-            
-            // 更新价格信息
-            const samplePrice = samplePrices[selectedSample];
-            document.getElementById('servicePrice').textContent = `¥${samplePrice}`;
-            document.getElementById('totalPrice').textContent = `¥${samplePrice}`;
-            document.getElementById('bottomTotalPrice').textContent = `¥${samplePrice}`;
-            
-
+            updateConfirmOrderInfo();
             updateNextButton();
+        }
+
+        // 切换选中详情显示
+        function toggleSelectedDetails() {
+            const detailsList = document.getElementById('selectedDetailsList');
+            const toggleText = document.getElementById('toggleText');
+            const toggleIcon = document.getElementById('toggleIcon');
+            
+            if (detailsList.classList.contains('hidden')) {
+                detailsList.classList.remove('hidden');
+                toggleText.textContent = '收起详情';
+                toggleIcon.classList.add('rotate-180');
+            } else {
+                detailsList.classList.add('hidden');
+                toggleText.textContent = '查看详情';
+                toggleIcon.classList.remove('rotate-180');
+            }
+        }
+        
+        // 更新订单确认信息
+        function updateConfirmOrderInfo() {
+            const selectedLocationName = document.getElementById('selectedLocationName');
+            const selectedSampleName = document.getElementById('selectedSampleName');
+            const estimatedDuration = document.getElementById('estimatedDuration');
+            const servicePrice = document.getElementById('servicePrice');
+            const totalPrice = document.getElementById('totalPrice');
+            const bottomTotalPrice = document.getElementById('bottomTotalPrice');
+            
+            // 获取选中的景点
+            const locations = new Set();
+            let sampleNames = [];
+            let totalCost = 0;
+            let totalDuration = 0;
+            
+            selectedSamples.forEach(sampleId => {
+                const sample = sampleData[sampleId];
+                if (sample) {
+                    locations.add(sample.location);
+                    sampleNames.push(sample.name);
+                    totalCost += sample.price;
+                    
+                    // 简单的时长累加（转换为秒）
+                    const [minutes, seconds] = sample.duration.split(':').map(Number);
+                    totalDuration += minutes * 60 + seconds;
+                }
+            });
+            
+            // 更新显示
+            selectedLocationName.textContent = Array.from(locations).join('、');
+            selectedSampleName.textContent = sampleNames.join('、');
+            
+            // 转换总时长回分:秒格式
+            const totalMinutes = Math.floor(totalDuration / 60);
+            const remainingSeconds = totalDuration % 60;
+            estimatedDuration.textContent = `${totalMinutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+            
+            servicePrice.textContent = `¥${totalCost}`;
+            totalPrice.textContent = `¥${totalCost}`;
+            bottomTotalPrice.textContent = `¥${totalCost}`;
         }
 
 
@@ -684,18 +2055,39 @@
             // 检查登录状态
             const loginInfo = JSON.parse(localStorage.getItem('loginInfo') || '{}');
             
+            // 准备订单信息
+            const locations = new Set();
+            let sampleNames = [];
+            let totalCost = 0;
+            let orderItems = [];
+            
+            selectedSamples.forEach(sampleId => {
+                const sample = sampleData[sampleId];
+                if (sample) {
+                    locations.add(sample.location);
+                    sampleNames.push(sample.name);
+                    totalCost += sample.price;
+                    orderItems.push({
+                        id: sampleId,
+                        name: sample.name,
+                        location: sample.location,
+                        price: sample.price,
+                        duration: sample.duration
+                    });
+                }
+            });
+            
+            const orderInfo = {
+                locations: Array.from(locations),
+                locationNames: Array.from(locations).join('、'),
+                sampleNames: sampleNames.join('、'),
+                totalPrice: totalCost,
+                items: orderItems,
+                timestamp: Date.now()
+            };
+            
             if (!loginInfo.isLoggedIn) {
                 // 未登录，先存储订单信息，然后跳转到登录页面
-                const orderInfo = {
-                    location: selectedLocation,
-                    locationName: locationNames[selectedLocation],
-                    sample: selectedSample,
-                    sampleName: sampleNames[selectedSample],
-                    totalPrice: samplePrices[selectedSample],
-                    duration: serviceDuration,
-                    timestamp: Date.now()
-                };
-                
                 localStorage.setItem('pendingOrder', JSON.stringify(orderInfo));
                 localStorage.setItem('returnUrl', 'user-management.html?action=payment');
                 
@@ -703,16 +2095,6 @@
                 location.href = 'login.html';
             } else {
                 // 已登录，存储订单信息并跳转到支付页面
-                const orderInfo = {
-                    location: selectedLocation,
-                    locationName: locationNames[selectedLocation],
-                    sample: selectedSample,
-                    sampleName: sampleNames[selectedSample],
-                    totalPrice: samplePrices[selectedSample],
-                    duration: serviceDuration,
-                    timestamp: Date.now()
-                };
-                
                 localStorage.setItem('pendingOrder', JSON.stringify(orderInfo));
                 
                 // 跳转到用户管理页面进行支付
@@ -750,16 +2132,16 @@
             }
         }
 
-        // 检查登录状态并跳转到定制页面
-        function checkLoginAndGoToCustomize() {
+        // 检查登录状态并跳转到我的页面
+        function checkLoginAndGoToProfile() {
             const loginInfo = JSON.parse(localStorage.getItem('loginInfo') || '{}');
             if (!loginInfo.isLoggedIn) {
                 // 未登录，设置返回URL并跳转到登录页面
-                localStorage.setItem('returnUrl', 'after-service.html');
+                localStorage.setItem('returnUrl', 'user-management.html');
                 location.href = 'login.html';
             } else {
-                // 已登录，直接跳转到定制页面
-                location.href = 'after-service.html';
+                // 已登录，直接跳转到我的页面
+                location.href = 'user-management.html';
             }
         }
     </script>

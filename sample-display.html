@@ -4,58 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>样片展示 - 无人机自助打卡</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="assets/css/tailwind-custom.css" rel="stylesheet">
+    <link href="assets/css/font-awesome.min.css" rel="stylesheet">
+    <link href="assets/css/inter-font.css" rel="stylesheet">
 
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#3B82F6',
-                        secondary: '#1E40AF',
-                        accent: '#06B6D4',
-                        dark: '#1E293B',
-                        light: '#F8FAFC',
-                        'gray-medium': '#64748B',
-                        'gray-light': '#E2E8F0',
-                        'blue-primary': '#3B82F6',
-                        'blue-secondary': '#1D4ED8',
-                    },
-                    fontFamily: {
-                        inter: ['Inter', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'sans-serif'],
-                    },
-                }
-            }
-        }
-    </script>
-    <style type="text/tailwindcss">
-        @layer utilities {
-            .touch-friendly {
-                touch-action: manipulation;
-                -webkit-tap-highlight-color: transparent;
-            }
-            .safe-area-bottom {
-                padding-bottom: constant(safe-area-inset-bottom);
-                padding-bottom: env(safe-area-inset-bottom);
-            }
-            .miniprogram-scroll {
-                -webkit-overflow-scrolling: touch;
-            }
-            .miniprogram-card {
-                box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-                border-radius: 8px;
-            }
-            .scrollbar-hide {
-                -ms-overflow-style: none;
-                scrollbar-width: none;
-            }
-            .scrollbar-hide::-webkit-scrollbar {
-                display: none;
-            }
-        }
-    </style>
 </head>
 <body class="font-inter bg-light text-dark antialiased touch-action-manipulation">
     <div class="min-h-screen w-full pb-16 safe-area-bottom">
@@ -91,9 +43,9 @@
         <div class="px-4 py-4 miniprogram-scroll">
             <div class="grid grid-cols-2 gap-3">
                 <!-- 视频样片1 - 山顶俯拍全景 -->
-                <div class="gallery-item miniprogram-card overflow-hidden touch-friendly" data-category="mountain" onclick="openModal('山顶俯拍全景', '360度环绕拍摄，展现壮丽山景，包含日出时分的金色光影效果', 'https://picsum.photos/id/1015/600/400', 'video', 'mountain')">
+                <div class="gallery-item miniprogram-card overflow-hidden touch-friendly" data-category="mountain" onclick="openModal('山顶俯拍全景', '360度环绕拍摄，展现壮丽山景，包含日出时分的金色光影效果', 'assets/images/mountain-1015.jpg', 'video', 'mountain')">
                     <div class="relative">
-                        <img src="https://picsum.photos/id/1015/600/400" alt="山顶俯拍全景" class="w-full h-32 object-cover">
+                        <img src="assets/images/mountain-1015.jpg" alt="山顶俯拍全景" class="w-full h-32 object-cover">
                         <div class="absolute top-2 right-2 bg-accent/90 backdrop-blur-sm rounded-full px-2 py-1 text-xs text-white">
                             <i class="fa fa-play mr-1"></i> 视频
                         </div>
@@ -119,9 +71,9 @@
                 </div>
                 
                 <!-- 视频样片2 - 湖畔追踪拍摄 -->
-                <div class="gallery-item miniprogram-card overflow-hidden touch-friendly" data-category="lake" onclick="openModal('湖畔追踪拍摄', '智能跟拍功能，捕捉湖边漫步的美好瞬间，配合夕阳余晖', 'https://picsum.photos/id/1031/600/400', 'video', 'lake')">
+                <div class="gallery-item miniprogram-card overflow-hidden touch-friendly" data-category="lake" onclick="openModal('湖畔追踪拍摄', '智能跟拍功能，捕捉湖边漫步的美好瞬间，配合夕阳余晖', 'assets/images/lake-1031.jpg', 'video', 'lake')">
                     <div class="relative">
-                        <img src="https://picsum.photos/id/1031/600/400" alt="湖畔追踪拍摄" class="w-full h-32 object-cover">
+                        <img src="assets/images/lake-1031.jpg" alt="湖畔追踪拍摄" class="w-full h-32 object-cover">
                         <div class="absolute top-2 right-2 bg-accent/90 backdrop-blur-sm rounded-full px-2 py-1 text-xs text-white">
                             <i class="fa fa-play mr-1"></i> 视频
                         </div>
@@ -147,9 +99,9 @@
                 </div>
                 
                 <!-- 视频样片3 - 城市夜景航拍 -->
-                <div class="gallery-item miniprogram-card overflow-hidden touch-friendly" data-category="city" onclick="openModal('城市夜景航拍', '现代都市灯火辉煌，夜景航拍展现城市魅力', 'https://picsum.photos/id/1016/600/400', 'video', 'city')">
+                <div class="gallery-item miniprogram-card overflow-hidden touch-friendly" data-category="city" onclick="openModal('城市夜景航拍', '现代都市灯火辉煌，夜景航拍展现城市魅力', 'assets/images/city-1016.jpg', 'video', 'city')">
                     <div class="relative">
-                        <img src="https://picsum.photos/id/1016/600/400" alt="城市夜景航拍" class="w-full h-32 object-cover">
+                        <img src="assets/images/city-1016.jpg" alt="城市夜景航拍" class="w-full h-32 object-cover">
                         <div class="absolute top-2 right-2 bg-accent/90 backdrop-blur-sm rounded-full px-2 py-1 text-xs text-white">
                             <i class="fa fa-play mr-1"></i> 视频
                         </div>
@@ -175,9 +127,9 @@
                 </div>
                 
                 <!-- 视频样片4 - 森林俯拍 -->
-                <div class="gallery-item miniprogram-card overflow-hidden touch-friendly" data-category="forest" onclick="openModal('森林俯拍', '绿意盎然的自然画卷，展现大自然的美丽', 'https://picsum.photos/id/1020/600/400', 'video', 'forest')">
+                <div class="gallery-item miniprogram-card overflow-hidden touch-friendly" data-category="forest" onclick="openModal('森林俯拍', '绿意盎然的自然画卷，展现大自然的美丽', 'assets/images/forest-1020.jpg', 'video', 'forest')">
                     <div class="relative">
-                        <img src="https://picsum.photos/id/1020/600/400" alt="森林俯拍" class="w-full h-32 object-cover">
+                        <img src="assets/images/forest-1020.jpg" alt="森林俯拍" class="w-full h-32 object-cover">
                         <div class="absolute top-2 right-2 bg-accent/90 backdrop-blur-sm rounded-full px-2 py-1 text-xs text-white">
                             <i class="fa fa-play mr-1"></i> 视频
                         </div>
@@ -252,7 +204,7 @@
                 </div>
                 
                 <button onclick="goToShooting()" class="w-full py-3 bg-primary text-white rounded-lg font-medium touch-friendly">
-                    <i class="fa fa-rocket mr-2"></i>选择此效果立即拍摄
+                    <i class="fa fa-rocket mr-2"></i>选择此效果拍摄
                 </button>
             </div>
         </div>
