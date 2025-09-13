@@ -2084,8 +2084,24 @@
             });
             
             // 更新显示
-            selectedLocationName.textContent = Array.from(locations).join('、');
-            selectedSampleName.textContent = sampleNames.join('、');
+            // 使用简略方式显示地点，避免一行显示不下
+            const locationArray = Array.from(locations);
+            let locationDisplay;
+            if (locationArray.length <= 2) {
+                locationDisplay = locationArray.join('、');
+            } else {
+                locationDisplay = `${locationArray[0]}等${locationArray.length}景点`;
+            }
+            selectedLocationName.textContent = locationDisplay;
+            
+            // 使用简略方式显示样片，避免一行显示不下
+            let sampleDisplay;
+            if (sampleNames.length <= 2) {
+                sampleDisplay = sampleNames.join('、');
+            } else {
+                sampleDisplay = `${sampleNames[0]}等${sampleNames.length}个样片`;
+            }
+            selectedSampleName.textContent = sampleDisplay;
             
             // 转换总时长回分:秒格式
             const totalMinutes = Math.floor(totalDuration / 60);
@@ -2126,10 +2142,26 @@
                 }
             });
             
+            // 生成简略显示文本
+            const locationArray = Array.from(locations);
+            let locationNamesDisplay;
+            if (locationArray.length <= 2) {
+                locationNamesDisplay = locationArray.join('、');
+            } else {
+                locationNamesDisplay = `${locationArray[0]}等${locationArray.length}景点`;
+            }
+            
+            let sampleNamesDisplay;
+            if (sampleNames.length <= 2) {
+                sampleNamesDisplay = sampleNames.join('、');
+            } else {
+                sampleNamesDisplay = `${sampleNames[0]}等${sampleNames.length}个样片`;
+            }
+            
             const orderInfo = {
                 locations: Array.from(locations),
-                locationNames: Array.from(locations).join('、'),
-                sampleNames: sampleNames.join('、'),
+                locationNames: locationNamesDisplay,
+                sampleNames: sampleNamesDisplay,
                 totalPrice: totalCost,
                 items: orderItems,
                 timestamp: Date.now()

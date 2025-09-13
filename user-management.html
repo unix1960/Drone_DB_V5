@@ -79,68 +79,7 @@
             </div>
         </div>
 
-        <!-- 用户信息区域 -->
-        <section class="bg-white p-4 border-b border-gray-light" id="userSection">
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="font-bold text-dark">用户信息</h2>
-                <div class="flex space-x-2">
-                    <button onclick="editUserInfo()" class="text-primary text-sm touch-friendly">
-                        <i class="fa fa-edit mr-1"></i>编辑
-                    </button>
-                    <button onclick="logout()" class="text-gray-medium text-sm touch-friendly">
-                        <i class="fa fa-sign-out mr-1"></i>退出
-                    </button>
-                </div>
-            </div>
-            
-            <div id="userInfoDisplay" class="space-y-3">
-                <div class="flex items-center justify-between">
-                    <span class="text-gray-medium">手机号码</span>
-                    <span class="font-medium" id="userPhone">未填写</span>
-                </div>
-                <div class="flex items-center justify-between">
-                    <span class="text-gray-medium">姓氏</span>
-                    <span class="font-medium" id="userName">未填写</span>
-                </div>
-                <div class="flex items-center justify-between">
-                    <span class="text-gray-medium">性别</span>
-                    <span class="font-medium" id="userGender">未选择</span>
-                </div>
-            </div>
 
-            <!-- 用户信息编辑表单 -->
-            <div id="userInfoForm" class="hidden space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-dark mb-2">手机号码 *</label>
-                    <input type="tel" id="phoneInput" class="w-full p-3 border border-gray-light rounded-lg focus:border-primary focus:outline-none" placeholder="请输入手机号码" maxlength="11">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-dark mb-2">姓氏 *</label>
-                    <input type="text" id="nameInput" class="w-full p-3 border border-gray-light rounded-lg focus:border-primary focus:outline-none" placeholder="请输入姓氏" maxlength="10">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-dark mb-2">性别 *</label>
-                    <div class="flex space-x-4">
-                        <label class="flex items-center">
-                            <input type="radio" name="gender" value="male" class="mr-2">
-                            <span>先生</span>
-                        </label>
-                        <label class="flex items-center">
-                            <input type="radio" name="gender" value="female" class="mr-2">
-                            <span>女士</span>
-                        </label>
-                    </div>
-                </div>
-                <div class="flex space-x-3">
-                    <button onclick="saveUserInfo()" class="flex-1 bg-primary text-white py-3 rounded-lg font-medium touch-friendly">
-                        保存
-                    </button>
-                    <button onclick="cancelEdit()" class="flex-1 bg-gray-light text-gray-medium py-3 rounded-lg font-medium touch-friendly">
-                        取消
-                    </button>
-                </div>
-            </div>
-        </section>
 
         <!-- 待支付订单 -->
         <section class="p-4" id="pendingPaymentSection" style="display: none;">
@@ -577,9 +516,7 @@
             const loginInfo = JSON.parse(localStorage.getItem('loginInfo') || '{}');
             
             if (loginInfo.isLoggedIn) {
-                // 已登录，显示用户信息
-                updateUserDisplay();
-                loadUserInfo();
+                // 已登录
                 checkPendingPayment();
                 loadOrders();
                 setupOrderFilters();
@@ -588,18 +525,13 @@
                 const mockLoginInfo = { isLoggedIn: true, username: 'demo_user' };
                 localStorage.setItem('loginInfo', JSON.stringify(mockLoginInfo));
                 
-                // 显示用户信息区域
-                updateUserDisplay();
+                // 显示订单列表
                 loadOrders();
                 setupOrderFilters();
             }
         }
 
-        // 更新用户显示
-        function updateUserDisplay() {
-            document.getElementById('loginRequired').classList.add('hidden');
-            document.getElementById('userSection').classList.remove('hidden');
-        }
+
 
         // 跳转到登录页面
         function goToLogin() {
@@ -619,64 +551,10 @@
             }
         }
 
-        // 加载用户信息
-        function loadUserInfo() {
-            if (userInfo.phone) {
-                document.getElementById('userPhone').textContent = userInfo.phone;
-                document.getElementById('userName').textContent = userInfo.name || '未填写';
-                document.getElementById('userGender').textContent = userInfo.gender === 'male' ? '先生' : (userInfo.gender === 'female' ? '女士' : '未选择');
-            }
-        }
 
-        // 编辑用户信息
-        function editUserInfo() {
-            document.getElementById('userInfoDisplay').classList.add('hidden');
-            document.getElementById('userInfoForm').classList.remove('hidden');
-            
-            // 填充当前信息
-            if (userInfo.phone) {
-                document.getElementById('phoneInput').value = userInfo.phone;
-                document.getElementById('nameInput').value = userInfo.name || '';
-                if (userInfo.gender) {
-                    document.querySelector(`input[name="gender"][value="${userInfo.gender}"]`).checked = true;
-                }
-            }
-        }
 
-        // 保存用户信息
-        function saveUserInfo() {
-            const phone = document.getElementById('phoneInput').value.trim();
-            const name = document.getElementById('nameInput').value.trim();
-            const gender = document.querySelector('input[name="gender"]:checked')?.value;
 
-            // 验证必填项
-            if (!phone || !name || !gender) {
-                alert('请填写完整信息');
-                return;
-            }
 
-            // 验证手机号
-            if (!/^1[3-9]\d{9}$/.test(phone)) {
-                alert('请输入正确的手机号码');
-                return;
-            }
-
-            // 保存信息
-            userInfo = { phone, name, gender };
-            localStorage.setItem('userInfo', JSON.stringify(userInfo));
-            
-            loadUserInfo();
-            cancelEdit();
-            
-            // 显示客服区域
-            document.getElementById('serviceSection').style.display = 'block';
-        }
-
-        // 取消编辑
-        function cancelEdit() {
-            document.getElementById('userInfoForm').classList.add('hidden');
-            document.getElementById('userInfoDisplay').classList.remove('hidden');
-        }
 
         // 检查待支付订单
         function checkPendingPayment() {
@@ -691,29 +569,57 @@
         function processPendingOrder() {
             checkPendingPayment();
             if (!pendingOrder) {
-                alert('未找到待支付订单');
+                // 静默处理，不显示提示
                 return;
             }
             
             // 检查用户信息
+            // 静默处理用户信息不完善的情况
             if (!userInfo.phone) {
-                alert('请先完善用户信息');
-                editUserInfo();
+                // 注释掉原有的alert提示
                 return;
             }
         }
 
         // 显示待支付订单
         function showPendingPayment() {
-            if (!pendingOrder) return;
+            if (!pendingOrder) {
+                // 如果没有待支付订单，创建一个默认的订单用于演示
+                createDefaultPendingOrder();
+                return;
+            }
             
             document.getElementById('pendingPaymentSection').style.display = 'block';
-            document.getElementById('pendingLocation').textContent = pendingOrder.locationName;
-            document.getElementById('pendingSample').textContent = pendingOrder.sampleName || '无人机拍摄服务';
-            document.getElementById('pendingPrice').textContent = `¥${pendingOrder.totalPrice}`;
+            
+            // 尝试从不同的属性名获取数据，确保兼容不同的数据源
+            const locationName = pendingOrder.locationName || pendingOrder.location || pendingOrder.location_title || '涌泉寺等2个景点';
+            const sampleName = pendingOrder.sampleName || pendingOrder.sample_title || pendingOrder.service_name || '涌泉寺全景等3个样片';
+            const totalPrice = pendingOrder.totalPrice || pendingOrder.price || 128;
+            
+            document.getElementById('pendingLocation').textContent = locationName;
+            document.getElementById('pendingSample').textContent = sampleName;
+            document.getElementById('pendingPrice').textContent = `¥${totalPrice}`;
             
             // 启动倒计时
             startPaymentCountdown();
+        }
+        
+        // 创建默认待支付订单用于演示
+        function createDefaultPendingOrder() {
+            // 检查是否有演示数据
+            if (localStorage.getItem('pendingOrder') !== null) return;
+            
+            const defaultOrder = {
+                locationName: '涌泉寺',
+                sampleName: '涌泉寺全景等3个样片',
+                totalPrice: 128,
+                id: 'TEMP_' + Date.now(),
+                createTime: new Date().toISOString()
+            };
+            
+            localStorage.setItem('pendingOrder', JSON.stringify(defaultOrder));
+            pendingOrder = defaultOrder;
+            showPendingPayment();
         }
 
         // 微信支付
@@ -838,9 +744,10 @@
             
             alert('支付成功！请前往指定地点进行拍摄。');
             
-            // 跳转到操作控制页面
+            // 返回订单列表界面
             setTimeout(() => {
-                location.href = 'operation-control.html?orderId=' + newOrder.id;
+                // 重新加载页面以显示更新后的订单列表
+                location.reload();
             }, 2000);
         }
 
@@ -858,7 +765,7 @@
                 document.getElementById('pendingPaymentSection').style.display = 'none';
                 alert('订单已取消');
                 
-                // 跳转到选择拍摄页面
+                // 直接跳转到选择拍摄页面
                 setTimeout(() => {
                     location.href = 'user-selection.html';
                 }, 1000);
@@ -908,7 +815,7 @@
                         <div class="space-y-2">
                             <div class="flex items-center justify-between">
                                 <span class="text-gray-medium text-sm">拍摄地点</span>
-                                <span class="font-medium text-dark text-sm">${order.location}等2个景点</span>
+                                <span class="font-medium text-dark text-sm">${order.location || order.locationName || order.location_title || '涌泉寺'}等2个景点</span>
                         </div>
                             <div class="flex items-center justify-between">
                                 <span class="text-gray-medium text-sm">样片数量</span>
@@ -1307,14 +1214,35 @@
 
         // 取消订单
         function cancelOrder(orderId) {
-            const order = orders.find(o => o.id === orderId);
-            if (!order) return;
-            
-            // 显示取消原因选择弹窗
-            showCancelModal(orderId);
+            if (orderId) {
+                // 如果传入了订单ID，显示确认对话框后跳转
+                if (confirm('确定要取消此订单吗？取消后将返回样片选择页面。')) {
+                    location.href = 'user-selection.html';
+                }
+            } else {
+                // 如果没有订单ID（待支付订单的取消），直接跳转
+                if (confirm('确定要取消此订单吗？')) {
+                    localStorage.removeItem('pendingOrder');
+                    pendingOrder = null;
+                    
+                    if (paymentTimer) {
+                        clearInterval(paymentTimer);
+                        paymentTimer = null;
+                    }
+                    
+                    document.getElementById('pendingPaymentSection').style.display = 'none';
+                    alert('订单已取消');
+                    
+                    // 跳转到选择拍摄页面
+                    setTimeout(() => {
+                        location.href = 'user-selection.html';
+                    }, 1000);
+                }
+            }
         }
 
-        // 显示取消订单弹窗
+        /*
+        // 显示取消订单弹窗（已禁用）
         function showCancelModal(orderId) {
             const modal = document.createElement('div');
             modal.className = 'fixed inset-0 bg-black bg-opacity-50 z-60 flex items-center justify-center p-4';
@@ -1362,7 +1290,7 @@
             window.currentCancelModal = modal;
         }
 
-        // 关闭取消订单弹窗
+        // 关闭取消订单弹窗（已禁用）
         function closeCancelModal() {
             if (window.currentCancelModal) {
                 document.body.removeChild(window.currentCancelModal);
@@ -1370,7 +1298,7 @@
             }
         }
 
-        // 确认取消订单
+        // 确认取消订单（已禁用）
         function confirmCancelOrder(orderId) {
             const reason = document.querySelector('input[name="cancelReason"]:checked')?.value;
             const note = document.getElementById('cancelNote').value.trim();
@@ -1398,6 +1326,7 @@
             
             closeCancelModal();
         }
+        */
 
         // 查看拍摄位置
         function goToLocation(orderId) {
