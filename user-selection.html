@@ -2213,6 +2213,44 @@
             }
         }
 
+        // 从localStorage同步选中的样片状态
+        function syncSelectedSamples() {
+            try {
+                const selectedSamplesFromStorage = JSON.parse(localStorage.getItem('selectedSamples') || '[]');
+                if (Array.isArray(selectedSamplesFromStorage) && selectedSamplesFromStorage.length > 0) {
+                    // 遍历所有选中的样片标题
+                    selectedSamplesFromStorage.forEach(sampleTitle => {
+                        // 查找对应的样片ID
+                        let foundSampleId = null;
+                        
+                        // 遍历样片数据，查找匹配的标题
+                        Object.keys(sampleData).forEach(sampleId => {
+                            if (sampleData[sampleId].name === sampleTitle) {
+                                foundSampleId = sampleId;
+                            }
+                        });
+                        
+                        // 如果找到对应的样片ID，就选中它
+                        if (foundSampleId && !selectedSamples.has(foundSampleId)) {
+                            selectedSamples.add(foundSampleId);
+                            updateSampleUI(foundSampleId);
+                        }
+                    });
+                    
+                    // 更新显示和按钮状态
+                    updateSelectedItemsDisplay();
+                    updateNextButton();
+                }
+            } catch (error) {
+                console.error('同步选中样片状态时出错:', error);
+            }
+        }
+
+        // 页面加载时执行同步
+        document.addEventListener('DOMContentLoaded', function() {
+            syncSelectedSamples();
+        });
+
     </script>
 </body>
 </html>

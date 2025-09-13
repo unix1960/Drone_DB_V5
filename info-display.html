@@ -61,7 +61,7 @@
 </head>
 <body class="font-inter bg-light text-dark antialiased touch-action-manipulation">
     <!-- 页面容器 -->
-    <div class="min-h-screen w-full safe-area-bottom content-container">
+    <div class="min-h-screen w-full h-screen content-container">
         <!-- 头部导航 -->
         <header class="bg-white border-b border-gray-light sticky top-0 z-40">
             <div class="flex items-center justify-between h-14 px-4">
@@ -164,16 +164,7 @@
                         <p class="text-gray-medium text-sm leading-relaxed">拍摄完成后24-48小时内交付成片，高峰期可能延长至72小时。</p>
                     </div>
                     
-                    <div>
-                        <h4 class="font-medium text-dark mb-2">📱 操作流程</h4>
-                        <div class="text-gray-medium text-sm space-y-1">
-                            <p>1. 选择套餐并完成支付</p>
-                            <p>2. 按导航到达指定拍摄点</p>
-                            <p>3. 确认位置后召唤无人机</p>
-                            <p>4. 配合拍摄并等待AI剪辑</p>
-                            <p>5. 通过企业微信接收成片</p>
-                        </div>
-                    </div>
+
                 </div>
             </div>
         </section>
@@ -210,27 +201,7 @@
             </div>
         </section>
 
-        <!-- 免责声明 -->
-        <section class="px-4 pb-6">
-            <div class="miniprogram-card bg-gray-50 p-4">
-                <h3 class="text-lg font-bold mb-4 flex items-center text-gray-700">
-                    <i class="fa fa-shield text-gray-600 mr-2"></i>
-                    免责声明
-                </h3>
-                <div class="text-xs text-gray-600 space-y-2 leading-relaxed">
-                    <p>1. 本服务仅在指定区域和时间内提供，用户需严格按照指引操作。</p>
-                    <p>2. 因用户个人原因（未到达指定位置、不配合拍摄等）导致的拍摄失败，不予退款。</p>
-                    <p>3. 拍摄内容仅供个人使用，不得用于商业用途。如需商业使用请另行协商。</p>
-                    <p>4. 因不可抗力因素（自然灾害、政府管制等）导致的服务中断，不承担赔偿责任。</p>
-                    <p>5. 用户使用本服务即表示同意上述条款，最终解释权归本公司所有。</p>
-                </div>
-                <div class="mt-4 text-center">
-                    <button onclick="showFullTerms()" class="text-primary text-sm touch-friendly">
-                        查看完整服务条款 <i class="fa fa-angle-right"></i>
-                    </button>
-                </div>
-            </div>
-        </section>
+
 
         <!-- 立即体验按钮 -->
         <section class="px-4 pb-8">
@@ -241,33 +212,7 @@
         </section>
     </div>
 
-    <!-- 微信小程序底部导航栏 -->
-    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-light z-50 safe-area-bottom" id="bottomNav">
-        <div class="flex justify-around items-center h-16">
-            <div class="tab-item flex flex-col items-center justify-center text-gray-medium touch-friendly" onclick="location.href='index.html'">
-                <i class="fa fa-home text-lg mb-1"></i>
-                <span class="text-xs">首页</span>
-            </div>
-            <div class="tab-item flex flex-col items-center justify-center text-gray-medium touch-friendly" onclick="location.href='sample-display.html'">
-                <i class="fa fa-picture-o text-lg mb-1"></i>
-                <span class="text-xs">样片</span>
-            </div>
-            <div class="tab-item flex flex-col items-center justify-center touch-friendly" onclick="location.href='user-selection.html'">
-                <div class="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center -mt-6 shadow-lg relative">
-                    <i class="fa fa-camera text-lg"></i>
-                </div>
-                <span class="text-xs text-primary font-medium mt-1">拍摄</span>
-            </div>
-            <div class="tab-item flex flex-col items-center justify-center text-gray-medium touch-friendly" onclick="checkLoginAndGoToOrders()">
-                <i class="fa fa-user text-lg mb-1"></i>
-                <span class="text-xs">订单</span>
-            </div>
-            <div class="tab-item flex flex-col items-center justify-center text-gray-medium touch-friendly" onclick="checkLoginAndGoToCustomize()">
-                <i class="fa fa-star text-lg mb-1"></i>
-                <span class="text-xs">定制</span>
-            </div>
-        </div>
-    </nav>
+
 
     <!-- 服务条款弹窗 -->
     <div id="termsModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
@@ -303,8 +248,7 @@
     <script>
         // 小程序适配
         document.addEventListener('DOMContentLoaded', function() {
-            // 解决底部导航栏遮挡内容的问题
-            adjustContentPadding();
+    
             
             // 添加小程序风格的触摸反馈
             const touchElements = document.querySelectorAll('.touch-friendly');
@@ -326,41 +270,7 @@
             });
         });
 
-        // 窗口大小变化时重新调整padding
-        window.addEventListener('resize', adjustContentPadding);
 
-        // 调整内容区域的padding-bottom以适应底部导航栏
-        function adjustContentPadding() {
-            const nav = document.getElementById('bottomNav');
-            const contentContainer = document.querySelector('.content-container');
-            
-            if (nav && contentContainer) {
-                // 获取导航栏的实际高度
-                const navHeight = nav.offsetHeight;
-                // 获取安全区域底部高度
-                const safeAreaBottom = getSafeAreaBottom();
-                // 设置内容区域底部内边距，确保内容不被导航栏遮挡
-                contentContainer.style.paddingBottom = `${navHeight + safeAreaBottom}px`;
-            }
-        }
-
-        // 获取安全区域底部高度
-        function getSafeAreaBottom() {
-            if (typeof window !== 'undefined' && window.screen) {
-                // 尝试从环境变量获取
-                const envSafeArea = getComputedStyle(document.documentElement).getPropertyValue('--safe-area-inset-bottom');
-                if (envSafeArea) {
-                    return parseFloat(envSafeArea);
-                }
-                
-                // 回退方案
-                return Math.max(
-                    0,
-                    window.innerHeight - document.documentElement.clientHeight
-                );
-            }
-            return 0;
-        }
 
 
 
