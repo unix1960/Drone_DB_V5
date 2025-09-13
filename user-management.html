@@ -270,20 +270,51 @@
                 </div>
                 <span class="text-xs text-primary font-medium mt-1">拍摄</span>
             </div>
-            <div class="tab-item flex flex-col items-center justify-center text-primary touch-friendly active" onclick="checkLoginStatus()">
-                <i class="fa fa-user text-lg mb-1"></i>
+            <div class="tab-item flex flex-col items-center justify-center text-gray-medium touch-friendly" onclick="checkLoginStatus()">
+                <i class="fa fa-list-alt text-lg mb-1"></i>
                 <span class="text-xs">订单</span>
             </div>
-            <div class="tab-item flex flex-col items-center justify-center text-gray-medium touch-friendly" onclick="checkLoginAndGoToCustomize()">
-                <i class="fa fa-star text-lg mb-1"></i>
-                <span class="text-xs">定制</span>
+            <div class="tab-item flex flex-col items-center justify-center text-primary touch-friendly active">
+                <i class="fa fa-user text-lg mb-1"></i>
+                <span class="text-xs">我的</span>
             </div>
         </div>
     </nav>
 
+    <!-- 订单二维码弹窗 -->
+    <div id="orderQRModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg max-w-sm w-full">
+            <div class="sticky top-0 bg-white border-b border-gray-light p-4">
+                <div class="flex items-center justify-between">
+                    <h3 class="font-bold text-dark">订单二维码</h3>
+                    <button onclick="closeOrderQR()" class="text-gray-medium text-xl">
+                        <i class="fa fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="p-6 text-center">
+                <div class="mb-4">
+                    <div id="qrCodeContainer" class="w-64 h-64 mx-auto bg-gray-100 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-300">
+                        <div class="text-center text-gray-500">
+                            <i class="fa fa-qrcode text-4xl mb-2"></i>
+                            <p class="text-sm">订单二维码</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-6 space-y-3">
+                    <p class="text-xs text-gray-500">请向工作人员出示此二维码进行拍摄</p>
+                    <button onclick="saveQRCode()" class="w-full bg-gray-light text-gray-medium py-2 rounded-lg text-sm">
+                        <i class="fa fa-download mr-1"></i>
+                        保存图片
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- 订单详情弹窗 -->
     <div id="orderDetailModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-lg max-w-md w-full max-h-96 overflow-y-auto">
+        <div class="bg-white rounded-lg max-w-md w-full max-h-[80vh] overflow-y-auto">
             <div class="sticky top-0 bg-white border-b border-gray-light p-4">
                 <div class="flex items-center justify-between">
                     <h3 class="font-bold text-dark">订单详情</h3>
@@ -294,6 +325,54 @@
             </div>
             <div class="p-4 space-y-4" id="orderDetailContent">
                 <!-- 订单详情内容会动态填充 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 样片播放弹窗 - 全屏模式 -->
+    <div id="sampleVideoModal" class="fixed inset-0 bg-black z-[100] hidden flex flex-col">
+        <!-- 顶部信息栏 -->
+        <div class="bg-black bg-opacity-50 text-white p-4 flex items-center justify-between">
+            <div class="w-12"></div> <!-- 左侧占位，保持居中对齐 -->
+            <div class="flex-1 text-center">
+                <h3 class="font-bold" id="videoModalTitle">样片播放</h3>
+                <p class="text-sm opacity-80" id="videoModalLocation">天台山景区</p>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="text-right">
+                    <p class="text-sm" id="videoModalCounter">1 / 4</p>
+                </div>
+                <button onclick="closeSampleVideo()" class="text-white text-2xl">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- 主要内容区域 -->
+        <div class="flex-1 relative overflow-hidden">
+            <div id="sampleVideoContainer" class="h-full w-full">
+                <div class="sample-slide h-full w-full relative">
+                    <video id="sampleVideoPlayer" class="w-full h-full object-cover" controls autoplay>
+                        <source id="videoSource" src="" type="video/mp4">
+                        您的浏览器不支持视频播放
+                    </video>
+                    
+                    <!-- 左右切换按钮 - 浮动在视频上层 -->
+                    <button id="prevSampleBtn" onclick="playPreviousSample()" class="absolute left-4 top-1/2 transform -translate-y-1/2 w-12 h-12 bg-black bg-opacity-30 text-white rounded-full flex items-center justify-center text-xl hover:bg-opacity-60 transition-all duration-200 z-10">
+                        <i class="fa fa-chevron-left"></i>
+                    </button>
+                    <button id="nextSampleBtn" onclick="playNextSample()" class="absolute right-4 top-1/2 transform -translate-y-1/2 w-12 h-12 bg-black bg-opacity-30 text-white rounded-full flex items-center justify-center text-xl hover:bg-opacity-60 transition-all duration-200 z-10">
+                        <i class="fa fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 底部控制栏 -->
+        <div class="bg-black bg-opacity-50 text-white p-4 safe-area-bottom" style="padding-bottom: max(1rem, env(safe-area-inset-bottom, 1rem) + 4rem);">
+            <!-- 进度指示器 -->
+            <div class="flex justify-center space-x-2" id="sampleIndicators">
+                <!-- 指示器将通过JavaScript动态生成 -->
             </div>
         </div>
     </div>
@@ -319,23 +398,25 @@
 
         // 模拟订单数据
         const sampleOrders = [
+            // 第一位：待拍摄
             {
-                id: 'ORDER001',
-                location: '天台山观景台',
-                sampleName: '山顶俯拍全景',
-                price: 98,
-                status: 'completed',
-                date: '2025-01-15 14:30',
-                photos: 45,
-                videos: 1,
-                duration: '12分钟',
-                identityCode: 'ID001'
+                id: 'ORDER010',
+                location: '香炉峰',
+                sampleName: '香炉峰日出等3个样片',
+                price: 398,
+                status: 'pending_shooting',
+                date: '2025-01-20 08:30',
+                photos: 0,
+                videos: 0,
+                duration: '预约拍摄',
+                identityCode: 'ID010'
             },
+            // 第二位：拍摄中
             {
                 id: 'ORDER002',
-                location: '西湖景区',
-                sampleName: '湖畔追踪拍摄',
-                price: 98,
+                location: '摩崖石刻',
+                sampleName: '摩崖石刻等5个样片',
+                price: 568,
                 status: 'shooting',
                 date: '2025-01-16 10:15',
                 photos: 18,
@@ -343,11 +424,38 @@
                 duration: '8分钟',
                 identityCode: 'ID002'
             },
+            // 第二位：待定制
+            {
+                id: 'ORDER008',
+                location: '罗汉台',
+                sampleName: '罗汉台等4个样片',
+                price: 458,
+                status: 'pending_customize',
+                date: '2025-01-18 15:30',
+                photos: 38,
+                videos: 1,
+                duration: '15分钟',
+                identityCode: 'ID008'
+            },
+            // 第三位：已完成
+            {
+                id: 'ORDER001',
+                location: '涌泉寺',
+                sampleName: '涌泉寺等8个样片',
+                price: 888,
+                status: 'completed',
+                date: '2025-01-15 14:30',
+                photos: 45,
+                videos: 1,
+                duration: '12分钟',
+                identityCode: 'ID001'
+            },
+            // 其他状态订单
             {
                 id: 'ORDER003',
-                location: '钱塘江大桥',
-                sampleName: '城市夜景航拍',
-                price: 98,
+                location: '屴崱峰',
+                sampleName: '屴崱峰等2个样片',
+                price: 276,
                 status: 'processing',
                 date: '2025-01-16 16:20',
                 photos: 25,
@@ -356,68 +464,30 @@
                 identityCode: 'ID003'
             },
             {
-                id: 'ORDER004',
-                location: '灵隐寺',
-                sampleName: '森林俯拍',
-                price: 98,
-                status: 'failed',
-                date: '2025-01-17 09:30',
-                photos: 0,
-                videos: 0,
-                duration: '0分钟',
-                identityCode: 'ID004',
-                failReason: '天气原因无法起飞'
-            },
-            {
                 id: 'ORDER005',
-                location: '断桥残雪',
-                sampleName: '湖畔追踪拍摄',
-                price: 98,
+                location: '香炉峰',
+                sampleName: '香炉峰等3个样片',
+                price: 384,
                 status: 'cancelled',
                 date: '2025-01-17 14:15',
                 photos: 0,
                 videos: 0,
                 duration: '0分钟',
                 identityCode: 'ID005',
-                cancelReason: '用户临时有事'
-            },
-            {
-                id: 'ORDER006',
-                location: '雷峰塔',
-                sampleName: '山顶俯拍全景',
-                price: 98,
-                status: 'refunded',
-                date: '2025-01-18 11:00',
-                photos: 0,
-                videos: 0,
-                duration: '0分钟',
-                identityCode: 'ID006',
-                refundAmount: 98,
-                refundTime: '2025-01-18 15:30'
+                cancelReason: '用户临时有事',
+                selectedSamples: ['xianglu_peak', 'xianglu_mist', 'xianglu_sunset'] // 已选择的样片ID
             },
             {
                 id: 'ORDER007',
-                location: '三潭印月',
-                sampleName: '森林俯拍',
-                price: 98,
+                location: '灵源洞',
+                sampleName: '灵源洞等5个样片',
+                price: 540,
                 status: 'expired',
                 date: '2025-01-10 10:00',
                 photos: 0,
                 videos: 0,
                 duration: '0分钟',
                 identityCode: 'ID007'
-            },
-            {
-                id: 'ORDER008',
-                location: '苏堤春晓',
-                sampleName: '湖畔追踪拍摄',
-                price: 98,
-                status: 'pending_customize',
-                date: '2025-01-18 15:30',
-                photos: 38,
-                videos: 1,
-                duration: '15分钟',
-                identityCode: 'ID008'
             }
         ];
 
@@ -489,6 +559,12 @@
         function initializePage() {
             checkLoginStatus();
             
+            // 确保样片播放弹窗是隐藏状态
+            const sampleVideoModal = document.getElementById('sampleVideoModal');
+            if (sampleVideoModal) {
+                sampleVideoModal.classList.add('hidden');
+            }
+            
             // 检查URL参数
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('action') === 'payment') {
@@ -508,11 +584,14 @@
                 loadOrders();
                 setupOrderFilters();
             } else {
-                // 未登录，显示登录提示
-                document.getElementById('loginRequired').classList.remove('hidden');
-                document.getElementById('userSection').classList.add('hidden');
-                document.getElementById('ordersList').innerHTML = '';
-                document.getElementById('emptyState').style.display = 'none';
+                // 未登录，模拟登录状态以显示示例数据
+                const mockLoginInfo = { isLoggedIn: true, username: 'demo_user' };
+                localStorage.setItem('loginInfo', JSON.stringify(mockLoginInfo));
+                
+                // 显示用户信息区域
+                updateUserDisplay();
+                loadOrders();
+                setupOrderFilters();
             }
         }
 
@@ -817,24 +896,36 @@
                 
                 return `
                     <div class="miniprogram-card bg-white p-4 touch-friendly" onclick="showOrderDetail('${order.id}')">
+                        <!-- 顶部：订单号和状态 -->
                         <div class="flex items-center justify-between mb-3">
-                            <div class="flex-1">
-                                <h3 class="font-bold text-dark">${order.location}</h3>
-                                <p class="text-gray-medium text-sm">${order.sampleName || order.package || '无人机拍摄服务'}</p>
-                            </div>
-                            <div class="text-right">
+                            <span class="text-gray-medium text-sm">订单号：${order.id}</span>
                                 <span class="px-2 py-1 rounded-full text-xs ${statusConfig.class}">
                                     ${statusConfig.text}
                                 </span>
-                                <p class="text-primary font-bold mt-1">¥${order.price}</p>
+                            </div>
+                        
+                        <!-- 主要信息 -->
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-medium text-sm">拍摄地点</span>
+                                <span class="font-medium text-dark text-sm">${order.location}等2个景点</span>
+                        </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-medium text-sm">样片数量</span>
+                                <span class="font-medium text-dark text-sm">${generateSampleImages(order.location).length}个样片</span>
+                        </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-medium text-sm">订单金额</span>
+                                <span class="text-primary font-bold text-sm">¥${order.price}</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-medium text-sm">下单时间</span>
+                                <span class="font-medium text-dark text-sm">${order.date}</span>
                             </div>
                         </div>
-                        <div class="flex items-center justify-between text-sm text-gray-medium mb-2">
-                            <span>订单号：${order.id}</span>
-                            <span>${order.date}</span>
-                        </div>
+                        
                         ${statusDescription ? `
-                            <div class="text-xs text-gray-600 mb-2">
+                            <div class="text-xs text-gray-600 mt-3 mb-2 bg-gray-50 p-2 rounded">
                                 ${statusDescription}
                             </div>
                         ` : ''}
@@ -851,20 +942,18 @@
         // 获取状态描述
         function getStatusDescription(order) {
             switch(order.status) {
+                case 'pending_shooting':
+                    return '请联系工作人员前往拍摄地点进行拍摄';
                 case 'shooting':
-                    return '请前往拍摄地点，开始您的无人机拍摄之旅';
+                    return '请联系工作人员开始您的无人机拍摄之旅';
                 case 'processing':
                     return 'AI正在为您精心制作专属大片，预计2-4小时完成';
                 case 'completed':
                     return `成片已完成！共${order.photos}张照片，${order.videos}个视频`;
                 case 'pending_customize':
                     return '拍摄完成，请选择您需要的定制选项，我们将为您制作专属成片';
-                case 'failed':
-                    return order.failReason ? `拍摄失败：${order.failReason}` : '拍摄失败，您可以申请退款或重新拍摄';
                 case 'cancelled':
                     return order.cancelReason ? `取消原因：${order.cancelReason}` : '订单已取消';
-                case 'refunded':
-                    return order.refundTime ? `已于${order.refundTime}退款¥${order.refundAmount}` : '订单已退款';
                 case 'expired':
                     return '订单已过期，如需帮助请联系客服';
                 default:
@@ -875,12 +964,25 @@
         // 获取操作按钮
         function getActionButtons(order) {
             switch(order.status) {
+                case 'pending_shooting':
+                    return `
+                        <div class="flex space-x-2">
+                            <button onclick="event.stopPropagation(); showOrderQR('${order.id}')" class="flex-1 bg-primary text-white py-2 rounded-lg text-sm font-medium">
+                                <i class="fa fa-qrcode mr-1"></i>
+                                订单二维码
+                            </button>
+                            <button onclick="event.stopPropagation(); cancelOrder('${order.id}')" class="flex-1 bg-gray-light text-gray-medium py-2 rounded-lg text-sm font-medium">
+                                <i class="fa fa-times mr-1"></i>
+                                取消订单
+                            </button>
+                        </div>
+                    `;
                 case 'shooting':
                     return `
                         <div class="flex space-x-2">
-                            <button onclick="event.stopPropagation(); goToShooting('${order.id}')" class="flex-1 bg-primary text-white py-2 rounded-lg text-sm font-medium">
-                                <i class="fa fa-camera mr-1"></i>
-                                前往拍摄
+                            <button onclick="event.stopPropagation(); showOrderQR('${order.id}')" class="flex-1 bg-primary text-white py-2 rounded-lg text-sm font-medium">
+                                <i class="fa fa-qrcode mr-1"></i>
+                                订单二维码
                             </button>
                             <button onclick="event.stopPropagation(); cancelOrder('${order.id}')" class="flex-1 bg-gray-light text-gray-medium py-2 rounded-lg text-sm font-medium">
                                 <i class="fa fa-times mr-1"></i>
@@ -897,9 +999,9 @@
                                 <i class="fa fa-eye mr-1"></i>
                                 查看成片
                             </button>
-                            <button onclick="event.stopPropagation(); shareVideo('${order.id}')" class="flex-1 bg-blue-500 text-white py-2 rounded-lg text-sm font-medium">
-                                <i class="fa fa-share-alt mr-1"></i>
-                                分享视频
+                            <button onclick="event.stopPropagation(); downloadVideo('${order.id}')" class="flex-1 bg-blue-500 text-white py-2 rounded-lg text-sm font-medium">
+                                <i class="fa fa-download mr-1"></i>
+                                下载视频
                             </button>
                         </div>
                     `;
@@ -910,18 +1012,12 @@
                             成片定制
                         </button>
                     `;
-                case 'failed':
+                case 'cancelled':
                     return `
-                        <div class="flex space-x-2">
-                            <button onclick="event.stopPropagation(); retakeOrder('${order.id}')" class="flex-1 bg-primary text-white py-2 rounded-lg text-sm font-medium">
+                        <button onclick="event.stopPropagation(); reorderCancelledOrder('${order.id}')" class="w-full bg-primary text-white py-2 rounded-lg text-sm font-medium">
                                 <i class="fa fa-refresh mr-1"></i>
-                                重新拍摄
+                            重新下单
                             </button>
-                            <button onclick="event.stopPropagation(); refundOrder('${order.id}')" class="flex-1 bg-red-500 text-white py-2 rounded-lg text-sm font-medium">
-                                <i class="fa fa-money mr-1"></i>
-                                申请退款
-                            </button>
-                        </div>
                     `;
                 case 'expired':
                     return ``;
@@ -933,13 +1029,12 @@
         // 获取状态配置
         function getStatusConfig(status) {
             const configs = {
+                'pending_shooting': { text: '待拍摄', class: 'bg-red-100 text-red-600' },
                 'shooting': { text: '拍摄中', class: 'bg-orange-100 text-orange-600' },
                 'processing': { text: 'AI剪辑中', class: 'bg-blue-100 text-blue-600' },
                 'completed': { text: '已完成', class: 'bg-green-100 text-green-600' },
                 'pending_customize': { text: '待定制', class: 'bg-indigo-100 text-indigo-600' },
                 'cancelled': { text: '已取消', class: 'bg-gray-100 text-gray-600' },
-                'failed': { text: '拍摄失败', class: 'bg-red-100 text-red-600' },
-                'refunded': { text: '已退款', class: 'bg-purple-100 text-purple-600' },
                 'expired': { text: '已过期', class: 'bg-yellow-100 text-yellow-600' }
             };
             return configs[status] || configs['shooting'];
@@ -971,12 +1066,68 @@
             });
         }
 
+        // 生成样片图片数据
+        function generateSampleImages(location) {
+            const locationSamples = {
+                '香炉峰': [
+                    { name: '香炉峰日出', image: 'https://picsum.photos/id/1015/200/100' },
+                    { name: '香炉峰云海', image: 'https://picsum.photos/id/1016/200/100' },
+                    { name: '香炉峰晚霞', image: 'https://picsum.photos/id/1018/200/100' },
+                    { name: '香炉峰全景', image: 'https://picsum.photos/id/1019/200/100' }
+                ],
+                '涌泉寺': [
+                    { name: '涌泉寺大雄宝殿', image: 'https://picsum.photos/id/1020/200/100' },
+                    { name: '涌泉寺千年古塔', image: 'https://picsum.photos/id/1021/200/100' },
+                    { name: '涌泉寺禅意园林', image: 'https://picsum.photos/id/1022/200/100' },
+                    { name: '涌泉寺晨钟暮鼓', image: 'https://picsum.photos/id/1023/200/100' },
+                    { name: '涌泉寺梵音缭绕', image: 'https://picsum.photos/id/1024/200/100' },
+                    { name: '涌泉寺古韵悠长', image: 'https://picsum.photos/id/1025/200/100' },
+                    { name: '涌泉寺佛光普照', image: 'https://picsum.photos/id/1026/200/100' },
+                    { name: '涌泉寺庄严殿宇', image: 'https://picsum.photos/id/1027/200/100' }
+                ],
+                '摩崖石刻': [
+                    { name: '摩崖石刻远景', image: 'https://picsum.photos/id/1028/200/100' },
+                    { name: '摩崖石刻细节', image: 'https://picsum.photos/id/1029/200/100' },
+                    { name: '摩崖石刻全貌', image: 'https://picsum.photos/id/1030/200/100' },
+                    { name: '摩崖石刻艺术', image: 'https://picsum.photos/id/1031/200/100' },
+                    { name: '摩崖石刻历史', image: 'https://picsum.photos/id/1032/200/100' }
+                ],
+                '屴崱峰': [
+                    { name: '屴崱峰奇景', image: 'https://picsum.photos/id/1033/200/100' },
+                    { name: '屴崱峰险峻', image: 'https://picsum.photos/id/1034/200/100' }
+                ],
+                '罗汉台': [
+                    { name: '罗汉台古韵', image: 'https://picsum.photos/id/1035/200/100' },
+                    { name: '罗汉台禅境', image: 'https://picsum.photos/id/1036/200/100' },
+                    { name: '罗汉台静谧', image: 'https://picsum.photos/id/1037/200/100' },
+                    { name: '罗汉台悟道', image: 'https://picsum.photos/id/1038/200/100' }
+                ],
+                '白云洞': [
+                    { name: '白云洞仙境', image: 'https://picsum.photos/id/1039/200/100' },
+                    { name: '白云洞神秘', image: 'https://picsum.photos/id/1040/200/100' },
+                    { name: '白云洞奇观', image: 'https://picsum.photos/id/1041/200/100' },
+                    { name: '白云洞清幽', image: 'https://picsum.photos/id/1042/200/100' },
+                    { name: '白云洞飘渺', image: 'https://picsum.photos/id/1043/200/100' },
+                    { name: '白云洞仙踪', image: 'https://picsum.photos/id/1044/200/100' }
+                ]
+            };
+            
+            return locationSamples[location] || [
+                { name: '精美样片1', image: 'https://picsum.photos/id/1050/200/100' },
+                { name: '精美样片2', image: 'https://picsum.photos/id/1051/200/100' },
+                { name: '精美样片3', image: 'https://picsum.photos/id/1052/200/100' },
+                { name: '精美样片4', image: 'https://picsum.photos/id/1053/200/100' }
+            ];
+        }
+
         // 显示订单详情
         function showOrderDetail(orderId) {
-            const order = orders.find(o => o.id === orderId);
+            const order = orders.find(o => o.id === orderId) || sampleOrders.find(o => o.id === orderId);
             if (!order) return;
             
             const content = document.getElementById('orderDetailContent');
+            // 设置订单ID到modal元素用于样片播放
+            content.setAttribute('data-order-id', orderId);
             content.innerHTML = `
                 <div class="space-y-4">
                     <div>
@@ -988,7 +1139,7 @@
                             </div>
                             <div class="flex justify-between">
                                 <span class="text-gray-medium">拍摄地点</span>
-                                <span>${order.location}</span>
+                                <span>${order.location}等2个</span>
                             </div>
                             <div class="flex justify-between">
                                 <span class="text-gray-medium">样片名称</span>
@@ -1002,6 +1153,30 @@
                                 <span class="text-gray-medium">下单时间</span>
                                 <span>${order.date}</span>
                             </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-medium text-dark mb-2">已选样片</h4>
+                        <div class="grid grid-cols-2 gap-2">
+                            ${generateSampleImages(order.location).map((sample, index) => `
+                                <div class="bg-black rounded-lg overflow-hidden cursor-pointer hover:opacity-90 transition-opacity" onclick="playSampleVideo('${sample.name}', '${sample.image}')">
+                                    <div class="relative aspect-video">
+                                        <img src="${sample.image}" alt="${sample.name}" class="w-full h-full object-cover">
+                                        <div class="absolute inset-0 flex items-center justify-center">
+                                            <div class="w-12 h-12 bg-black bg-opacity-60 rounded-full flex items-center justify-center">
+                                                <i class="fa fa-play text-white text-lg ml-1"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="p-3 bg-white">
+                                        <div class="flex items-center justify-between">
+                                            <p class="text-dark text-sm font-medium truncate flex-1 mr-2">${sample.name}</p>
+                                            <p class="text-gray-600 text-xs flex-shrink-0">12分钟</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
                         </div>
                     </div>
                     
@@ -1029,38 +1204,105 @@
                                 <i class="fa fa-download mr-2"></i>
                                 下载成片
                             </button>
-                            <button onclick="shareOrder('${order.id}')" class="w-full bg-gray-light text-gray-medium py-3 rounded-lg font-medium">
-                                <i class="fa fa-share mr-2"></i>
-                                分享订单
-                            </button>
                         </div>
-                    ` : order.status === 'shooting' ? `
-                        <div class="bg-orange-50 border border-orange-200 p-3 rounded-lg">
-                            <p class="text-orange-800 text-sm">
-                                <i class="fa fa-info-circle mr-1"></i>
-                                请前往指定地点进行拍摄，拍摄完成后我们将立即开始制作您的专属大片。
-                            </p>
-                        </div>
-                        
-                        <button onclick="goToShooting('${order.id}')" class="w-full bg-primary text-white py-3 rounded-lg font-medium">
-                            <i class="fa fa-camera mr-2"></i>
-                            前往拍摄
-                        </button>
                     ` : ''}
                 </div>
             `;
             
+            // 确保样片播放弹窗隐藏
+            const sampleVideoModal = document.getElementById('sampleVideoModal');
+            if (sampleVideoModal) {
+                sampleVideoModal.classList.add('hidden');
+            }
+            
             document.getElementById('orderDetailModal').classList.remove('hidden');
         }
+
+        // 关闭订单二维码
+        function closeOrderQR() {
+            document.getElementById('orderQRModal').classList.add('hidden');
+            window.currentQROrder = null;
+        }
+
+        // 保存二维码图片
+        function saveQRCode() {
+            if (!window.currentQROrder) return;
+            
+            // 小程序环境使用微信保存图片API
+            if (typeof wx !== 'undefined') {
+                wx.saveImageToPhotosAlbum({
+                    filePath: 'temp://qr_code_' + window.currentQROrder.id + '.png',
+                    success: function() {
+                        showToast('二维码已保存到相册');
+                    },
+                    fail: function() {
+                        showToast('保存失败，请手动截图保存');
+                    }
+                });
+            } else {
+                showToast('请手动截图保存二维码');
+            }
+        }
+
 
         // 关闭订单详情
         function closeOrderDetail() {
             document.getElementById('orderDetailModal').classList.add('hidden');
         }
 
-        // 前往拍摄
-        function goToShooting(orderId) {
-            location.href = `operation-control.html?orderId=${orderId}`;
+        // 显示订单二维码
+        function showOrderQR(orderId) {
+            const order = orders.find(o => o.id === orderId) || sampleOrders.find(o => o.id === orderId);
+            if (!order) return;
+            
+            // 生成二维码内容（包含订单信息的JSON）
+            const qrData = {
+                orderId: order.id,
+                location: order.location,
+                price: order.price,
+                date: order.date,
+                status: order.status
+            };
+            
+            // 创建二维码显示区域
+            const qrContainer = document.getElementById('qrCodeContainer');
+            qrContainer.innerHTML = `
+                <div class="w-full h-full bg-white rounded border-2 border-gray-200 flex items-center justify-center">
+                    <div class="text-center">
+                        <div class="w-56 h-56 mx-auto mb-2 bg-gray-800" style="
+                            background: repeating-linear-gradient(
+                                0deg,
+                                #000,
+                                #000 4px,
+                                #fff 4px,
+                                #fff 8px
+                            ),
+                            repeating-linear-gradient(
+                                90deg,
+                                #000,
+                                #000 4px,
+                                #fff 4px,
+                                #fff 8px
+                            );
+                            background-size: 8px 8px;
+                            position: relative;
+                        ">
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <div class="bg-white p-2 rounded">
+                                    <i class="fa fa-qrcode text-2xl text-gray-800"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-xs text-gray-600">订单 ${order.id}</p>
+                    </div>
+                </div>
+            `;
+            
+            // 显示弹窗
+            document.getElementById('orderQRModal').classList.remove('hidden');
+            
+            // 存储当前订单信息用于分享和保存
+            window.currentQROrder = order;
         }
 
         // 取消订单
@@ -1213,81 +1455,59 @@
             viewer.innerHTML = `
                 <!-- 顶部信息栏 -->
                 <div class="bg-black bg-opacity-50 text-white p-4 flex items-center justify-between">
-                    <div class="flex items-center">
-                        <button onclick="closeMediaViewer()" class="mr-4 text-white text-2xl">
-                            <i class="fa fa-times"></i>
-                        </button>
-                        <div>
-                            <h3 class="font-bold">${order.location}</h3>
-                            <p class="text-sm opacity-80">${order.package}</p>
+                    <div class="w-12"></div> <!-- 左侧占位，保持居中对齐 -->
+                    <div class="flex-1 text-center">
+                        <h3 class="font-bold" id="mediaViewerTitle">精彩视频</h3>
                         </div>
-                    </div>
+                    <div class="flex items-center space-x-4">
                     <div class="text-right">
                         <p class="text-sm" id="mediaCounter">1 / ${mediaItems.length}</p>
-                        <p class="text-xs opacity-80">${order.date}</p>
+                        </div>
+                        <button onclick="closeMediaViewer()" class="text-white text-2xl">
+                            <i class="fa fa-times"></i>
+                        </button>
                     </div>
                 </div>
                 
                 <!-- 主要内容区域 -->
                 <div class="flex-1 relative overflow-hidden">
-                    <div id="mediaContainer" class="h-full flex transition-transform duration-300" style="width: ${mediaItems.length * 100}%;">
-                        ${mediaItems.map((item, index) => `
-                            <div class="media-slide h-full flex items-center justify-center bg-black" style="width: ${100 / mediaItems.length}%;" data-index="${index}">
-                                ${item.type === 'video' ? `
+                    <div id="mediaContainer" class="h-full w-full">
+                        <div class="media-slide h-full w-full relative">
+                            <div id="currentMediaContent" class="w-full h-full flex items-center justify-center">
+                                ${mediaItems[0].type === 'video' ? `
                                     <video 
-                                        class="max-w-full max-h-full" 
+                                        class="w-full h-full object-cover" 
                                         controls 
-                                        poster="${item.poster}"
+                                        poster="${mediaItems[0].poster}"
                                         preload="metadata"
-                                        data-video-index="${index}"
                                     >
-                                        <source src="${item.src}" type="video/mp4">
+                                        <source src="${mediaItems[0].src}" type="video/mp4">
                                         您的浏览器不支持视频播放
                                     </video>
                                 ` : `
                                     <img 
-                                        src="${item.src}" 
-                                        alt="${item.title}" 
-                                        class="max-w-full max-h-full object-contain"
-                                        loading="lazy"
+                                        src="${mediaItems[0].src}" 
+                                        alt="${mediaItems[0].title}" 
+                                        class="w-full h-full object-cover"
                                     >
                                 `}
-                            </div>
-                        `).join('')}
                     </div>
                     
-                    <!-- 左右切换按钮 -->
+                            <!-- 左右切换按钮 - 浮动在媒体上层 -->
                     ${mediaItems.length > 1 ? `
-                        <button id="prevBtn" onclick="previousMedia()" class="absolute left-4 top-1/2 transform -translate-y-1/2 w-12 h-12 bg-black bg-opacity-50 text-white rounded-full flex items-center justify-center text-xl hover:bg-opacity-70 transition-opacity">
-                            <i class="fa fa-angle-left"></i>
+                                <button id="prevBtn" onclick="previousMedia()" class="absolute left-4 top-1/2 transform -translate-y-1/2 w-12 h-12 bg-black bg-opacity-30 text-white rounded-full flex items-center justify-center text-xl hover:bg-opacity-60 transition-all duration-200 z-10">
+                                    <i class="fa fa-chevron-left"></i>
                         </button>
-                        <button id="nextBtn" onclick="nextMedia()" class="absolute right-4 top-1/2 transform -translate-y-1/2 w-12 h-12 bg-black bg-opacity-50 text-white rounded-full flex items-center justify-center text-xl hover:bg-opacity-70 transition-opacity">
-                            <i class="fa fa-angle-right"></i>
+                                <button id="nextBtn" onclick="nextMedia()" class="absolute right-4 top-1/2 transform -translate-y-1/2 w-12 h-12 bg-black bg-opacity-30 text-white rounded-full flex items-center justify-center text-xl hover:bg-opacity-60 transition-all duration-200 z-10">
+                                    <i class="fa fa-chevron-right"></i>
                         </button>
                     ` : ''}
                 </div>
-                
-                <!-- 底部控制栏 -->
-                <div class="bg-black bg-opacity-50 text-white p-4 safe-area-bottom" style="padding-bottom: max(1rem, env(safe-area-inset-bottom, 1rem) + 4rem);">
-                    <div class="flex items-center justify-between mb-3">
-                        <div class="flex-1">
-                            <h4 class="font-medium" id="currentMediaTitle">${mediaItems[0].title}</h4>
-                            <p class="text-sm opacity-80" id="currentMediaInfo">
-                                ${mediaItems[0].type === 'video' ? `视频 · ${mediaItems[0].duration}` : '照片'}
-                            </p>
-                        </div>
-                        <div class="flex space-x-2">
-                            <button onclick="shareCurrentMedia()" class="bg-blue-500 text-white px-4 py-2 rounded-lg text-sm">
-                                <i class="fa fa-share-alt mr-1"></i>
-                                分享
-                            </button>
-                            <button onclick="downloadCurrentMedia()" class="bg-green-500 text-white px-4 py-2 rounded-lg text-sm">
-                                <i class="fa fa-download mr-1"></i>
-                                下载
-                            </button>
                         </div>
                     </div>
                     
+                <!-- 底部控制栏 -->
+                <div class="bg-black bg-opacity-50 text-white p-4 safe-area-bottom" style="padding-bottom: max(1rem, env(safe-area-inset-bottom, 1rem) + 4rem);">
                     <!-- 进度指示器 -->
                     ${mediaItems.length > 1 ? `
                         <div class="flex justify-center space-x-2">
@@ -1325,45 +1545,35 @@
 
         // 添加滑动支持
         function addSwipeSupport() {
-            const container = document.getElementById('mediaContainer');
+            const mediaContent = document.getElementById('currentMediaContent');
+            if (!mediaContent) return;
+            
             let startX = 0;
             let isDragging = false;
-            let currentTransform = 0;
             
-            container.addEventListener('touchstart', function(e) {
+            mediaContent.addEventListener('touchstart', function(e) {
                 startX = e.touches[0].clientX;
                 isDragging = true;
             });
             
-            container.addEventListener('touchmove', function(e) {
+            mediaContent.addEventListener('touchmove', function(e) {
                 if (!isDragging) return;
                 e.preventDefault();
-                
-                const currentX = e.touches[0].clientX;
-                const diff = currentX - startX;
-                const maxTransform = -(window.mediaViewerItems.length - 1) * (100 / window.mediaViewerItems.length);
-                
-                currentTransform = Math.max(maxTransform, Math.min(0, -(window.currentMediaIndex * (100 / window.mediaViewerItems.length)) + diff / window.innerWidth * 50));
-                container.style.transform = `translateX(${currentTransform}%)`;
             });
             
-            container.addEventListener('touchend', function(e) {
+            mediaContent.addEventListener('touchend', function(e) {
                 if (!isDragging) return;
                 isDragging = false;
                 
                 const threshold = 50;
                 const diff = e.changedTouches[0].clientX - startX;
                 
-                if (Math.abs(diff) > threshold) {
+                if (Math.abs(diff) > threshold && window.mediaViewerItems.length > 1) {
                     if (diff > 0 && window.currentMediaIndex > 0) {
                         previousMedia();
                     } else if (diff < 0 && window.currentMediaIndex < window.mediaViewerItems.length - 1) {
                         nextMedia();
-                    } else {
-                        updateMediaDisplay();
                     }
-                } else {
-                    updateMediaDisplay();
                 }
             });
         }
@@ -1409,17 +1619,10 @@
 
         // 更新媒体显示
         function updateMediaDisplay() {
-            const container = document.getElementById('mediaContainer');
             const counter = document.getElementById('mediaCounter');
-            const title = document.getElementById('currentMediaTitle');
-            const info = document.getElementById('currentMediaInfo');
+            const viewerTitle = document.getElementById('mediaViewerTitle');
+            const mediaContent = document.getElementById('currentMediaContent');
             const indicators = document.querySelectorAll('.indicator-dot');
-            
-            if (!container) return;
-            
-            // 更新容器位置
-            const translateX = -(window.currentMediaIndex * (100 / window.mediaViewerItems.length));
-            container.style.transform = `translateX(${translateX}%)`;
             
             // 更新计数器
             if (counter) {
@@ -1428,10 +1631,33 @@
             
             // 更新当前媒体信息
             const currentItem = window.mediaViewerItems[window.currentMediaIndex];
-            if (title) title.textContent = currentItem.title;
-            if (info) {
-                info.textContent = currentItem.type === 'video' ? 
-                    `视频 · ${currentItem.duration}` : '照片';
+            
+            // 更新顶部标题
+            if (viewerTitle) viewerTitle.textContent = '精彩视频';
+            
+            // 更新媒体内容
+            if (mediaContent) {
+                if (currentItem.type === 'video') {
+                    mediaContent.innerHTML = `
+                        <video 
+                            class="w-full h-full object-cover" 
+                            controls 
+                            poster="${currentItem.poster}"
+                            preload="metadata"
+                        >
+                            <source src="${currentItem.src}" type="video/mp4">
+                            您的浏览器不支持视频播放
+                        </video>
+                    `;
+                } else {
+                    mediaContent.innerHTML = `
+                        <img 
+                            src="${currentItem.src}" 
+                            alt="${currentItem.title}" 
+                            class="w-full h-full object-cover"
+                        >
+                    `;
+                }
             }
             
             // 更新指示器
@@ -1444,34 +1670,8 @@
                     dot.classList.remove('bg-white');
                 }
             });
-            
-            // 停止其他视频播放
-            const videos = document.querySelectorAll('#mediaViewer video');
-            videos.forEach((video, index) => {
-                if (index !== window.currentMediaIndex) {
-                    video.pause();
-                }
-            });
         }
 
-        // 分享当前媒体
-        function shareCurrentMedia() {
-            const currentItem = window.mediaViewerItems[window.currentMediaIndex];
-            if (typeof wx !== 'undefined') {
-                wx.showShareMenu({
-                    withShareTicket: true
-                });
-            } else {
-                showToast(`正在分享 ${currentItem.title}`);
-            }
-        }
-
-        // 下载当前媒体
-        function downloadCurrentMedia() {
-            const currentItem = window.mediaViewerItems[window.currentMediaIndex];
-            showToast(`正在下载 ${currentItem.title}`);
-            // 实际项目中这里应该调用下载API
-        }
 
         // 关闭媒体浏览器
         function closeMediaViewer() {
@@ -1499,6 +1699,63 @@
             location.href = `after-service.html?orderId=${orderId}`;
         }
 
+        // 下载视频
+        function downloadVideo(orderId) {
+            const order = orders.find(o => o.id === orderId) || sampleOrders.find(o => o.id === orderId);
+            if (!order) {
+                showToast('订单信息未找到');
+                return;
+            }
+            
+            if (typeof wx !== 'undefined') {
+                // 微信小程序下载
+                wx.downloadFile({
+                    url: 'https://sample-videos.com/download/' + orderId,
+                    success: () => showToast('下载成功'),
+                    fail: () => showToast('下载失败')
+                });
+            } else if (typeof my !== 'undefined') {
+                // 支付宝小程序下载
+                my.downloadFile({
+                    url: 'https://sample-videos.com/download/' + orderId,
+                    success: () => showToast('下载成功'),
+                    fail: () => showToast('下载失败')
+                });
+            } else {
+                // 网页端下载
+                showToast('正在准备下载...');
+                // 模拟下载过程
+                setTimeout(() => {
+                    showToast('下载完成！文件已保存到下载文件夹');
+                }, 2000);
+            }
+        }
+
+        // 重新下单（已取消订单）
+        function reorderCancelledOrder(orderId) {
+            const order = orders.find(o => o.id === orderId) || sampleOrders.find(o => o.id === orderId);
+            if (!order) {
+                showToast('订单信息未找到');
+                return;
+            }
+            
+            // 检查是否有已选择的样片信息
+            if (order.selectedSamples && order.selectedSamples.length > 0) {
+                // 将已选择的样片信息存储到localStorage，供user-selection.html页面使用
+                localStorage.setItem('reorderSamples', JSON.stringify(order.selectedSamples));
+                showToast('正在为您恢复之前的选择...');
+            } else {
+                // 没有样片信息，清除可能存在的旧数据
+                localStorage.removeItem('reorderSamples');
+                showToast('跳转到选择页面...');
+            }
+            
+            // 延迟跳转，让用户看到提示
+            setTimeout(() => {
+                location.href = 'user-selection.html?reorder=true';
+            }, 1000);
+        }
+
         // 重新拍摄
         function retakeOrder(orderId) {
             if (confirm('确定要重新拍摄吗？将为您创建新的拍摄订单。')) {
@@ -1522,24 +1779,216 @@
             }
         }
 
-        // 申请退款
-        function refundOrder(orderId) {
-            const order = orders.find(o => o.id === orderId);
-            if (!order) return;
+
+        // 全局变量用于样片播放
+        let currentSampleIndex = 0;
+        let currentOrderSamples = [];
+
+        // 播放样片视频
+        function playSampleVideo(sampleName, sampleImage) {
+            // 从订单详情中获取所有样片
+            const orderDetailContent = document.getElementById('orderDetailContent');
+            const currentOrderId = orderDetailContent?.getAttribute('data-order-id');
             
-            if (confirm(`确定要申请退款吗？将退还您支付的¥${order.price}。`)) {
-                // 更新订单状态
-                const orderIndex = orders.findIndex(o => o.id === orderId);
-                if (orderIndex !== -1) {
-                    orders[orderIndex].status = 'refunded';
-                    orders[orderIndex].refundAmount = order.price;
-                    orders[orderIndex].refundTime = new Date().toLocaleString('zh-CN');
-                    localStorage.setItem('orders', JSON.stringify(orders));
-                    
-                    showToast('退款申请已提交，预计3-5个工作日到账');
-                    loadOrders();
+            if (currentOrderId) {
+                const order = orders.find(o => o.id === currentOrderId) || sampleOrders.find(o => o.id === currentOrderId);
+                if (order) {
+                    currentOrderSamples = generateSampleImages(order.location);
+                    // 找到当前样片的索引
+                    currentSampleIndex = currentOrderSamples.findIndex(sample => sample.name === sampleName);
+                    if (currentSampleIndex === -1) currentSampleIndex = 0;
+                }
+            } else {
+                // 如果没有找到订单，创建单个样片数组
+                currentOrderSamples = [{ name: sampleName, image: sampleImage }];
+                currentSampleIndex = 0;
+            }
+
+             // 初始化样片播放器
+             initializeSamplePlayer();
+             
+             // 播放当前样片
+             playCurrentSample();
+             
+             // 显示弹窗
+             document.getElementById('sampleVideoModal').classList.remove('hidden');
+        }
+
+         // 播放当前索引的样片
+         function playCurrentSample() {
+             if (currentOrderSamples.length === 0) return;
+             
+             const currentSample = currentOrderSamples[currentSampleIndex];
+             
+             // 设置弹窗标题和计数器
+             document.getElementById('videoModalTitle').textContent = currentSample.name;
+             document.getElementById('videoModalCounter').textContent = `${currentSampleIndex + 1} / ${currentOrderSamples.length}`;
+             
+             // 获取并显示景点信息
+             const orderDetailContent = document.getElementById('orderDetailContent');
+             const currentOrderId = orderDetailContent?.getAttribute('data-order-id');
+             if (currentOrderId) {
+                 const order = orders.find(o => o.id === currentOrderId) || sampleOrders.find(o => o.id === currentOrderId);
+                 if (order) {
+                     document.getElementById('videoModalLocation').textContent = `${order.location} · 天台山`;
+                 }
+             }
+             
+             
+             // 生成模拟的视频URL
+             const videoUrl = generateSampleVideoUrl(currentSample.name);
+             const videoPlayer = document.getElementById('sampleVideoPlayer');
+             const videoSource = document.getElementById('videoSource');
+             
+             // 设置视频源并重置播放状态
+             videoSource.src = videoUrl;
+             videoPlayer.load();
+             videoPlayer.currentTime = 0;
+             
+             // 更新切换按钮状态
+             updateSampleNavigationButtons();
+             
+             // 更新进度指示器
+             updateSampleIndicators();
+             
+             // 自动开始播放
+             setTimeout(() => {
+                 videoPlayer.play().catch(error => {
+                     console.error('视频播放失败:', error);
+                     showToast('视频播放失败，请稍后重试');
+                 });
+             }, 300);
+         }
+
+        // 播放上一个样片
+        function playPreviousSample() {
+            if (currentOrderSamples.length <= 1) return;
+            currentSampleIndex = (currentSampleIndex - 1 + currentOrderSamples.length) % currentOrderSamples.length;
+            playCurrentSample();
+        }
+
+        // 播放下一个样片
+        function playNextSample() {
+            if (currentOrderSamples.length <= 1) return;
+            currentSampleIndex = (currentSampleIndex + 1) % currentOrderSamples.length;
+            playCurrentSample();
+        }
+
+        // 直接播放指定索引的样片
+        function playSpecificSample(index) {
+            if (index >= 0 && index < currentOrderSamples.length) {
+                currentSampleIndex = index;
+                playCurrentSample();
+            }
+        }
+
+         // 初始化样片播放器
+         function initializeSamplePlayer() {
+             // 隐藏底部导航栏
+             const bottomNav = document.getElementById('bottomNav');
+             if (bottomNav) {
+                 bottomNav.style.display = 'none';
+             }
+             
+             // 初始化进度指示器
+             updateSampleIndicators();
+         }
+
+         // 更新样片导航按钮状态
+         function updateSampleNavigationButtons() {
+             const prevBtn = document.getElementById('prevSampleBtn');
+             const nextBtn = document.getElementById('nextSampleBtn');
+             
+             if (currentOrderSamples.length <= 1) {
+                 prevBtn.style.display = 'none';
+                 nextBtn.style.display = 'none';
+             } else {
+                 prevBtn.style.display = 'flex';
+                 nextBtn.style.display = 'flex';
+             }
+         }
+         
+         // 更新样片进度指示器
+         function updateSampleIndicators() {
+             const indicatorsContainer = document.getElementById('sampleIndicators');
+             
+             if (currentOrderSamples.length <= 1) {
+                 indicatorsContainer.innerHTML = '';
+                 return;
+             }
+             
+             indicatorsContainer.innerHTML = currentOrderSamples.map((_, index) => `
+                 <button 
+                     class="w-2 h-2 rounded-full transition-colors duration-200 indicator-dot ${index === currentSampleIndex ? 'bg-white' : 'bg-white bg-opacity-30'}" 
+                     onclick="playSpecificSample(${index})"
+                     data-index="${index}"
+                 ></button>
+             `).join('');
+         }
+
+
+         // 关闭样片视频弹窗
+         function closeSampleVideo() {
+             const videoPlayer = document.getElementById('sampleVideoPlayer');
+             videoPlayer.pause();
+             videoPlayer.currentTime = 0; // 重置播放进度
+             document.getElementById('sampleVideoModal').classList.add('hidden');
+             
+             // 恢复底部导航栏显示
+             const bottomNav = document.getElementById('bottomNav');
+             if (bottomNav) {
+                 bottomNav.style.display = 'flex';
+             }
+             
+             // 重置全局变量
+             currentSampleIndex = 0;
+             currentOrderSamples = [];
+         }
+
+        // 键盘快捷键支持
+        document.addEventListener('keydown', function(e) {
+            const modal = document.getElementById('sampleVideoModal');
+            if (!modal.classList.contains('hidden')) {
+                switch(e.key) {
+                    case 'Escape':
+                        closeSampleVideo();
+                        break;
+                    case 'ArrowLeft':
+                        e.preventDefault();
+                        playPreviousSample();
+                        break;
+                    case 'ArrowRight':
+                        e.preventDefault();
+                        playNextSample();
+                        break;
+                    case ' ':
+                        e.preventDefault();
+                        const video = document.getElementById('sampleVideoPlayer');
+                        if (video.paused) {
+                            video.play();
+                        } else {
+                            video.pause();
+                        }
+                        break;
                 }
             }
+        });
+
+        // 生成样片视频URL（模拟）
+        function generateSampleVideoUrl(sampleName) {
+            // 实际项目中这里应该根据样片名称从数据库获取对应的视频URL
+            // 这里使用模拟的视频URL
+            const videoMappings = {
+                '香炉峰日出': 'https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4',
+                '香炉峰云海': 'https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_2mb.mp4',
+                '香炉峰晚霞': 'https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_3mb.mp4',
+                '涌泉寺大雄宝殿': 'https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_4mb.mp4',
+                '涌泉寺千年古塔': 'https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_5mb.mp4',
+                '摩崖石刻远景': 'https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_6mb.mp4',
+                '摩崖石刻细节': 'https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_7mb.mp4'
+            };
+            
+            return videoMappings[sampleName] || 'https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4';
         }
 
         // 显示小程序提示
@@ -1564,17 +2013,6 @@
             // 实际项目中这里应该调用下载API
         }
 
-        // 分享订单
-        function shareOrder(orderId) {
-            // 小程序分享功能
-            if (typeof wx !== 'undefined') {
-                wx.showShareMenu({
-                    withShareTicket: true
-                });
-            } else {
-                showToast('分享功能暂时不可用');
-            }
-        }
 
         // 显示客服电话
         function showServicePhone() {
@@ -1614,18 +2052,20 @@
             }
         });
 
-        // 检查登录状态并跳转到定制页面
-        function checkLoginAndGoToCustomize() {
-            const loginInfo = JSON.parse(localStorage.getItem('loginInfo') || '{}');
-            if (!loginInfo.isLoggedIn) {
-                // 未登录，设置返回URL并跳转到登录页面
-                localStorage.setItem('returnUrl', 'after-service.html');
-                location.href = 'login.html';
-            } else {
-                // 已登录，直接跳转到定制页面
-                location.href = 'after-service.html';
+        // 点击遮罩关闭二维码弹窗
+        document.getElementById('orderQRModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeOrderQR();
             }
-        }
+        });
+
+        // 点击遮罩关闭样片视频弹窗
+        document.getElementById('sampleVideoModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeSampleVideo();
+            }
+        });
+
     </script>
 </body>
 </html>
