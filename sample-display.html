@@ -4,17 +4,65 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>样片展示 - 无人机自助打卡</title>
-    <link href="assets/css/tailwind-custom.css" rel="stylesheet">
-    <link href="assets/css/font-awesome.min.css" rel="stylesheet">
-    <link href="assets/css/inter-font.css" rel="stylesheet">
-
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#1E40AF',
+                        accent: '#06B6D4',
+                        dark: '#1E293B',
+                        light: '#F8FAFC',
+                        'gray-medium': '#64748B',
+                        'gray-light': '#E2E8F0',
+                        success: '#10B981',
+                        warning: '#F59E0B',
+                        danger: '#EF4444',
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .touch-friendly {
+                touch-action: manipulation;
+                -webkit-tap-highlight-color: transparent;
+            }
+            .safe-area-bottom {
+                padding-bottom: constant(safe-area-inset-bottom);
+                padding-bottom: env(safe-area-inset-bottom);
+            }
+            .miniprogram-scroll {
+                -webkit-overflow-scrolling: touch;
+            }
+            .miniprogram-card {
+                box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+                border-radius: 8px;
+            }
+            .scrollbar-hide {
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
+            .scrollbar-hide::-webkit-scrollbar {
+                display: none;
+            }
+        }
+    </style>
 </head>
 <body class="font-inter bg-light text-dark antialiased touch-action-manipulation">
     <div class="min-h-screen w-full pb-16 safe-area-bottom">
         <!-- 顶部导航栏 -->
         <header class="sticky top-0 left-0 right-0 bg-white z-30 border-b border-gray-light">
             <div class="container mx-auto px-4 py-3 flex justify-center items-center">
-                <h1 class="text-lg font-medium">样片展示</h1>
+                <h1 class="font-bold text-dark">样片展示</h1>
             </div>
         </header>
 
@@ -140,7 +188,7 @@
                             <div class="text-xs text-gray-medium">¥148</div>
                         </div>
                     </div>
-                </div>
+                        </div>
                 
                 <!-- 回龙阁样片 -->
                 <div class="gallery-item miniprogram-card overflow-hidden touch-friendly" data-category="heritage" onclick="openModal('回龙阁建筑拍摄', '古典楼阁，建筑瑰宝，展现传统建筑的精美工艺', 'https://picsum.photos/id/1022/150/120', 'video', 'heritage')">
@@ -335,13 +383,13 @@
                 <div class="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center -mt-6 shadow-lg relative">
                     <i class="fa fa-camera text-lg"></i>
                 </div>
-                <span class="text-xs text-primary font-medium mt-1">拍摄</span>
+                <span class="text-xs text-gray-medium font-medium mt-1">拍摄</span>
             </div>
             <div class="tab-item flex flex-col items-center justify-center text-gray-medium touch-friendly" onclick="checkLoginAndGoToOrders()">
                 <i class="fa fa-list-alt text-lg mb-1"></i>
                 <span class="text-xs">订单</span>
             </div>
-            <div class="tab-item flex flex-col items-center justify-center text-gray-medium touch-friendly" onclick="checkLoginAndGoToProfile()">
+            <div class="tab-item flex flex-col items-center justify-center text-gray-medium touch-friendly" onclick="location.href='my-profile.html'">
                 <i class="fa fa-user text-lg mb-1"></i>
                 <span class="text-xs">我的</span>
             </div>
@@ -592,18 +640,6 @@
             }
         }
 
-        // 检查登录状态并跳转到个人页面
-        function checkLoginAndGoToProfile() {
-            const loginInfo = JSON.parse(localStorage.getItem('loginInfo') || '{}');
-            if (!loginInfo.isLoggedIn) {
-                // 未登录，设置返回URL并跳转到登录页面
-                localStorage.setItem('returnUrl', 'user-management.html');
-                location.href = 'login.html';
-            } else {
-                // 已登录，直接跳转到个人管理页面
-                location.href = 'user-management.html';
-            }
-        }
 
     </script>
 </body>

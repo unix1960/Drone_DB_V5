@@ -1165,11 +1165,11 @@
                 <span class="text-xs text-primary font-medium mt-1">拍摄</span>
             </div>
             <div class="tab-item flex flex-col items-center justify-center text-gray-medium touch-friendly" onclick="checkLoginAndGoToOrders()">
-                <i class="fa fa-user text-lg mb-1"></i>
+                <i class="fa fa-list-alt text-lg mb-1"></i>
                 <span class="text-xs">订单</span>
             </div>
-            <div class="tab-item flex flex-col items-center justify-center text-gray-medium touch-friendly" onclick="checkLoginAndGoToProfile()">
-                <i class="fa fa-user-circle text-lg mb-1"></i>
+            <div class="tab-item flex flex-col items-center justify-center text-gray-medium touch-friendly" onclick="location.href='my-profile.html'">
+                <i class="fa fa-user text-lg mb-1"></i>
                 <span class="text-xs">我的</span>
             </div>
         </div>
@@ -2181,18 +2181,6 @@
             }
         }
 
-        // 检查登录状态并跳转到我的页面
-        function checkLoginAndGoToProfile() {
-            const loginInfo = JSON.parse(localStorage.getItem('loginInfo') || '{}');
-            if (!loginInfo.isLoggedIn) {
-                // 未登录，设置返回URL并跳转到登录页面
-                localStorage.setItem('returnUrl', 'user-management.html');
-                location.href = 'login.html';
-            } else {
-                // 已登录，直接跳转到我的页面
-                location.href = 'user-management.html';
-            }
-        }
     </script>
 </body>
 </html>

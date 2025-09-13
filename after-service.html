@@ -69,8 +69,12 @@
     <div class="min-h-screen w-full safe-area-bottom content-container">
         <!-- 头部导航 -->
         <header class="bg-white border-b border-gray-light sticky top-0 z-40">
-            <div class="flex items-center justify-center h-14 px-4">
+            <div class="flex items-center justify-between h-14 px-4">
+                <button onclick="goBack()" class="touch-friendly p-2 -ml-2">
+                    <i class="fa fa-arrow-left text-xl text-dark"></i>
+                </button>
                 <h1 class="font-bold text-dark">成片定制</h1>
+                <div class="w-8"></div> <!-- 占位元素，保持标题居中 -->
             </div>
         </header>
 
@@ -393,37 +397,10 @@
     </div>
 
     <!-- 固定客服电话按钮 -->
-    <button onclick="callService()" class="fixed bottom-20 right-4 w-12 h-12 bg-primary text-white rounded-full shadow-lg z-40 flex items-center justify-center touch-friendly hover:bg-primary/90 transition-colors">
-        <i class="fa fa-phone text-lg"></i>
+    <button onclick="callService()" class="fixed bottom-6 right-6 w-14 h-14 bg-primary text-white rounded-full shadow-lg z-40 flex items-center justify-center touch-friendly hover:bg-primary/90 transition-colors">
+        <i class="fa fa-phone text-2xl"></i>
     </button>
 
-    <!-- 微信小程序底部导航栏 -->
-    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-light z-50 safe-area-bottom" id="bottomNav">
-        <div class="flex justify-around items-center h-16">
-            <div class="tab-item flex flex-col items-center justify-center text-gray-medium touch-friendly" onclick="location.href='index.html'">
-                <i class="fa fa-home text-lg mb-1"></i>
-                <span class="text-xs">首页</span>
-            </div>
-            <div class="tab-item flex flex-col items-center justify-center text-gray-medium touch-friendly" onclick="location.href='sample-display.html'">
-                <i class="fa fa-picture-o text-lg mb-1"></i>
-                <span class="text-xs">样片</span>
-            </div>
-            <div class="tab-item flex flex-col items-center justify-center touch-friendly" onclick="location.href='user-selection.html'">
-                <div class="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center -mt-6 shadow-lg relative">
-                    <i class="fa fa-camera text-lg"></i>
-                </div>
-                <span class="text-xs text-primary font-medium mt-1">拍摄</span>
-            </div>
-            <div class="tab-item flex flex-col items-center justify-center text-gray-medium touch-friendly" onclick="checkLoginAndGoToOrders()">
-                <i class="fa fa-user text-lg mb-1"></i>
-                <span class="text-xs">订单</span>
-            </div>
-            <div class="tab-item flex flex-col items-center justify-center text-primary touch-friendly active">
-                <i class="fa fa-star text-lg mb-1"></i>
-                <span class="text-xs">定制</span>
-            </div>
-        </div>
-    </nav>
 
     <!-- 预览弹窗 -->
     <div id="previewModal" class="fixed inset-0 bg-black bg-opacity-75 z-50 hidden flex items-center justify-center p-4">
@@ -604,9 +581,6 @@
             // 加载订单信息
             loadOrderInfo();
             
-            // 解决底部导航栏遮挡内容的问题
-            adjustContentPadding();
-            
             // 添加小程序风格的触摸反馈
             const touchElements = document.querySelectorAll('.touch-friendly');
             touchElements.forEach(element => {
@@ -645,42 +619,6 @@
             // 加载保存的草稿
             loadDraft();
         });
-
-        // 窗口大小变化时重新调整padding
-        window.addEventListener('resize', adjustContentPadding);
-
-        // 调整内容区域的padding-bottom以适应底部导航栏
-        function adjustContentPadding() {
-            const nav = document.getElementById('bottomNav');
-            const contentContainer = document.querySelector('.content-container');
-            
-            if (nav && contentContainer) {
-                // 获取导航栏的实际高度
-                const navHeight = nav.offsetHeight;
-                // 获取安全区域底部高度
-                const safeAreaBottom = getSafeAreaBottom();
-                // 设置内容区域底部内边距，确保内容不被导航栏遮挡
-                contentContainer.style.paddingBottom = `${navHeight + safeAreaBottom}px`;
-            }
-        }
-
-        // 获取安全区域底部高度
-        function getSafeAreaBottom() {
-            if (typeof window !== 'undefined' && window.screen) {
-                // 尝试从环境变量获取
-                const envSafeArea = getComputedStyle(document.documentElement).getPropertyValue('--safe-area-inset-bottom');
-                if (envSafeArea) {
-                    return parseFloat(envSafeArea);
-                }
-                
-                // 回退方案
-                return Math.max(
-                    0,
-                    window.innerHeight - document.documentElement.clientHeight
-                );
-            }
-            return 0;
-        }
 
 
 
@@ -1019,6 +957,17 @@
             } else {
                 // 已登录，直接跳转到订单页面
                 location.href = 'user-management.html';
+            }
+        }
+
+        // 回退功能
+        function goBack() {
+            // 优先使用浏览器历史记录
+            if (window.history.length > 1) {
+                window.history.back();
+            } else {
+                // 如果没有历史记录，返回到首页
+                location.href = 'index.html';
             }
         }
     </script>

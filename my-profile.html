@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>我的 - 无人机自助打卡</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#1E40AF',
+                        accent: '#06B6D4',
+                        dark: '#1E293B',
+                        light: '#F8FAFC',
+                        'gray-medium': '#64748B',
+                        'gray-light': '#E2E8F0',
+                        success: '#10B981',
+                        warning: '#F59E0B',
+                        danger: '#EF4444',
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .touch-friendly {
+                touch-action: manipulation;
+                -webkit-tap-highlight-color: transparent;
+            }
+            .safe-area-bottom {
+                padding-bottom: constant(safe-area-inset-bottom);
+                padding-bottom: env(safe-area-inset-bottom);
+            }
+        }
+    </style>
+    <style>
+        .miniprogram-card {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border-radius: 8px;
+        }
+        .menu-item {
+            transition: background-color 0.2s ease;
+        }
+        .menu-item:active {
+            background-color: #F1F5F9;
+        }
+        .avatar-container {
+            position: relative;
+        }
+        .avatar-badge {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+        .customer-service {
+            position: fixed;
+            bottom: 80px;
+            right: 1.5rem;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background-color: #3B82F6;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.5);
+            z-index: 50;
+        }
+        .customer-service:active {
+            transform: scale(0.95);
+        }
+        .logout-btn {
+            padding: 0.75rem;
+            font-size: 1rem;
+        }
+        .gender-option {
+            transition: all 0.2s ease;
+        }
+        .gender-option.selected {
+            background-color: #3B82F6;
+            color: white;
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #3B82F6;
+        }
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+    </style>
+</head>
+<body class="font-inter bg-light text-dark antialiased touch-action-manipulation">
+    <div class="min-h-screen w-full pb-16 safe-area-bottom">
+        <!-- 顶部导航栏 -->
+        <header class="sticky top-0 left-0 right-0 bg-white z-30 border-b border-gray-light">
+            <div class="container mx-auto px-4 py-3 flex justify-center items-center">
+                <h1 class="font-bold text-dark">我的</h1>
+            </div>
+        </header>
+
+        <!-- 用户信息区域 -->
+        <section class="bg-gradient-to-b from-blue-400 to-blue-500 p-6 relative overflow-hidden">
+            <div class="absolute inset-0 flex items-center justify-center">
+                <i class="fa fa-user text-white text-9xl opacity-10"></i>
+            </div>
+            <div class="relative z-10">
+                <div class="flex items-center mb-4">
+                    <div class="avatar-container">
+                        <img id="userAvatar" src="https://picsum.photos/id/1005/200/200" alt="用户头像" class="w-16 h-16 rounded-full object-cover border-2 border-white">
+                        <div class="avatar-badge bg-green-500 flex items-center justify-center text-white text-xs">
+                            <i class="fa fa-check"></i>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <h2 class="text-white font-bold text-xl" id="userName">游客</h2>
+                        <div class="flex items-center mt-1">
+                            <span class="text-white opacity-80 text-sm mr-3" id="userPhone">未登录</span>
+                            <span class="bg-white bg-opacity-20 text-white text-xs px-2 py-0.5 rounded-full" id="userLevel">普通用户</span>
+                        </div>
+                    </div>
+                </div>
+                
+                 <!-- 已登录状态 -->
+                 <div id="loggedInStats" class="grid grid-cols-3 gap-4 bg-white bg-opacity-10 backdrop-blur-sm rounded-xl p-3 hidden">
+                     <div class="text-center">
+                         <p class="text-white font-bold text-xl" id="userOrders">0</p>
+                         <p class="text-white opacity-80 text-xs">我的订单</p>
+                     </div>
+                     <div class="text-center">
+                         <p class="text-white font-bold text-xl" id="userSamples">0</p>
+                         <p class="text-white opacity-80 text-xs">选中样片</p>
+                     </div>
+                     <div class="text-center">
+                         <p class="text-white font-bold text-xl" id="userVideos">0</p>
+                         <p class="text-white opacity-80 text-xs">我的成片</p>
+                     </div>
+                 </div>
+                 
+                 <!-- 未登录状态 - 登录按钮 -->
+                 <div id="loginButton" class="text-center">
+                     <div class="bg-white bg-opacity-10 backdrop-blur-sm rounded-xl p-4 mb-4">
+                         <p class="text-white opacity-90 text-sm mb-3">登录后享受更多功能</p>
+                         <button onclick="goToLogin()" class="w-full bg-white text-primary py-3 px-4 rounded-lg font-medium touch-friendly shadow-lg">
+                             <i class="fa fa-sign-in mr-2"></i>立即登录
+                         </button>
+                     </div>
+                 </div>
+            </div>
+        </section>
+        
+        
+        <!-- 功能菜单 -->
+        <section class="px-4 mb-4">
+            <div class="miniprogram-card bg-white rounded-xl overflow-hidden">
+                <!-- 账户管理 -->
+                <div class="p-4">
+                    <h3 class="text-sm text-gray-medium mb-3">账户管理</h3>
+                    <div class="space-y-px">
+                        <div class="menu-item flex items-center justify-between p-3 bg-gray-50 touch-friendly" onclick="showProfileModal()">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                                    <i class="fa fa-user text-primary"></i>
+                                </div>
+                                <span>完善资料</span>
+                            </div>
+                            <i class="fa fa-angle-right text-gray-medium"></i>
+                        </div>
+                        <div class="menu-item flex items-center justify-between p-3 bg-gray-50 touch-friendly" onclick="showChangePasswordModal()">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center mr-3">
+                                    <i class="fa fa-lock text-red-500"></i>
+                                </div>
+                                <span>修改密码</span>
+                            </div>
+                            <i class="fa fa-angle-right text-gray-medium"></i>
+                        </div>
+                        <div class="menu-item flex items-center justify-between p-3 bg-gray-50 touch-friendly" onclick="showPrivacyModal()">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center mr-3">
+                                    <i class="fa fa-shield text-green-500"></i>
+                                </div>
+                                <span>隐私设置</span>
+                            </div>
+                            <i class="fa fa-angle-right text-gray-medium"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 帮助与支持 -->
+                <div class="p-4 border-t border-gray-light">
+                    <h3 class="text-sm text-gray-medium mb-3">帮助与支持</h3>
+                    <div class="space-y-px">
+                        <div class="menu-item flex items-center justify-between p-3 bg-gray-50 touch-friendly" onclick="showDisclaimerModal()">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 rounded-full bg-yellow-100 flex items-center justify-center mr-3">
+                                    <i class="fa fa-exclamation-triangle text-warning"></i>
+                                </div>
+                                <span>免责声明</span>
+                            </div>
+                            <i class="fa fa-angle-right text-gray-medium"></i>
+                        </div>
+                        <div class="menu-item flex items-center justify-between p-3 bg-gray-50 touch-friendly" onclick="showAboutUsModal()">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 rounded-full bg-cyan-100 flex items-center justify-center mr-3">
+                                    <i class="fa fa-info-circle text-cyan-500"></i>
+                                </div>
+                                <span>关于我们</span>
+                            </div>
+                            <i class="fa fa-angle-right text-gray-medium"></i>
+                        </div>
+                         <div class="menu-item flex items-center justify-between p-3 bg-gray-50 touch-friendly" onclick="addWechat()">
+                             <div class="flex items-center">
+                                 <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center mr-3">
+                                     <i class="fa fa-wechat text-green-500"></i>
+                                 </div>
+                                 <span>加入企业微信</span>
+                             </div>
+                             <i class="fa fa-angle-right text-gray-medium"></i>
+                         </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- 退出登录按钮 -->
+        <section id="logoutSection" class="px-4 mb-8 hidden">
+            <button class="logout-btn w-full bg-gray-light text-gray-medium py-3 rounded-lg font-medium touch-friendly" onclick="logout()">
+                退出登录
+            </button>
+        </section>
+        
+        <!-- 底部信息 -->
+        <div class="px-4 text-center text-xs text-gray-medium mb-4">
+            <p>欢迎使用无人机自助打卡 v1.0.0</p>
+            <p class="mt-1">© 2025 无人机自助打卡 版权所有</p>
+        </div>
+    </div>
+
+    <!-- 微信小程序底部导航栏 -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-light z-50 safe-area-bottom" id="bottomNav">
+        <div class="flex justify-around items-center h-16">
+            <div class="tab-item flex flex-col items-center justify-center text-gray-medium touch-friendly" onclick="location.href='index.html'">
+                <i class="fa fa-home text-lg mb-1"></i>
+                <span class="text-xs">首页</span>
+            </div>
+            <div class="tab-item flex flex-col items-center justify-center text-gray-medium touch-friendly" onclick="location.href='sample-display.html'">
+                <i class="fa fa-picture-o text-lg mb-1"></i>
+                <span class="text-xs">样片</span>
+            </div>
+            <div class="tab-item flex flex-col items-center justify-center touch-friendly" onclick="location.href='user-selection.html'">
+                <div class="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center -mt-6 shadow-lg relative">
+                    <i class="fa fa-camera text-lg"></i>
+                </div>
+                <span class="text-xs text-gray-medium font-medium mt-1">拍摄</span>
+            </div>
+            <div class="tab-item flex flex-col items-center justify-center text-gray-medium touch-friendly" onclick="checkLoginAndGoToOrders()">
+                <i class="fa fa-list-alt text-lg mb-1"></i>
+                <span class="text-xs">订单</span>
+            </div>
+            <div class="tab-item flex flex-col items-center justify-center text-primary touch-friendly active">
+                <i class="fa fa-user text-lg mb-1"></i>
+                <span class="text-xs">我的</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 完善资料弹窗 -->
+    <div id="profileModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
+        <div class="bg-white rounded-xl w-11/12 max-w-md p-5" style="max-height: 80vh; overflow-y: auto;">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold">完善资料</h3>
+                <button onclick="hideProfileModal()" class="text-gray-medium">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+            <form id="profileForm">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-medium mb-1">头像</label>
+                    <div class="flex items-center space-x-3">
+                        <img id="profileAvatar" src="https://picsum.photos/id/1005/200/200" alt="头像" class="w-16 h-16 rounded-full object-cover border-2 border-gray-light">
+                        <button type="button" onclick="changeAvatar()" class="px-4 py-2 bg-gray-light text-dark rounded-lg text-sm">
+                            更换头像
+                        </button>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label for="profileName" class="block text-sm font-medium text-gray-medium mb-1">姓名</label>
+                    <input type="text" id="profileName" class="w-full px-4 py-2 border border-gray-light rounded-lg" placeholder="请输入您的姓名">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-medium mb-1">性别</label>
+                    <div class="flex space-x-3">
+                        <button type="button" class="gender-option flex-1 py-2 px-4 border border-gray-light rounded-lg text-center" data-gender="male">
+                            <i class="fa fa-mars mr-1"></i>男
+                        </button>
+                        <button type="button" class="gender-option flex-1 py-2 px-4 border border-gray-light rounded-lg text-center" data-gender="female">
+                            <i class="fa fa-venus mr-1"></i>女
+                        </button>
+
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label for="profilePhone" class="block text-sm font-medium text-gray-medium mb-1">手机号</label>
+                    <input type="tel" id="profilePhone" class="w-full px-4 py-2 border border-gray-light rounded-lg" placeholder="请输入手机号" readonly>
+                    <p class="text-xs text-gray-medium mt-1">手机号不可修改</p>
+                </div>
+                <div class="mb-4">
+                    <label for="profileEmail" class="block text-sm font-medium text-gray-medium mb-1">邮箱（可选）</label>
+                    <input type="email" id="profileEmail" class="w-full px-4 py-2 border border-gray-light rounded-lg" placeholder="请输入邮箱地址">
+                </div>
+                <div class="flex space-x-3 mt-6">
+                    <button type="button" onclick="hideProfileModal()" class="flex-1 bg-gray-light text-dark py-2 rounded-lg">取消</button>
+                    <button type="submit" class="flex-1 bg-primary text-white py-2 rounded-lg">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 修改密码弹窗 -->
+    <div id="passwordModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
+        <div class="bg-white rounded-xl w-11/12 max-w-md p-5">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold">修改密码</h3>
+                <button onclick="hideChangePasswordModal()" class="text-gray-medium">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+            <form id="changePasswordForm">
+                <div class="mb-4">
+                    <label for="oldPassword" class="block text-sm font-medium text-gray-medium mb-1">原密码</label>
+                    <input type="password" id="oldPassword" class="w-full px-4 py-2 border border-gray-light rounded-lg" placeholder="请输入原密码">
+                </div>
+                <div class="mb-4">
+                    <label for="newPassword" class="block text-sm font-medium text-gray-medium mb-1">新密码</label>
+                    <input type="password" id="newPassword" class="w-full px-4 py-2 border border-gray-light rounded-lg" placeholder="请输入新密码">
+                </div>
+                <div class="mb-4">
+                    <label for="confirmPassword" class="block text-sm font-medium text-gray-medium mb-1">确认密码</label>
+                    <input type="password" id="confirmPassword" class="w-full px-4 py-2 border border-gray-light rounded-lg" placeholder="请再次输入新密码">
+                </div>
+                <div class="flex space-x-3 mt-6">
+                    <button type="button" onclick="hideChangePasswordModal()" class="flex-1 bg-gray-light text-dark py-2 rounded-lg">取消</button>
+                    <button type="submit" class="flex-1 bg-primary text-white py-2 rounded-lg">确认</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 隐私设置弹窗 -->
+    <div id="privacyModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
+        <div class="bg-white rounded-xl w-11/12 max-w-md p-5">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold">隐私设置</h3>
+                <button onclick="hidePrivacyModal()" class="text-gray-medium">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+            <div class="space-y-4">
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div class="flex-1">
+                        <h4 class="font-medium text-dark">允许用于宣传推广</h4>
+                        <p class="text-sm text-gray-medium mt-1">允许将您的成片用于平台宣传和推广活动</p>
+                    </div>
+                    <label class="switch ml-3">
+                        <input type="checkbox" id="allowPromotion" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div class="flex-1">
+                        <h4 class="font-medium text-dark">接收推送通知</h4>
+                        <p class="text-sm text-gray-medium mt-1">接收订单状态、优惠活动等推送消息</p>
+                    </div>
+                    <label class="switch ml-3">
+                        <input type="checkbox" id="allowNotification" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div class="flex-1">
+                        <h4 class="font-medium text-dark">分享位置信息</h4>
+                        <p class="text-sm text-gray-medium mt-1">允许获取位置信息以提供更好的服务</p>
+                    </div>
+                    <label class="switch ml-3">
+                        <input type="checkbox" id="allowLocation" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+            <div class="mt-6">
+                <button onclick="savePrivacySettings()" class="w-full bg-primary text-white py-3 rounded-lg font-medium">
+                    保存设置
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 免责声明弹窗 -->
+    <div id="disclaimerModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
+        <div class="bg-white rounded-xl w-11/12 max-w-md p-5" style="max-height: 80vh; overflow-y: auto;">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold">免责声明</h3>
+                <button onclick="hideDisclaimerModal()" class="text-gray-medium">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+            <div class="text-sm text-gray-medium space-y-4">
+                <div>
+                    <h4 class="font-medium text-dark mb-2">1. 服务说明</h4>
+                    <p>无人机自助打卡服务是一项基于无人机技术的航拍服务，旨在为用户提供高质量的航拍照片和视频。</p>
+                </div>
+                <div>
+                    <h4 class="font-medium text-dark mb-2">2. 安全责任</h4>
+                    <p>用户在使用服务过程中应遵守相关法律法规，确保人身和财产安全。因用户违规操作或不当行为导致的任何损失，平台不承担责任。</p>
+                </div>
+                <div>
+                    <h4 class="font-medium text-dark mb-2">3. 天气因素</h4>
+                    <p>无人机飞行受天气条件影响，如遇恶劣天气（大风、雨雪、雾霾等），为确保安全，服务可能延期或取消。</p>
+                </div>
+                <div>
+                    <h4 class="font-medium text-dark mb-2">4. 设备故障</h4>
+                    <p>因设备故障、技术问题或不可抗力因素导致的服务中断或质量问题，平台将尽力补救，但不承担超出服务费用的额外赔偿责任。</p>
+                </div>
+                <div>
+                    <h4 class="font-medium text-dark mb-2">5. 内容版权</h4>
+                    <p>拍摄内容的版权归用户所有，但用户授权平台在宣传推广中使用（可在隐私设置中关闭）。</p>
+                </div>
+                <div>
+                    <h4 class="font-medium text-dark mb-2">6. 隐私保护</h4>
+                    <p>平台承诺保护用户隐私信息，不会泄露用户个人信息给第三方。</p>
+                </div>
+                <div>
+                    <h4 class="font-medium text-dark mb-2">7. 服务变更</h4>
+                    <p>平台保留随时修改或终止服务的权利，如有重大变更将提前通知用户。</p>
+                </div>
+                <p class="text-xs text-gray-400 mt-4">本声明的最终解释权归无人机自助打卡平台所有。</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 关于我们弹窗 -->
+    <div id="aboutUsModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
+        <div class="bg-white rounded-xl w-11/12 max-w-md p-5" style="max-height: 80vh; overflow-y: auto;">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold">关于我们</h3>
+                <button onclick="hideAboutUsModal()" class="text-gray-medium">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+            <div class="space-y-4">
+                <div class="text-center mb-4">
+                    <div class="w-20 h-20 mx-auto bg-primary/10 rounded-full flex items-center justify-center mb-2">
+                        <i class="fa fa-paper-plane text-primary text-3xl"></i>
+                    </div>
+                    <h4 class="font-bold text-lg">无人机自助打卡</h4>
+                    <p class="text-sm text-gray-medium">版本 1.0.0</p>
+                </div>
+                
+                <div class="text-sm text-gray-medium">
+                    <p class="mb-3">无人机自助打卡是一个创新的景区服务解决方案，通过先进的无人机技术为景区游客提供专业的高空摄影和视频拍摄服务。</p>
+                    <p class="mb-3">我们致力于通过科技手段提升旅游体验，让每一位游客都能轻松获得专业级的航拍作品，记录美好的旅行时光。</p>
+                    <p class="mb-3">平台特色：</p>
+                    <ul class="list-disc list-inside space-y-1 mb-3">
+                        <li>专业航拍设备，4K高清画质</li>
+                        <li>AI智能构图，自动优化拍摄角度</li>
+                        <li>多样化样片选择，满足不同需求</li>
+                        <li>快速交付，即拍即得</li>
+                        <li>安全可靠，专业团队运维</li>
+                    </ul>
+                </div>
+                
+                <div class="border-t border-gray-light pt-4">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-sm">官方网站</span>
+                        <span class="text-primary text-sm">www.drone-selfie.com</span>
+                    </div>
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-sm">客服热线</span>
+                        <span class="text-primary text-sm">400-888-6666</span>
+                    </div>
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-sm">商务合作</span>
+                        <span class="text-primary text-sm">business@drone-selfie.com</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm">技术支持</span>
+                        <span class="text-primary text-sm">support@drone-selfie.com</span>
+                    </div>
+                </div>
+                
+                <div class="text-center text-xs text-gray-400 pt-4 border-t border-gray-light">
+                    <p>© 2025 无人机自助打卡 版权所有</p>
+                    <p class="mt-1">让科技点亮您的旅行时光</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 客服热线浮动按钮 -->
+    <button class="customer-service" onclick="callCustomerService()">
+        <i class="fa fa-phone"></i>
+    </button>
+
+    <script>
+        // 模拟用户数据
+        let userData = {
+            isLoggedIn: false,
+            name: '',
+            phone: '',
+            email: '',
+            gender: '',
+            avatar: 'https://picsum.photos/id/1005/200/200',
+            orders: 0,
+            samples: 0,
+            videos: 0,
+            allowPromotion: true,
+            allowNotification: true,
+            allowLocation: true
+        };
+
+        // 初始化页面
+        document.addEventListener('DOMContentLoaded', function() {
+            // 检查登录状态
+            checkLoginStatus();
+            
+            // 绑定事件监听器
+            bindEventListeners();
+            
+            // 加载用户数据
+            loadUserData();
+            
+            // 添加小程序风格的触摸反馈
+            addTouchFeedback();
+        });
+
+        // 检查登录状态
+        function checkLoginStatus() {
+            const loginInfo = JSON.parse(localStorage.getItem('loginInfo') || '{}');
+            userData.isLoggedIn = loginInfo.isLoggedIn || false;
+            
+            if (userData.isLoggedIn) {
+                userData.phone = loginInfo.phone || '';
+                // 显示已登录状态
+                document.getElementById('loggedInStats').classList.remove('hidden');
+                document.getElementById('loginButton').classList.add('hidden');
+                document.getElementById('logoutSection').classList.remove('hidden');
+                updateUserDisplay();
+            } else {
+                // 显示未登录状态
+                document.getElementById('loggedInStats').classList.add('hidden');
+                document.getElementById('loginButton').classList.remove('hidden');
+                document.getElementById('logoutSection').classList.add('hidden');
+            }
+        }
+
+        // 更新用户显示信息
+        function updateUserDisplay() {
+            document.getElementById('userName').textContent = userData.name || '用户';
+            document.getElementById('userPhone').textContent = userData.phone || '未绑定手机';
+            document.getElementById('userLevel').textContent = userData.isLoggedIn ? '注册用户' : '游客';
+            document.getElementById('userAvatar').src = userData.avatar;
+            document.getElementById('userOrders').textContent = userData.orders;
+            document.getElementById('userSamples').textContent = userData.samples;
+            document.getElementById('userVideos').textContent = userData.videos;
+        }
+
+        // 加载用户数据
+        function loadUserData() {
+            const savedData = JSON.parse(localStorage.getItem('userData') || '{}');
+            userData = { ...userData, ...savedData };
+            updateUserDisplay();
+        }
+
+        // 保存用户数据
+        function saveUserData() {
+            localStorage.setItem('userData', JSON.stringify(userData));
+        }
+
+        // 绑定事件监听器
+        function bindEventListeners() {
+            // 完善资料表单
+            document.getElementById('profileForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                saveProfile();
+            });
+
+            // 修改密码表单
+            document.getElementById('changePasswordForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                changePassword();
+            });
+
+            // 性别选择
+            document.querySelectorAll('.gender-option').forEach(button => {
+                button.addEventListener('click', function() {
+                    document.querySelectorAll('.gender-option').forEach(btn => btn.classList.remove('selected'));
+                    this.classList.add('selected');
+                    userData.gender = this.dataset.gender;
+                });
+            });
+
+            // 点击弹窗外部关闭
+            const modals = ['profileModal', 'passwordModal', 'privacyModal', 'disclaimerModal', 'aboutUsModal'];
+            modals.forEach(modalId => {
+                document.getElementById(modalId).addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        this.classList.add('hidden');
+                    }
+                });
+            });
+        }
+
+        // 添加触摸反馈
+        function addTouchFeedback() {
+            const touchElements = document.querySelectorAll('.touch-friendly');
+            touchElements.forEach(element => {
+                element.addEventListener('touchstart', function() {
+                    this.style.opacity = '0.7';
+                    this.style.transform = 'scale(0.95)';
+                });
+                
+                element.addEventListener('touchend', function() {
+                    this.style.opacity = '1';
+                    this.style.transform = 'scale(1)';
+                });
+                
+                element.addEventListener('touchcancel', function() {
+                    this.style.opacity = '1';
+                    this.style.transform = 'scale(1)';
+                });
+            });
+        }
+
+        // 跳转到登录页面
+        function goToLogin() {
+            localStorage.setItem('returnUrl', 'my-profile.html');
+            location.href = 'login.html';
+        }
+
+        // 显示完善资料弹窗
+        function showProfileModal() {
+            if (!userData.isLoggedIn) {
+                showToast('请先登录');
+                return;
+            }
+            
+            // 填充现有数据
+            document.getElementById('profileName').value = userData.name || '';
+            document.getElementById('profilePhone').value = userData.phone || '';
+            document.getElementById('profileEmail').value = userData.email || '';
+            document.getElementById('profileAvatar').src = userData.avatar;
+            
+            // 设置性别选择
+            if (userData.gender) {
+                document.querySelectorAll('.gender-option').forEach(btn => {
+                    btn.classList.remove('selected');
+                    if (btn.dataset.gender === userData.gender) {
+                        btn.classList.add('selected');
+                    }
+                });
+            }
+            
+            document.getElementById('profileModal').classList.remove('hidden');
+        }
+
+        // 隐藏完善资料弹窗
+        function hideProfileModal() {
+            document.getElementById('profileModal').classList.add('hidden');
+        }
+
+        // 保存用户资料
+        function saveProfile() {
+            const name = document.getElementById('profileName').value.trim();
+            const email = document.getElementById('profileEmail').value.trim();
+            
+            if (!name) {
+                showToast('请输入姓名');
+                return;
+            }
+            
+            if (email && !isValidEmail(email)) {
+                showToast('请输入正确的邮箱格式');
+                return;
+            }
+            
+            userData.name = name;
+            userData.email = email;
+            
+            saveUserData();
+            updateUserDisplay();
+            hideProfileModal();
+            showToast('资料保存成功');
+        }
+
+        // 更换头像
+        function changeAvatar() {
+            // 模拟头像更换，实际项目中应该调用图片上传API
+            const avatarIds = [1005, 1006, 1011, 1012, 1013, 1014, 1015, 1016];
+            const randomId = avatarIds[Math.floor(Math.random() * avatarIds.length)];
+            const newAvatar = `https://picsum.photos/id/${randomId}/200/200`;
+            
+            userData.avatar = newAvatar;
+            document.getElementById('profileAvatar').src = newAvatar;
+            document.getElementById('userAvatar').src = newAvatar;
+            showToast('头像更换成功');
+        }
+
+        // 显示修改密码弹窗
+        function showChangePasswordModal() {
+            if (!userData.isLoggedIn) {
+                showToast('请先登录');
+                return;
+            }
+            document.getElementById('passwordModal').classList.remove('hidden');
+        }
+
+        // 隐藏修改密码弹窗
+        function hideChangePasswordModal() {
+            document.getElementById('passwordModal').classList.add('hidden');
+            // 清空表单
+            document.getElementById('oldPassword').value = '';
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmPassword').value = '';
+        }
+
+        // 修改密码
+        function changePassword() {
+            const oldPassword = document.getElementById('oldPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            if (!oldPassword || !newPassword || !confirmPassword) {
+                showToast('请填写所有密码字段');
+                return;
+            }
+            
+            if (newPassword.length < 6) {
+                showToast('新密码长度至少6位');
+                return;
+            }
+            
+            if (newPassword !== confirmPassword) {
+                showToast('新密码与确认密码不一致');
+                return;
+            }
+            
+            // 模拟API调用
+            setTimeout(() => {
+                hideChangePasswordModal();
+                showToast('密码修改成功');
+            }, 500);
+        }
+
+        // 显示隐私设置弹窗
+        function showPrivacyModal() {
+            // 加载当前设置
+            document.getElementById('allowPromotion').checked = userData.allowPromotion;
+            document.getElementById('allowNotification').checked = userData.allowNotification;
+            document.getElementById('allowLocation').checked = userData.allowLocation;
+            
+            document.getElementById('privacyModal').classList.remove('hidden');
+        }
+
+        // 隐藏隐私设置弹窗
+        function hidePrivacyModal() {
+            document.getElementById('privacyModal').classList.add('hidden');
+        }
+
+        // 保存隐私设置
+        function savePrivacySettings() {
+            userData.allowPromotion = document.getElementById('allowPromotion').checked;
+            userData.allowNotification = document.getElementById('allowNotification').checked;
+            userData.allowLocation = document.getElementById('allowLocation').checked;
+            
+            saveUserData();
+            hidePrivacyModal();
+            showToast('隐私设置已保存');
+        }
+
+        // 显示免责声明弹窗
+        function showDisclaimerModal() {
+            document.getElementById('disclaimerModal').classList.remove('hidden');
+        }
+
+        // 隐藏免责声明弹窗
+        function hideDisclaimerModal() {
+            document.getElementById('disclaimerModal').classList.add('hidden');
+        }
+
+        // 显示关于我们弹窗
+        function showAboutUsModal() {
+            document.getElementById('aboutUsModal').classList.remove('hidden');
+        }
+
+        // 隐藏关于我们弹窗
+        function hideAboutUsModal() {
+            document.getElementById('aboutUsModal').classList.add('hidden');
+        }
+
+         // 拨打客服电话
+         function callCustomerService() {
+             if (typeof wx !== 'undefined') {
+                 wx.makePhoneCall({
+                     phoneNumber: '400-888-6666'
+                 });
+             } else {
+                 window.open('tel:400-888-6666');
+             }
+         }
+
+         // 添加企业微信
+         function addWechat() {
+             // 小程序中的微信联系逻辑
+             if (typeof wx !== 'undefined') {
+                 wx.showModal({
+                     title: '加入企业微信',
+                     content: '请搜索企业微信号：DroneVideo2025 或扫描二维码添加，我们将通过企业微信发送您的拍摄成片。',
+                     showCancel: false
+                 });
+             } else {
+                 showToast('请搜索企业微信号：DroneVideo2025 或扫描二维码添加');
+                 // 也可以显示二维码弹窗
+                 showWechatQRModal();
+             }
+         }
+
+         // 显示企业微信二维码弹窗
+         function showWechatQRModal() {
+             const modal = document.createElement('div');
+             modal.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center';
+             modal.innerHTML = `
+                 <div class="bg-white rounded-xl w-11/12 max-w-sm p-6 text-center">
+                     <h3 class="text-lg font-bold mb-4">加入企业微信</h3>
+                     <div class="w-48 h-48 mx-auto mb-4 bg-gray-100 rounded-lg flex items-center justify-center">
+                         <div class="text-center">
+                             <i class="fa fa-qrcode text-4xl text-gray-400 mb-2"></i>
+                             <p class="text-sm text-gray-medium">企业微信二维码</p>
+                         </div>
+                     </div>
+                     <p class="text-sm text-gray-medium mb-4">扫描二维码或搜索企业微信号</p>
+                     <p class="text-primary font-medium mb-4">DroneVideo2025</p>
+                     <button onclick="this.closest('.fixed').remove()" class="w-full bg-primary text-white py-2 rounded-lg">
+                         我知道了
+                     </button>
+                 </div>
+             `;
+             document.body.appendChild(modal);
+             
+             // 点击背景关闭
+             modal.addEventListener('click', function(e) {
+                 if (e.target === this) {
+                     document.body.removeChild(this);
+                 }
+             });
+         }
+
+        // 退出登录
+        function logout() {
+            if (confirm('确定要退出登录吗？')) {
+                localStorage.removeItem('loginInfo');
+                userData.isLoggedIn = false;
+                showToast('已退出登录');
+                setTimeout(() => {
+                    location.reload();
+                }, 1000);
+            }
+        }
+
+        // 检查登录状态并跳转到订单页面
+        function checkLoginAndGoToOrders() {
+            const loginInfo = JSON.parse(localStorage.getItem('loginInfo') || '{}');
+            if (!loginInfo.isLoggedIn) {
+                localStorage.setItem('returnUrl', 'user-management.html');
+                location.href = 'login.html';
+            } else {
+                location.href = 'user-management.html';
+            }
+        }
+
+        // 验证邮箱格式
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        // 显示提示信息
+        function showToast(message, duration = 2000) {
+            // 小程序环境
+            if (typeof wx !== 'undefined') {
+                wx.showToast({
+                    title: message,
+                    icon: 'none',
+                    duration: duration
+                });
+                return;
+            }
+            
+            // 浏览器环境
+            const toast = document.createElement('div');
+            toast.className = 'fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black/80 text-white px-4 py-2 rounded-lg z-[9999] text-sm';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                if (document.body.contains(toast)) {
+                    document.body.removeChild(toast);
+                }
+            }, duration);
+        }
+    </script>
+</body>
+</html>
